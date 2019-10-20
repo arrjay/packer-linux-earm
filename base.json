@@ -1,0 +1,29 @@
+{
+	"variables": {
+	},
+	"builders": [{
+		"type": "arm-image",
+		"iso_url": "./2019-09-26-raspbian-buster-lite.zip",
+		"iso_checksum_type": "sha256",
+		"iso_checksum": "a50237c2f718bd8d806b96df5b9d2174ce8b789eda1f03434ed2213bbca6c6ff",
+		"target_image_size": 4294967296,
+		"output_directory": "base-image"
+	}],
+	"provisioners": [
+		{
+			"type": "file",
+			"source": "./ssh_id",
+			"destination": "/tmp/SSH_PUB"
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"scripts": [
+				"./scripts/common/apt-upgrade.sh",
+				"./scripts/common/login-config.sh"
+			],
+			"skip_clean": true
+		}
+	]
+}
