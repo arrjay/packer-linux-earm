@@ -1,0 +1,3 @@
+[submodule "vendor/dotfiles"]
+	path = vendor/dotfiles
+	url = http://github.com/arrjay/dotfiles.git
