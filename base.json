@@ -21,7 +21,9 @@
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/common/apt-upgrade.sh",
-				"./scripts/common/login-config.sh"
+				"./scripts/common/packages.sh",
+				"./scripts/common/login-config.sh",
+				"./scripts/common/i18n.sh"
 			],
 			"skip_clean": true
 		}

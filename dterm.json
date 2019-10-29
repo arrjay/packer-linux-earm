@@ -1,0 +1,23 @@
+{
+	"variables": {
+	},
+	"builders": [{
+		"type": "arm-image",
+		"image_type": "raspberrypi",
+		"iso_url": "./base-image/image",
+		"iso_checksum_type": "none",
+		"target_image_size": 4294967296,
+		"output_directory": "dterm-image"
+	}],
+	"provisioners": [
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"scripts": [
+				"./scripts/install-dterm.sh"
+			],
+			"skip_clean": true
+		}
+	]
+}

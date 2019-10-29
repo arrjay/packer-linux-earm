@@ -3,6 +3,7 @@
 set -e
 
 u=ejusdem
+h='$6$6fGmOsJL.Ql5uGyI$GLLkrlJRnvkqKDf35.3QfI219fD1/RYTaV1qbHk9Mm.tuMDF17tQ38pPoD/inTo633u8Yq36FDyirlVJKQ3ed.'
 
 # install augtool
 apt-get -qq -y install augeas-tools
@@ -29,3 +30,7 @@ touch /boot/ssh
 rm -f /etc/sudoers.d/010_pi-nopasswd
 printf '%s ALL=(ALL) NOPASSWD: ALL\n' $u > /etc/sudoers.d/010_$u-nopasswd
 chmod 0440 /etc/sudoers.d/010_$u-nopasswd
+
+# set password for user and root to hash from top
+usermod -p $h root
+usermod -p $h $u
