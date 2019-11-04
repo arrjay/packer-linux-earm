@@ -19,9 +19,27 @@
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [ "mkdir /etc/skel/.bash.d" ],
+			"skip_clean": true
+		},
+		{
+			"type": "file",
+			"source": "./vendor/dotfiles/bashrc",
+			"destination": "/etc/skel/.bashrc"
+		},
+		{
+			"type": "file",
+			"source": "./vendor/dotfiles/bash.d/",
+			"destination": "/etc/skel/.bash.d/"
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/common/apt-upgrade.sh",
 				"./scripts/common/packages.sh",
+				"./scripts/common/base-network.sh",
 				"./scripts/common/login-config.sh",
 				"./scripts/common/i18n.sh"
 			],
