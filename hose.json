@@ -1,6 +1,9 @@
 {
 	"variables": {
+          "ups_root_password": "changeit",
+          "ups_mon_password": "public"
 	},
+        "sensitive-variables": [ "ups_root_password", "ups_mon_password" ],
 	"builders": [{
 		"type": "arm-image",
 		"image_type": "raspberrypi",
@@ -12,7 +15,9 @@
 	"provisioners": [
 		{
 			"type": "shell",
-			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                              "UPS_ROOT_PASSWORD={{user `ups_root_password`}}",
+                                              "UPS_MON_PASSWORD={user `ups_mon_password`}}" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/hose.sh"
