@@ -1,7 +1,8 @@
 {
 	"variables": {
           "ups_root_password": "changeit",
-          "ups_mon_password": "public"
+          "ups_mon_password": "public",
+          "synergy_version": "1.10.3.stable_b84+ca35737a"
 	},
         "sensitive-variables": [ "ups_root_password", "ups_mon_password" ],
 	"builders": [{
@@ -13,6 +14,11 @@
 		"output_directory": "gloves"
 	}],
 	"provisioners": [
+		{
+			"type": "file",
+			"source": "./vendor/no-redist/synergy_{{user `synergy_version`}}_raspbian_armhf.deb",
+			"destination": "/tmp/synergy.deb"
+		},
 		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",

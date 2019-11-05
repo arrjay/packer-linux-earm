@@ -53,3 +53,7 @@ printf '[SeatDefaults]\nautologin-user=%s\n' $u > /etc/lightdm/lightdm.conf.d/au
 mkdir -p /home/$u/.config/autostart
 printf '[Desktop Entry]\nHidden=true\n' > /home/$u/.config/autostart/light-locker.desktop
 chown -R $u:$u /home/$u
+
+# install synergy
+dpkg -i /tmp/synergy.deb || true
+apt-get install -qq -y -f
