@@ -1,4 +1,5 @@
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
+GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 base-image/image: base.json $(COMMON_SCRIPTS)
 	-rm -rf base-image
 	packer build base.json
@@ -19,6 +20,6 @@ hose/image: dterm-image/image hose.json scripts/hose.sh
 	-rm -rf hose
 	packer build hose.json
 
-gloves/image: xfce-image/image gloves.json scripts/gloves.sh
+gloves/image: xfce-image/image gloves.json scripts/gloves.sh $(GLOVES_SECRETS)
 	-rm -rf gloves
 	packer build gloves.json

@@ -1,6 +1,14 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
+
+# copy stable host keys to image
+ln -s /dev/null /etc/systemd/system/regenerate_ssh_host_keys.service
+mv /tmp/gloves/ssh_host_*_key /etc/ssh
+chmod 0600 /etc/ssh/ssh_host_*_key
+for k in /etc/ssh/ssh_host_*_key ; do
+  [[ -f $k ]] && ssh-keygen -y -f $k > $k.pub
+done
 
 # install nut for ups fun...
 apt-get install -qq -y nut nut-monitor apg
@@ -57,3 +65,18 @@ chown -R $u:$u /home/$u
 # install synergy
 dpkg -i /tmp/synergy.deb || true
 apt-get install -qq -y -f
+
+# create use for ssh tunneling of synergy
+u=tunnel
+groupadd $u
+useradd -g $u $u
+mkdir -p /home/$u/.ssh
+
+# restrict this user to allow the synergy port, 24800 via ssh authorized_key wrangling
+p=24800
+while read -r t k r ; do
+  case $t in ssh-*) : ;; *) continue ;; esac
+  printf 'command="/bin/true",restrict,port-forwarding,permitopen="localhost:%s",permitopen="127.0.0.1:%s" %s %s %s\n' $p $p $t $k $r > /home/$u/.ssh/authorized_keys
+done < /tmp/gloves/sshpub_tunnel_keys
+
+chown -R $u:$u /home/$u

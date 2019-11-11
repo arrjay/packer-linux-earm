@@ -16,6 +16,11 @@
 	"provisioners": [
 		{
 			"type": "file",
+			"source": "./secrets/gloves",
+			"destination": "/tmp"
+		},
+		{
+			"type": "file",
 			"source": "./vendor/no-redist/synergy_{{user `synergy_version`}}_raspbian_armhf.deb",
 			"destination": "/tmp/synergy.deb"
 		},
@@ -23,7 +28,7 @@
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
                                               "UPS_ROOT_PASSWORD={{user `ups_root_password`}}",
-                                              "UPS_MON_PASSWORD={user `ups_mon_password`}}" ],
+                                              "UPS_MON_PASSWORD={{user `ups_mon_password`}}" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/gloves.sh"
