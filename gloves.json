@@ -16,6 +16,11 @@
 	"provisioners": [
 		{
 			"type": "file",
+			"source": "./secrets/common",
+			"destination": "/tmp"
+		},
+		{
+			"type": "file",
 			"source": "./secrets/gloves",
 			"destination": "/tmp"
 		},
@@ -31,6 +36,7 @@
                                               "UPS_MON_PASSWORD={{user `ups_mon_password`}}" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
+				"./scripts/common/etherwake.sh",
 				"./scripts/gloves.sh"
 			],
 			"skip_clean": true
