@@ -39,6 +39,7 @@
 			"scripts": [
 				"./scripts/common/apt-upgrade.sh",
 				"./scripts/common/packages.sh",
+				"./scripts/common/ssm.sh",
 				"./scripts/common/base-network.sh",
 				"./scripts/common/login-config.sh",
 				"./scripts/common/i18n.sh"
