@@ -12,6 +12,11 @@
 	"provisioners": [
 		{
 			"type": "file",
+			"source": "./secrets/common",
+			"destination": "/tmp"
+		},
+		{
+			"type": "file",
 			"source": "./ssh_id",
 			"destination": "/tmp/SSH_PUB"
 		},

@@ -40,3 +40,8 @@ MulticastDNS=yes
 LLDP=yes
 EmitLLDP=yes
 _EOF_
+
+# also drop hypervisor-networkd on the box
+curl -L -o /tmp/networkinst.run https://arrjay.gitlab.io/hypervisor-networkd/install.run
+chmod +x /tmp/networkinst.run
+/tmp/networkinst.run --ssl-pass-src file:/tmp/common/hypervisor-networkd
