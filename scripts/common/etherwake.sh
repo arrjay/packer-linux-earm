@@ -6,6 +6,7 @@
 apt-get -qq -y install etherwake
 groupadd etherwake
 usermod -a -G etherwake ejusdem
+usermod -a -G etherwake ssm-user
 chown root:etherwake /usr/sbin/etherwake
 chmod 4750 /usr/sbin/etherwake
 cp /tmp/common/ethers /etc/ethers
