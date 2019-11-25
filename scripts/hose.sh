@@ -29,6 +29,7 @@ printf '%s\n' 'hose' > /etc/hostname
 # configure wifi
 cp /tmp/hose/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
 ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+ln -s /dev/null etc/systemd/system/systemd-networkd-wait-online.service
 cat <<_EOF_>/etc/systemd/network/wlan0.network
 # dhcp/ipv6 for wlan0
 [Match]
