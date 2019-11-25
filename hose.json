@@ -14,6 +14,11 @@
 	}],
 	"provisioners": [
 		{
+			"type": "file",
+			"source": "./secrets/hose",
+			"destination": "/tmp"
+		},
+		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
                                               "UPS_ROOT_PASSWORD={{user `ups_root_password`}}",

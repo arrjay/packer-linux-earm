@@ -14,7 +14,7 @@ passwd -l pi
 # add ejusdem user
 groupadd $u
 useradd -g $u $u
-for g in dialout i2c systemd-journal ; do
+for g in dialout i2c systemd-journal netdev ; do
   usermod -a -G $g $u
 done
 

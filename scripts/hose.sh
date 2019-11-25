@@ -26,6 +26,18 @@ _EOF_
 # set the hostname
 printf '%s\n' 'hose' > /etc/hostname
 
+# configure wifi
+cp /tmp/hose/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
+ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+cat <<_EOF_>/etc/systemd/network/wlan0.network
+# dhcp/ipv6 for wlan0
+[Match]
+Name=wlan0
+[Network]
+IPv6AcceptRA=yes
+DHCP=yes
+_EOF_
+
 # enable the serial port
 printf 'enable_uart=%s\n' '1' >> /boot/config.txt
 
