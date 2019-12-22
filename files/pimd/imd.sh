@@ -4,7 +4,7 @@ mkdir -p /run/imd
 
 IMD_FILE="MDDATA.XML"
 IMD_RUN="/run/imd"
-IMD_MOUNT="${IMD_RUN}/source"
+IMD_MOUNT="/boot/imd"
 IMD_PATH="${IMD_MOUNT}/${IMD_FILE}"
 
 . /usr/lib/untrustedhost/shellib/imd.bash
@@ -24,15 +24,6 @@ lock(){
 unlock(){ lockfile-remove $lock_file; }
 
 lock "${lock_file}" "${lock_retry}"
-
-# give a moment for /dev/disk/by-label/IMD
-sleep 1
-
-[[ -e /dev/disk/by-label/IMD ]] || { unlock ; exit 0 ; }
-
-mkdir -p "${IMD_MOUNT}"
-
-mount -o ro /dev/disk/by-label/IMD "${IMD_MOUNT}"
 
 [[ -f "${IMD_PATH}" ]] || { unlock ; exit 0 ; }
 
@@ -137,9 +128,7 @@ done
 }
 
 for f in /usr/lib/untrustedhost/imd/* ; do
-  [[ -x "${f}" ]] && { "${f}" || { umount /run/imd/source ; unlock ; exit 1 ; } ; }
+  [[ -x "${f}" ]] && { "${f}" || { unlock ; exit 1 ; } ; }
 done
-
-umount /run/imd/source
 
 unlock
