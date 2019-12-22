@@ -15,3 +15,8 @@ make
 cp /usr/src/dterm/dterm /usr/local/bin/dterm
 chmod 0755 /usr/local/bin/dterm
 
+cat << _EOF_ > /etc/dtermrc
+115200 8 n 1
+# below sets dterm attn key to ctrl-n idek
+esc=.
+_EOF_
