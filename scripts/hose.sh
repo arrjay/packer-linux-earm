@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -163,15 +163,32 @@ IPv6AcceptRA=yes
 DHCP=yes
 _EOF_
 
+# install pimd
+apt-get install -qq -y lockfile-progs
+mkdir -p /usr/lib/untrustedhost/s{cripts,hellib}
+cp /tmp/pimd/imd.sh /usr/lib/untrustedhost/scripts
+cp /tmp/pimd/*.bash /usr/lib/untrustedhost/shellib
+
 # enable the serial port
 printf 'enable_uart=%s\n' '1' >> /boot/config.txt
 
 # configure i2c clock overlay
 printf 'dtoverlay=%s\n' 'i2c-rtc,ds1307' >> /boot/config.txt
 
-# disable usb2(!) - it is problematic with usbserial
-sed -i -e 's/dwc_otg.speed=[0-9]\+//' -e 's/$/ dwc_otg.speed=1/' /boot/cmdline.txt
+# configure networking flags
+sed -i -e 's/$/ut_skip_br br_garage_ospf/' /boot/cmdline.txt
 
-# install dhcp service
-apt-get install -qq -y isc-dhcp-server
+# install/configure dhcp service
+apt-get install -qq -y isc-dhcp-server git
 
+# install/configure chrony
+apt-get install -qq -y chrony
+
+# install/configure bind(!)
+cat <<_EOF_>/etc/systemd/resolved.conf
+[Resolve]
+DNSStubListener=no
+DNS=127.0.0.1
+_EOF_
+
+apt-get install -qq -y bind9
