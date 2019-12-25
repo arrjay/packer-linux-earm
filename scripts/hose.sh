@@ -164,10 +164,22 @@ DHCP=yes
 _EOF_
 
 # install pimd
-apt-get install -qq -y lockfile-progs
-mkdir -p /usr/lib/untrustedhost/s{cripts,hellib}
-cp /tmp/pimd/imd.sh /usr/lib/untrustedhost/scripts
+apt-get install -qq -y lockfile-progs xmlstarlet ipcalc
+mkdir -p /usr/lib/untrustedhost/{imd,scripts,shellib,tmpfiles-factory}
+cp /tmp/pimd/imd.sh /tmp/pimd/veth-network /usr/lib/untrustedhost/scripts
 cp /tmp/pimd/*.bash /usr/lib/untrustedhost/shellib
+cp /tmp/pimd/zz_* /usr/lib/untrustedhost/imd
+cp /tmp/pimd/anycast-prefixes.conf /usr/lib/untrustedhost/tmpfiles-factory
+cp /tmp/pimd/anycast-healthchecker.conf /etc/tmpfiles.d/anycast-healthchecker.conf
+
+# configure parts of it...directly ;)
+mkdir -p /etc/untrustedhost/netxml
+echo "<address ipv4=\"172.16.1.128/31\"/>" > /etc/untrustedhost/netxml/dnsauth.xml
+
+# install/configure bird from/with pimd bits
+apt-get install -qq -y bird
+printf 'router id %s;\n' "172.16.193.9" > /etc/bird/router_id.conf
+cp /tmp/pimd/bird.conf /etc/bird/bird.conf
 
 # enable the serial port
 printf 'enable_uart=%s\n' '1' >> /boot/config.txt
