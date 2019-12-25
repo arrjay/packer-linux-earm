@@ -7,11 +7,7 @@ rtid="172.16.193.9"
 ospf_zm=("ospf.garage:0.0.1.0")
 
 # ospf zone keys - shellcheck has no idea how I got these ;)
-# shellcheck disable=SC2034
-{
-  ospf_key_00000100[1]='Tu8ibaiX0JaiToov'
-  ospf_key_00000100[2]='Oong9Waichuongoo'
-}
+. ./secrets/common/ospfkeys
 
 # deploy would be expecting a libvirt xml doc to modify, but...this isn't libvirt, so make something.
 xmlstarlet_args=()
