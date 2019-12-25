@@ -33,3 +33,16 @@ _EOF_
 
 # save the root pw under /root as well
 printf '%s\n' $upw > /root/upsd-pw
+
+# a little systemd housekeeping
+mkdir -p /etc/systemd/system/nut-{monitor,driver}.service.d
+cat <<_EOF_> /etc/systemd/system/nut-monitor.service.d/10-dependency.conf
+[Unit]
+After=nut-driver.service
+_EOF_
+
+cat <<_EOF_> /etc/systemd/system/nut-driver.service.d/10-sleep.conf
+[Service]
+# give the ups drivers time to settle
+ExecStartPost=/bin/sleep 1
+_EOF_
