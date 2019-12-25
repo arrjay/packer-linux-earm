@@ -6,6 +6,13 @@ rtid="172.16.193.9"
 # bridge name:ospf zones
 ospf_zm=("ospf.garage:0.0.1.0")
 
+# ospf zone keys - shellcheck has no idea how I got these ;)
+# shellcheck disable=SC2034
+{
+  ospf_key_00000100[1]='Tu8ibaiX0JaiToov'
+  ospf_key_00000100[2]='Oong9Waichuongoo'
+}
+
 # deploy would be expecting a libvirt xml doc to modify, but...this isn't libvirt, so make something.
 xmlstarlet_args=()
 
@@ -18,9 +25,9 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem'
 
 # loop on zm struct
 for ent in "${ospf_zm[@]}" ; do
-  name='' ; zone='' ; IFS=:
+  name='' ; zone='' ; area_hx='' ; id_keys='' ; IFS=:
   read -r name zone <<<"${ent}"
-  echo $name $zone
+  unset IFS
   # add a new interface statement
   xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices' '--type' 'elem' '-n' 'interface' '-v' '')
   xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]' '--type' 'attr' '-n' 'type' '-v' 'bridge')
@@ -32,6 +39,24 @@ for ent in "${ospf_zm[@]}" ; do
   # visit the router block and add the ospf zone
   xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/router' '--type' 'elem' '-n' 'ospf' '-v' '')
   xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/router/ospf[last()]' '--type' 'attr' '-n' 'area' '-v' "${zone}")
+  # lookup keys
+  # convert area from octet to hex for lookup...requires multiple args to printf.
+  # shellcheck disable=SC2086
+  area_hx=$(printf '%02X' ${zone//./ })
+  handle="ospf_key_${area_hx}"
+  # this is...the only way to get the keys of an array dynamically AFAICT.
+  # shellcheck disable=SC1083,SC2086
+  id_keys=$(eval echo \${!${handle}[*]})
+  [[ "${id_keys}" ]] && {
+    for keyid in ${id_keys} ; do
+      # shellcheck disable=SC1083,SC2086
+      pass=$(eval echo \${${handle}[${keyid}]})
+      xmlstarlet_args=("${xmlstarlet_args[@]}"
+                         -s "/metadata/router/ospf[@area=\"${zone}\"]" -t 'elem' -n 'authentication' -v ''
+                         -s "/metadata/router/ospf[@area=\"${zone}\"]/authentication[last()]" -t 'attr' -n 'key' -v "${keyid}"
+                         -s "/metadata/router/ospf[@area=\"${zone}\"]/authentication[@key=\"${keyid}\"]" -t 'attr' -n 'password' -v "${pass}")
+    done
+  }
 done
 
 # insert router id, ospf keys
