@@ -31,15 +31,19 @@ lock "${lock_file}" "${lock_retry}"
 xml_hn=$(xmlstarlet sel -t -v 'metadata/domain/name' < "${IMD_PATH}")
 [[ "${xml_hn}" != '' ]] && { hostnamectl set-hostname "${xml_hn}" ; }
 
+mkdir -p /run/unstrustedhost
+chmod 0755 /run/unstrustedhost
+
 router_id=$(xmlstarlet sel -t -v metadata/router/@id "${IMD_PATH}")
 
 [[ "${router_id}" ]] && {
-  printf 'router id %s;\n' "${router_id}" > /etc/bird/router_id.conf
-  chown bird:bird /etc/bird/router_id.conf
+  printf 'router id %s;\n' "${router_id}" > /run/untrustedhost/router_id.conf
+  chown bird:bird /run/untrustedhost/router_id.conf
 
   # check for ospf areas assigned to interfaces
   ospf_areas='' ; ospf_areas="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface[@type="bridge"]/ospf/@area' "${IMD_PATH}")"
   [[ "${ospf_areas[*]}" ]] && {
+    rm -f /run/untrustedhost/ospf_areas.conf
     {
       ospf_seen=()
       # write the ospf protocol section
@@ -71,8 +75,8 @@ router_id=$(xmlstarlet sel -t -v metadata/router/@id "${IMD_PATH}")
       done
       # close the ospf proto section
       printf '}\n'
-    } >> /etc/bird/ospf_areas.conf
-    chown bird:bird /etc/bird/ospf_areas.conf
+    } >> /run/untrustedhost/ospf_areas.conf
+    chown bird:bird /run/untrustedhost/ospf_areas.conf
   }
 }
 

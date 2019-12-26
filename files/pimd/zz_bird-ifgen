@@ -4,6 +4,8 @@
 
 # shellcheck source=../shellib/imd.bash
 . /usr/lib/untrustedhost/shellib/imd.bash
+mkdir -p /run/untrustedhost
+chmod 0755 /run/untrustedhost
 
 addrs=()
 prefixes=()
@@ -39,4 +41,6 @@ protocol direct direct${pinfix} {
 EOF
 pinfix=$((pinfix + 1))
 done
-} > /etc/bird/anycast-interfaces.conf
+} > /run/untrustedhost/anycast-interfaces.conf
+chgrp bird /run/untrustedhost/anycast-interfaces.conf
+chmod 0750 /run/untrustedhost/anycast-interfaces.conf
