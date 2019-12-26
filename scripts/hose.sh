@@ -153,7 +153,7 @@ printf '%s\n' 'hose' > /etc/hostname
 # configure wifi
 cp /tmp/hose/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
 ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
-ln -s /dev/null etc/systemd/system/systemd-networkd-wait-online.service
+ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
 cat <<_EOF_>/etc/systemd/network/wlan0.network
 # dhcp/ipv6 for wlan0
 [Match]
@@ -171,6 +171,8 @@ cp /tmp/pimd/*.bash /usr/lib/untrustedhost/shellib
 cp /tmp/pimd/zz_* /usr/lib/untrustedhost/imd
 cp /tmp/pimd/anycast-prefixes.conf /usr/lib/untrustedhost/tmpfiles-factory
 cp /tmp/pimd/anycast-healthchecker.conf /etc/tmpfiles.d/anycast-healthchecker.conf
+cp /tmp/pimd/imd.service /etc/systemd/system
+ln -s /etc/systemd/system/imd.service /etc/systemd/system/multi-user.target.wants/imd.service
 
 # configure parts of it...directly ;)
 mkdir -p /etc/untrustedhost/netxml

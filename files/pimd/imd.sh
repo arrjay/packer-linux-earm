@@ -31,8 +31,8 @@ lock "${lock_file}" "${lock_retry}"
 xml_hn=$(xmlstarlet sel -t -v 'metadata/domain/name' < "${IMD_PATH}")
 [[ "${xml_hn}" != '' ]] && { hostnamectl set-hostname "${xml_hn}" ; }
 
-mkdir -p /run/unstrustedhost
-chmod 0755 /run/unstrustedhost
+mkdir -p /run/untrustedhost
+chmod 0755 /run/untrustedhost
 
 router_id=$(xmlstarlet sel -t -v metadata/router/@id "${IMD_PATH}")
 
