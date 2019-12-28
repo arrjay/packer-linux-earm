@@ -182,6 +182,8 @@ echo "<address ipv4=\"172.16.1.128/31\"/>" > /etc/untrustedhost/netxml/dnsauth.x
 apt-get install -qq -y bird
 printf 'router id %s;\n' "172.16.193.9" > /etc/bird/router_id.conf
 cp /tmp/pimd/bird.conf /etc/bird/bird.conf
+mkdir -p /etc/systemd/system/bird.service.d
+cp /tmp/pimd/10-create-interface-cfg.conf /etc/systemd/system/bird.service.d
 
 # enable the serial port
 printf 'enable_uart=%s\n' '1' >> /boot/config.txt
