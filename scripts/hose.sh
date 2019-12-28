@@ -206,3 +206,18 @@ DNS=127.0.0.1
 _EOF_
 
 apt-get install -qq -y bind9
+
+# install/configure pdns authoritative
+mkdir /usr/lib/untrustedhost/share
+printf '%s\n' "pdns-backend-sqlite3 pdns-backend-sqlite3/dbconfig-install boolean false" | debconf-set-selections
+apt-get install -qq -y pdns-server sqlite3 dbconfig-sqlite3 haveged
+pushd /tmp
+apt-get download pdns-backend-sqlite3
+dpkg -i pdns-backend-sqlite3_*.deb
+ar x dns-backend-sqlite3_*.deb
+tar xf data.tar.xz ./usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql
+mv ./usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql /usr/lib/untrustedhost/share/
+popd
+mv /tmp/pimd/pdns.conf /etc/powerdns/pdns.conf
+rm -f /etc/powerdns/pdns.d/bind.conf
+mv /tmp/pimd/pdns.local.gsqlite3.conf /etc/powerdns/pdns.d

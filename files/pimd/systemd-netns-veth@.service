@@ -11,15 +11,15 @@ PrivateNetwork=true
 PrivateTmp=true
 
 # delete and (re-)create the veth pair here.
-ExecStartPre=-/usr/bin/rm /run/systemd/network/%i.0.network
-ExecStartPre=-/usr/bin/mkdir /run/systemd/network
-ExecStartPre=-/usr/sbin/ip -n 1 link del %i.0
+ExecStartPre=-/bin/rm /run/systemd/network/%i.0.network
+ExecStartPre=-/bin/mkdir /run/systemd/network
+ExecStartPre=-/sbin/ip -n 1 link del %i.0
 # generate a file for systemd-networkd
 ExecStart=/usr/lib/untrustedhost/scripts/veth-network hostgen %i
 # create our veth pair now, in our private space
-ExecStart=/usr/sbin/ip link add %i.0 type veth peer name %i.1
+ExecStart=/sbin/ip link add %i.0 type veth peer name %i.1
 # and hand the first half of it to PID 1 namespace
-ExecStart=/usr/sbin/ip link set %i.0 netns 1
+ExecStart=/sbin/ip link set %i.0 netns 1
 # configure our ipv4 address now
 ExecStart=/usr/lib/untrustedhost/scripts/veth-network v4conf %i
 
