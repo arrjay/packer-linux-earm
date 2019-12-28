@@ -9,6 +9,9 @@ ospf_zm=("ospf.garage:0.0.1.0")
 # ospf zone keys - shellcheck has no idea how I got these ;)
 . ./secrets/common/ospfkeys
 
+# hose data
+. ./secrets/hose/imdsecrets
+
 # deploy would be expecting a libvirt xml doc to modify, but...this isn't libvirt, so make something.
 xmlstarlet_args=()
 
@@ -57,6 +60,14 @@ done
 
 # insert router id, ospf keys
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/router' '--type' 'attr' '-n' 'id' '-v' "${rtid}")
+
+# application data - metadata/dnsauth (structure, ipv4 addr)
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dnsauth' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type' 'attr' '-n' 'fqdn' '-v' 'authns.g.bbxn.us')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type' 'elem' '-n' 'address' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth/address' '--type' 'attr' '-n' 'ipv4' '-v' "${ns_ipv4}")
+
+# zones
 
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
