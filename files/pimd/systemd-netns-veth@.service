@@ -2,6 +2,7 @@
 Description=veth glue for network namespace on %I
 After=syslog.target systemd-netns@%i.service imd.service
 JoinsNamespaceOf=systemd-netns@%i.service
+Before=systemd-networkd.service
 
 [Service]
 Type=oneshot
