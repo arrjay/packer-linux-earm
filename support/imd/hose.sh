@@ -12,6 +12,9 @@ ospf_zm=("ospf.garage:0.0.1.0")
 # hose data
 . ./secrets/hose/imdsecrets
 
+# dns tsig keys
+. ./secrets/common/tsigkeys
+
 # deploy would be expecting a libvirt xml doc to modify, but...this isn't libvirt, so make something.
 xmlstarlet_args=()
 
@@ -67,7 +70,27 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type' 'elem' '-n' 'address' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth/address' '--type' 'attr' '-n' 'ipv4' '-v' "${ns_ipv4}")
 
+# tsig keys
+# tsig keying
+for tskey in "${tsig_keys_names[@]}" ; do
+  xmlstarlet_args=("${xmlstarlet_args[@]}"
+    -s /metadata/dnsauth -t 'elem' -n 'tsigkey' -v ''
+    -i '/metadata/dnsauth/tsigkey[last()]' -t attr -n 'name' -v "${tskey//_/.}"
+    -i '/metadata/dnsauth/tsigkey[last()]' -t attr -n 'algo' -v "hmac-sha512"
+    -i '/metadata/dnsauth/tsigkey[last()]' -t attr -n 'data' -v "${tsig_keys["${tskey}"]}")
+done
+
 # zones
+for zonename in "${zones[@]}" ; do
+  xmlstarlet_args=("${xmlstarlet_args[@]}"
+    -s /metadata/dnsauth -t 'elem' -n "zone" -v ''
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'name' -v "${zonename}"
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'refresh' -v "86400"
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'retry' -v "7200"
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'expire' -v "3600000"
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "3600"
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'rname' -v "${fqdn}")
+done
 
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
