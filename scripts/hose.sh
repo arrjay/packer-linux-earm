@@ -223,3 +223,5 @@ popd
 mv /tmp/pimd/pdns.conf /etc/powerdns/pdns.conf
 rm -f /etc/powerdns/pdns.d/bind.conf
 mv /tmp/pimd/pdns.local.gsqlite3.conf /etc/powerdns/pdns.d
+mkdir -p /etc/systemd/system/pdns.service.d
+mv /tmp/pimd/10-wire-namespace.conf /etc/systemd/system/pdns.service.d
