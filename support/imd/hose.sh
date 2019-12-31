@@ -66,7 +66,7 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/router' '--type'
 
 # application data - metadata/dnsauth (structure, ipv4 addr)
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dnsauth' '-v' '')
-xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type' 'attr' '-n' 'fqdn' '-v' 'authns.g.bbxn.us')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type' 'attr' '-n' 'fqdn' '-v' "${dns_fqdn}")
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth' '--type' 'elem' '-n' 'address' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsauth/address' '--type' 'attr' '-n' 'ipv4' '-v' "${ns_ipv4}")
 
@@ -89,7 +89,15 @@ for zonename in "${zones[@]}" ; do
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'retry' -v "7200"
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'expire' -v "3600000"
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "3600"
-    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'rname' -v "${fqdn}")
+    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'rname' -v "${dns_fqdn}")
+  for tsigkey in "${tsig_keys_names[@]}" ; do
+    case "${tsigkey}" in
+      *update)
+        xmlstarlet_args=("${xmlstarlet_args[@]}" -s '/metadata/dnsauth/zone[last()]' -t 'elem' -n 'tsigkey' -v ''
+          -i '/metadata/dnsauth/zone[last()]/tsigkey[last()]' -t attr -n 'id' -v "${tsigkey//_/.}")
+      ;;
+    esac
+  done
 done
 
 # build in an empty metadata tag...
