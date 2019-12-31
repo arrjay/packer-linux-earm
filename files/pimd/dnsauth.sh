@@ -86,7 +86,7 @@ for k in "${zones[@]}" ; do
   [[ "${local_ts_arg}" ]] || local_ts_arg="${ts_arg}"
   pdnsutil create-zone "${k}"
   # if we're here, making a zone, set the TSIG secrets.
-  pdnsutil set-meta "${k}" TSIG-ALLOW-DNSUPDATE "${local_ts_arg}"
+  pdnsutil set-meta "${k}" TSIG-ALLOW-DNSUPDATE ${local_ts_arg//,/ }
 done
 
 server_fqdn="$(echo "${dnsauth_xml}" | xmlstarlet sel -t -v 'dnsauth/@fqdn')"
@@ -100,12 +100,12 @@ for k in "${zones[@]}" ; do
   local_ts_arg=''
   local_ts_arg=$(get_tsig_arg "${k}")
   # specific zones _will_ override the global
-  [[ "${local_ts_arg}" ]] && pdnsutil set-meta "${k}" TSIG-ALLOW-DNSUPDATE "${local_ts_arg}"
-  [[ "${fallback_tsig_mode}" == 'true' ]] && { [[ "${local_ts_arg}" ]] || pdnsutil set-meta "${k}" TSIG-ALLOW-DNSUPDATE "${ts_arg}" ; }
+  [[ "${local_ts_arg}" ]] && pdnsutil set-meta "${k}" TSIG-ALLOW-DNSUPDATE ${local_ts_arg//,/ }
+  [[ "${fallback_tsig_mode}" == 'true' ]] && { [[ "${local_ts_arg}" ]] || pdnsutil set-meta "${k}" TSIG-ALLOW-DNSUPDATE ${ts_arg//,/ } ; }
   local_ak_arg=''
   local_ak_arg=$(get_tsig_arg "${k}" "axfrkey")
   [[ "${local_ak_arg}" ]] && pdnsutil set-meta "${k}" TSIG-ALLOW-AXFR "${local_ak_arg}"
-  [[ "${fallback_tsig_mode}" == 'true' ]] && { [[ "${local_ak_arg}" ]] || pdnsutil set-meta "${k}" TSIG-ALLOW-AXFR "${ts_arg}" ; }
+  [[ "${fallback_tsig_mode}" == 'true' ]] && { [[ "${local_ak_arg}" ]] || pdnsutil set-meta "${k}" TSIG-ALLOW-AXFR ${ts_arg//,/ } ; }
   # get the current SOA
   read -r name ttl type rec server rname serial refresh retry expire nxttl < <(pdnsutil list-zone "${k}" | grep $'\tIN\tSOA\t')
   # get the SOA values from xml...
