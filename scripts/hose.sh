@@ -206,8 +206,28 @@ cat <<_EOF_>/etc/systemd/resolved.conf
 DNSStubListener=no
 DNS=127.0.0.1
 _EOF_
+cat <<_EOF_>/etc/logrotate.d/named-stats
+/var/cache/bind/named.stats {
+  su bind bind
+  daily
+  rotate 4
+  compress
+  delaycompress
+  create 0644 bind bind
+  missingok
+  postrotate
+    rndc reload > /dev/null
+  endscript
+}
+_EOF_
 
 apt-get install -qq -y bind9
+
+# install/configure nginx
+apt-get install -qq -y nginx
+openssl dhparam -out /etc/ssl/dhparam.pem 4096
+
+# TODO: certbot
 
 # install/configure pdns authoritative
 mkdir /usr/lib/untrustedhost/share
@@ -225,3 +245,16 @@ rm -f /etc/powerdns/pdns.d/bind.conf
 mv /tmp/pimd/pdns.local.gsqlite3.conf /etc/powerdns/pdns.d
 mkdir -p /etc/systemd/system/pdns.service.d
 mv /tmp/pimd/10-wire-namespace.conf /etc/systemd/system/pdns.service.d
+
+# configure rsyslog
+cat <<_EOF_>/etc/rsyslog.d/logsink.conf
+template(name="remote_daily" type="string" string="/var/log/remote/%FROMHOST-IP%/%\$YEAR%-%\$MONTH%-%$DAY%.log")
+
+ruleset(name="logsink"){
+  action(type="omfile" DynaFile="remote_daily")
+}
+
+module(load="imudp")
+
+input(type="imudp" address="172.16.193.214" port="514" ruleset="logsink")
+_EOF_
