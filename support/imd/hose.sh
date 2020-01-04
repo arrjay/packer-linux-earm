@@ -88,8 +88,13 @@ for zonename in "${zones[@]}" ; do
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'refresh' -v "86400"
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'retry' -v "7200"
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'expire' -v "3600000"
-    -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "3600"
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'rname' -v "${dns_fqdn}")
+  case "${zonename}" in
+    ni.g.bbxn.us|hv.g.bbxn.us) xmlstarlet_args=("${xmlstarlet_args[@]}"
+        -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "300") ;;
+    *) xmlstarlet_args=("${xmlstarlet_args[@]}"
+        -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "3600") ;;
+  esac
   for tsigkey in "${tsig_keys_names[@]}" ; do
     case "${tsigkey}" in
       *update)
