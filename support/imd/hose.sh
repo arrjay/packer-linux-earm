@@ -90,7 +90,7 @@ for zonename in "${zones[@]}" ; do
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'expire' -v "3600000"
     -i '/metadata/dnsauth/zone[last()]' -t attr -n 'rname' -v "${dns_fqdn}")
   case "${zonename}" in
-    ni.g.bbxn.us|hv.g.bbxn.us) xmlstarlet_args=("${xmlstarlet_args[@]}"
+    ni.g.bbxn.us|hv.g.bbxn.us|*.phy.bbxn.us) xmlstarlet_args=("${xmlstarlet_args[@]}"
         -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "300") ;;
     *) xmlstarlet_args=("${xmlstarlet_args[@]}"
         -i '/metadata/dnsauth/zone[last()]' -t attr -n 'nxttl' -v "3600") ;;
