@@ -28,6 +28,11 @@
 			"destination": "/tmp/SSH_PUB"
 		},
 		{
+			"type": "file",
+			"source": "files/initonce.sh",
+			"destination": "/tmp/initonce.sh"
+		},
+		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
@@ -49,6 +54,7 @@
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
+				"./scripts/common/firstboot.sh",
 				"./scripts/common/i18n.sh",
 				"./scripts/common/apt-upgrade.sh",
 				"./scripts/common/packages.sh",
