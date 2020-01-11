@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# temporary while running this to quiesce perl
+export LANG=C
+
 set -e
 
 # from https://raspberrypi.stackexchange.com/questions/28907/how-could-one-automate-the-raspbian-raspi-config-setup
