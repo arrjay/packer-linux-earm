@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # copy dhparams
-cp /tmp/dhparam.pem /etc/ssl/dhparam.pem
+cp /tmp/common/dhparam.pem /etc/ssl/dhparam.pem

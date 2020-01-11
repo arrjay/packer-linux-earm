@@ -47,4 +47,4 @@ augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1
 # also drop hypervisor-networkd on the box
 curl -L -o /tmp/networkinst.run https://arrjay.gitlab.io/hypervisor-networkd/install.run
 chmod +x /tmp/networkinst.run
-/tmp/networkinst.run --ssl-pass-src file:/tmp/common/hypervisor-networkd
+/tmp/networkinst.run --ssl-pass-src file:/tmp/common/hypervisor-networkd install || true
