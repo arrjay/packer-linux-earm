@@ -31,6 +31,7 @@
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/common/nutserver.sh",
+				"./scripts/common/kernelsrc.sh",
 				"./scripts/hose.sh"
 			],
 			"skip_clean": true

@@ -163,6 +163,18 @@ IPv6AcceptRA=yes
 DHCP=yes
 _EOF_
 
+# install xt_cgroup
+apt-get install -qq -y firewalld
+# walk a list of cgroup:tos field mappings
+ct=0
+for kv in "/system.slice/netdata.service:0x30" "/system.slice/isc-dhcp-server.service:0x38" "/system.slice/bind9.service:0x38" "/system.slice/chrony.service:0x38" ; do
+  k="${kv%:*}"
+  v="${kv#*:}"
+  firewall-offline-cmd --direct --add-rule ipv4 mangle OUTPUT_direct "${ct}" -m cgroup --path "${k}" -j TOS --set-tos "${v}"
+  firewall-offline-cmd --direct --add-rule ipv4 mangle INPUT_direct  "${ct}" -m cgroup --path "${k}" -j TOS --set-tos "${v}"
+  ((ct++)) || true
+done
+
 # install pimd
 apt-get install -qq -y lockfile-progs xmlstarlet ipcalc
 mkdir -p /usr/lib/untrustedhost/{imd,scripts,shellib,tmpfiles-factory}
@@ -225,7 +237,6 @@ apt-get install -qq -y bind9
 
 # install/configure nginx
 apt-get install -qq -y nginx
-openssl dhparam -out /etc/ssl/dhparam.pem 4096
 
 # TODO: certbot
 
@@ -236,7 +247,7 @@ apt-get install -qq -y pdns-server sqlite3 dbconfig-sqlite3 haveged
 pushd /tmp
 apt-get download pdns-backend-sqlite3
 dpkg -i pdns-backend-sqlite3_*.deb
-ar x dns-backend-sqlite3_*.deb
+ar x pdns-backend-sqlite3_*.deb
 tar xf data.tar.xz ./usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql
 mv ./usr/share/pdns-backend-sqlite3/schema/schema.sqlite3.sql /usr/lib/untrustedhost/share/
 popd
