@@ -1,3 +1,5 @@
+.DELETE_ON_ERROR:
+
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 base-image/image: base.json $(COMMON_SCRIPTS)
