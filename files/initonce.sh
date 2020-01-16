@@ -171,7 +171,7 @@ mkdir -p /run/systemd
 mount /boot
 mount / -o remount,rw
 
-sed -i 's| init=/usr/lib/untrustedhose/scripts/initonce\.sh||' /boot/cmdline.txt
+sed -i 's| init=/usr/lib/untrustedhost/scripts/initonce\.sh||' /boot/cmdline.txt
 sed -i 's| sdhci\.debug_quirks2=4||' /boot/cmdline.txt
 
 [ -f /etc/ld.so.preload.dist ] && mv -f /etc/ld.so.preload.dist /etc/ld.so.preload
