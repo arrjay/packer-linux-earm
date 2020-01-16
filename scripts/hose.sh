@@ -204,7 +204,7 @@ printf 'enable_uart=%s\n' '1' >> /boot/config.txt
 printf 'dtoverlay=%s\n' 'i2c-rtc,ds1307' >> /boot/config.txt
 
 # configure networking flags
-sed -i -e 's/$/ ut_skip_br br_garage_ospf/' /boot/cmdline.txt
+sed -i -e 's/$/ ut_skip_br ut_br_ospf_garage/' /boot/cmdline.txt
 
 # install/configure dhcp service
 apt-get install -qq -y isc-dhcp-server git
