@@ -6,7 +6,6 @@
 		"image_type": "raspberrypi",
 		"iso_url": "./dterm-image/image",
 		"iso_checksum_type": "none",
-		"last_partition_extra_size": 3221225472,
 		"output_directory": "xfce-image"
 	}],
 	"provisioners": [
