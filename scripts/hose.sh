@@ -164,6 +164,12 @@ DHCP=yes
 _EOF_
 
 # install xt_cgroup
+# prereq - iptables backport :x
+echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/backports.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+apt-get -qq -y update
+apt-get -t buster-backports -qq -y install iptables
+
 apt-get install -qq -y firewalld
 # walk a list of cgroup:tos field mappings
 ct=0
@@ -211,6 +217,13 @@ apt-get install -qq -y isc-dhcp-server git
 
 # install/configure chrony
 apt-get install -qq -y chrony
+
+# install/configure daytime
+apt-get install -qq -y xinetd
+augtool set '/files/etc/xinetd.d/daytime/service[1]/disable' '"no"'
+firewall-offline-cmd --new-service=daytime
+firewall-offline-cmd --service=daytime --add-port=13/tcp
+firewall-offline-cmd --service=daytime --set-short=daytime
 
 # install/configure bind(!)
 cat <<_EOF_>/etc/systemd/resolved.conf
