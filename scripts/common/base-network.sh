@@ -48,3 +48,9 @@ augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1
 curl -L -o /tmp/networkinst.run https://arrjay.gitlab.io/hypervisor-networkd/install.run
 chmod +x /tmp/networkinst.run
 /tmp/networkinst.run --ssl-pass-src file:/tmp/common/hypervisor-networkd install || true
+
+# configure the wireless interface
+sed -e 's/^Name=.*/Name=wlan0/' < /etc/systemd/network/zz_default.network > /etc/systemd/network/wlan0.network
+cp /tmp/common/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
+ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
