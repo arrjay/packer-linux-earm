@@ -66,6 +66,16 @@ chown -R $u:$u /home/$u
 dpkg -i /tmp/synergy.deb || true
 apt-get install -qq -y -f
 
+# configure synergy key
+read sk < /tmp/gloves/synergy_key
+mkdir -p /home/$u/.config/Synergy
+cat <<_EOF_>/home/$u/.config/Synergy/Synergy.conf
+[General]
+serialKey=$sk
+startedBefore=true
+_EOF_
+chown -R $u:$u /home/$u
+
 # create use for ssh tunneling of synergy
 u=tunnel
 groupadd $u
