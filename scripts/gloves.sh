@@ -10,12 +10,7 @@ for k in /etc/ssh/ssh_host_*_key ; do
   [[ -f $k ]] && ssh-keygen -y -f $k > $k.pub
 done
 
-# install nut for ups fun...
-apt-get install -qq -y nut nut-monitor apg
-printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
-
-# configure that entire stack
-# ups.conf is the ups service drivers
+# configure ups drivers
 cat <<_EOF_> /etc/nut/ups.conf
 maxretry = 3
 
@@ -24,27 +19,102 @@ maxretry = 3
   port = auto
 _EOF_
 
-# upsd.conf is the network ups control plane
-cat <<_EOF_> /etc/nut/upsd.conf
-LISTEN 0.0.0.0 3493
-LISTEN :: 3493
+# configure ups monitoring
+read -r upw < /root/upsd-pw
+
+cat <<_EOF_> /etc/nut/upsmon.conf
+
+# upsen to monitor
+MONITOR a@localhost 1 root $upw master
+# there is no b supply
+
+# system is _on_ the ups
+MINSUPPLIES 1
+
+SHUTDOWNCMD "/sbin/shutdown -h +0"
+
+# shove _everything through upssched
+NOTIFYCMD /sbin/upssched
+
+POLLFREQ 3
+
+POLLFREQALERT 3
+
+HOSTSYNC 15
+
+DEADTIME 10
+
+POWERDOWNFLAG /etc/killpower
+
+# only call upssched and let it handle the rest
+NOTIFYFLAG ONLINE EXEC
+NOTIFYFLAG ONBATT EXEC
+NOTIFYFLAG LOWBATT EXEC
+NOTIFYFLAG FSD EXEC
+NOTIFYFLAG COMMOK EXEC
+NOTIFYFLAG COMMBAD EXEC
+NOTIFYFLAG SHUTDOWN EXEC
+NOTIFYFLAG REPLBATT EXEC
+NOTIFYFLAG NOCOMM EXEC
+NOTIFYFLAG NOPARENT EXEC
+
+RBWARNTIME 43200
+
+NOCOMMWARNTIME 300
+
+FINALDELAY 5
 _EOF_
 
-# upsd.users is for ~the children~ authentication
-cat <<_EOF_> /etc/nut/upsd.users
-[root]
-  password = $UPS_ROOT_PASSWORD
-  actions = set fsd
-  instcmds = all
-  upsmon master
+# detour to tmpfiles.d to make the /var/run/nut/upssched directory
+cat <<_EOF_> /etc/tmpfiles.d/upssched.conf
+D /run/nut/upssched 0700 nut nut - -
+_EOF_
 
-[upsmon]
-  password = $UPS_UPSMON_PASSWORD
-  upsmon slave
+# sudo to allow upsdrvctl from nut
+cat <<_EOF_ > /etc/sudoers.d/030_nut
+nut ALL=(root) NOPASSWD: /sbin/upsdrvctl
+_EOF_
+chmod 0440 /etc/sudoers.d/030_nut
+
+# upssched command script
+cat <<_EOF_ > /usr/local/bin/upssched-cmd
+#!/usr/bin/env bash
+
+case \$1 in
+        kick-ups-*)
+		ups="\${1#kick-ups-}"
+		sudo -u root /sbin/upsdrvctl stop \$ups
+		sudo -u root /sbin/upsdrvctl start \$ups
+		;;
+	upsgone)
+		logger -t upssched-cmd "The UPS has been gone for awhile"
+		;;
+	*)
+		logger -t upssched-cmd "Unrecognized command: \$1"
+		;;
+esac
+_EOF_
+chown nut:nut /usr/local/bin/upssched-cmd
+chmod 0500 /usr/local/bin/upssched-cmd
+
+cat <<_EOF_> /etc/nut/upssched.conf
+# hand this script...whatever
+CMDSCRIPT /usr/local/bin/upssched-cmd
+
+# locking
+PIPEFN /run/nut/upssched/upssched.pipe
+LOCKFN /run/nut/upssched/upssched.lock
+
+# basically, we abuse upssched to restart the hid drivers should they peace out.
+AT COMMBAD a@localhost EXECUTE kick-ups-a
+AT NOCOMM a@localhost EXECUTE kick-ups-a
 _EOF_
 
 # set the hostname
 printf '%s\n' 'gloves' > /etc/hostname
+
+# configure networking flags
+sed -i -e 's/$/ ut_skip_br ut_br_ninf/' /boot/cmdline.txt
 
 # create gloves user
 u=gloves
