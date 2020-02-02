@@ -160,3 +160,6 @@ while read -r t k r ; do
 done < /tmp/gloves/sshpub_tunnel_keys
 
 chown -R $u:$u /home/$u
+
+# configure dterm
+echo 'tractor: ttyUSB0'
