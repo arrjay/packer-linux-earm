@@ -63,7 +63,8 @@
 				"./scripts/common/crypto.sh",
 				"./scripts/common/ssm.sh",
 				"./scripts/common/base-network.sh",
-				"./scripts/common/login-config.sh"
+				"./scripts/common/login-config.sh",
+				"./scripts/common/netdata.sh"
 			],
 			"skip_clean": true
 		}
