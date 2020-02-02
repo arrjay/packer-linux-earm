@@ -12,3 +12,14 @@ chmod 4750 /usr/sbin/etherwake
 cp /tmp/common/ethers /etc/ethers
 chown root:etherwake /etc/ethers
 chmod 640 /etc/ethers
+
+# have a stupid wake script too
+cat <<"_EOF_">/usr/local/bin/wake
+#!/usr/bin/env bash
+
+for d in /sys/class/net/*/device ; do
+  i="${d%/device}" ; i="${i##*/}"
+  etherwake -i $i $1
+done
+chmod 755 /usr/local/bin/wake
+_EOF_
