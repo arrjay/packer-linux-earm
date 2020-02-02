@@ -54,3 +54,12 @@ sed -e 's/^Name=.*/Name=wlan0/' < /etc/systemd/network/zz_default.network > /etc
 cp /tmp/common/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
 ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
 ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
+
+# install firewalld
+# prereq - iptables backport
+echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/backports.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+apt-get -qq -y update
+apt-get -t buster-backports -qq -y install iptables
+
+apt-get install -qq -y firewalld

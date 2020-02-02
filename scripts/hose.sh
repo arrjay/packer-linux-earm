@@ -150,14 +150,6 @@ _EOF_
 # set the hostname
 printf '%s\n' 'hose' > /etc/hostname
 
-# install xt_cgroup
-# prereq - iptables backport :x
-echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/backports.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
-apt-get -qq -y update
-apt-get -t buster-backports -qq -y install iptables
-
-apt-get install -qq -y firewalld
 # walk a list of cgroup:tos field mappings
 ct=0
 for kv in "/system.slice/netdata.service:0x30" "/system.slice/isc-dhcp-server.service:0x38" "/system.slice/bind9.service:0x38" "/system.slice/chrony.service:0x38" ; do
