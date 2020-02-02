@@ -114,7 +114,11 @@ _EOF_
 printf '%s\n' 'gloves' > /etc/hostname
 
 # configure networking flags
-sed -i -e 's/$/ ut_skip_br ut_br_ninf/' /boot/cmdline.txt
+sed -i -e 's/$/ ut_skip_br/' /boot/cmdline.txt
+
+# install synergy
+dpkg -i /tmp/synergy.deb || true
+apt-get install -qq -y -f
 
 # create gloves user
 u=gloves
@@ -127,14 +131,17 @@ rsync -a /etc/skel/ /home/$u/
 mkdir -p /etc/lightdm/lightdm.conf.d
 printf '[SeatDefaults]\nautologin-user=%s\n' $u > /etc/lightdm/lightdm.conf.d/autologin.conf
 
+# set display time for just this user
+# classic?
+#printf 'TZ=America/Los_Angeles\n' >> /home/$u/.profile
+#printf 'export TZ=America/Los_Angeles\n' >> /home/$u/.xsessionrc
+# systemd?
+#mkdir -p /home/$u/.config/environment.d
+#printf 'TZ=America/Los_Angeles\n' > /home/$u/.config/environment.d/tz.conf
+
 # disable light-locker
 mkdir -p /home/$u/.config/autostart
 printf '[Desktop Entry]\nHidden=true\n' > /home/$u/.config/autostart/light-locker.desktop
-chown -R $u:$u /home/$u
-
-# install synergy
-dpkg -i /tmp/synergy.deb || true
-apt-get install -qq -y -f
 
 # configure synergy key
 read sk < /tmp/gloves/synergy_key
@@ -144,6 +151,8 @@ cat <<_EOF_>/home/$u/.config/Synergy/Synergy.conf
 serialKey=$sk
 startedBefore=true
 _EOF_
+
+# finish with this user.
 chown -R $u:$u /home/$u
 
 # create use for ssh tunneling of synergy
