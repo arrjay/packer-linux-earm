@@ -105,5 +105,15 @@ for zonename in "${zones[@]}" ; do
   done
 done
 
+# application data - metadata/dhcpserver (ipv4 addr)
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dhcpserver' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver' '--type' 'elem' '-n' 'address' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/address' '--type' 'attr' '-n' 'ipv4' '-v' "${dhcp_ipv4}")
+
+# application data - metadata/dnsrecurse (ipv4 addr)
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dnsrecurse' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsrecurse' '--type' 'elem' '-n' 'address' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsrecurse/address' '--type' 'attr' '-n' 'ipv4' '-v' "${recurse_ipv4}")
+
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
