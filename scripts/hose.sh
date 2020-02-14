@@ -165,6 +165,7 @@ apt-get install -qq -y python3-pip python3-setuptools python3-docopt python3-whe
 pip3 install python-json-logger==0.1.11
 pip3 install anycast-healthchecker==0.9.0
 cp /tmp/pimd/anycast-healthchecker.service /etc/systemd/system
+cp /tmp/pimd/files/pimd/anycast-anycast-hc.conf /etc/anycast-healthchecker.d/anycast-hc.conf
 
 # install pimd
 apt-get install -qq -y lockfile-progs xmlstarlet ipcalc
