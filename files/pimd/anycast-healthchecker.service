@@ -1,0 +1,15 @@
+[Unit]
+Description=Anycast healthchecker
+After=imd.service
+Requires=imd.service
+Documentation=https://github.com/unixsurfer/anycast_healthchecker/blob/master/README.rst
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/anycast-healthchecker
+TimeoutStartSec=0
+ExecStart=/usr/local/bin/anycast-healthchecker $OPTIONS
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

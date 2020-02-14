@@ -160,6 +160,12 @@ for kv in "/system.slice/netdata.service:0x30" "/system.slice/isc-dhcp-server.se
   ((ct++)) || true
 done
 
+# install anycast-healthchecker
+apt-get install -qq -y python3-pip python3-setuptools python3-docopt python3-wheel
+pip3 install python-json-logger==0.1.11
+pip3 install anycast-healthchecker==0.9.0
+cp /tmp/pimd/anycast-healthchecker.service /etc/systemd/system
+
 # install pimd
 apt-get install -qq -y lockfile-progs xmlstarlet ipcalc
 mkdir -p /usr/lib/untrustedhost/{imd,scripts,shellib,tmpfiles-factory}
@@ -187,6 +193,7 @@ printf 'dtoverlay=%s\n' 'i2c-rtc,ds1307' >> /boot/config.txt
 sed -i -e 's/$/ ut_skip_br ut_br_ospf_garage/' /boot/cmdline.txt
 
 # install/configure dhcp service
+cp /tmp/pimd/anycast-dhcpd.conf /etc/anycast-healthchecker.d/dhcpd.conf
 apt-get install -qq -y isc-dhcp-relay isc-dhcp-server git
 
 # install/configure chrony
@@ -228,6 +235,7 @@ apt-get install -qq -y nginx
 # TODO: certbot
 
 # install/configure pdns authoritative
+cp /tmp/pimd/anycast-dnsauth.conf /etc/anycast-healthchecker.d/dnsauth.conf
 mkdir /usr/lib/untrustedhost/share
 printf '%s\n' "pdns-backend-sqlite3 pdns-backend-sqlite3/dbconfig-install boolean false" | debconf-set-selections
 apt-get install -qq -y pdns-server sqlite3 dbconfig-sqlite3 haveged
