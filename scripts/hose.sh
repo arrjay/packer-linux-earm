@@ -227,6 +227,7 @@ cat <<_EOF_>/etc/logrotate.d/named-stats
 }
 _EOF_
 
+cp /tmp/pimd/anycast-dnsrecurse.conf /etc/anycast-healthchecker.d/dnsrecurse.conf
 apt-get install -qq -y bind9
 
 # install/configure nginx
