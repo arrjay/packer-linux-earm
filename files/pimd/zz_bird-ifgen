@@ -19,13 +19,16 @@ for f in /etc/untrustedhost/netxml/*.xml ; do
   addrs=($(getaddrsv4 "${prefix}") "${addrs[@]}")
 done
 
+sladdrs=${addrs[*]}
+sladdrs=${sladdrs// /, }
+
 {
 # filter out prefixes _we_ have from other hosts
 cat <<EOF
 function avoid_selfadv()
 prefix set selfslice;
 {
-  selfslice = [ ${addrs[*]} ];
+  selfslice = [ ${sladdrs} ];
   if net ~ selfslice then return false;
   return true;
 }
