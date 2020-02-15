@@ -14,3 +14,5 @@ dhcp_peers="${dhcp_peers:0:-1}"
 [[ "${dhcp_peers}" ]] && {
   sed -i -e '/^\(SERVERS=\).*/{s//\1"'"${dhcp_peers}"'"/;:a;n;ba;q}' -e '$aSERVERS="'"${dhcp_peers}"'"' /etc/default/isc-dhcp-relay
 }
+
+exit 0
