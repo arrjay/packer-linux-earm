@@ -2,6 +2,8 @@
 
 set -e
 
+export DEBIAN_FRONTEND=noninteractive
+
 # install pijuice-base
 apt-get install -qq -y pijuice-base
 
@@ -165,11 +167,13 @@ apt-get install -qq -y python3-pip python3-setuptools python3-docopt python3-whe
 pip3 install python-json-logger==0.1.11
 pip3 install anycast-healthchecker==0.9.0
 cp /tmp/pimd/anycast-healthchecker.service /etc/systemd/system
-cp /tmp/pimd/files/pimd/anycast-anycast-hc.conf /etc/anycast-healthchecker.d/anycast-hc.conf
+mkdir -p /etc/anycast-healthchecker.d
+cp /tmp/pimd/anycast-anycast-hc.conf /etc/anycast-healthchecker.d/anycast-hc.conf
 
 # install pimd
 apt-get install -qq -y lockfile-progs xmlstarlet ipcalc
 mkdir -p /usr/lib/untrustedhost/{imd,scripts,shellib,tmpfiles-factory}
+mkdir -p /etc/untrustedhost/netxml
 cp /tmp/pimd/imd.sh /tmp/pimd/veth-network /usr/lib/untrustedhost/scripts
 cp /tmp/pimd/*.bash /usr/lib/untrustedhost/shellib
 cp /tmp/pimd/zz_* /usr/lib/untrustedhost/imd
@@ -191,11 +195,12 @@ printf 'enable_uart=%s\n' '1' >> /boot/config.txt
 printf 'dtoverlay=%s\n' 'i2c-rtc,ds1307' >> /boot/config.txt
 
 # configure networking flags
-sed -i -e 's/$/ ut_skip_br ut_br_ospf_garage/' /boot/cmdline.txt
+sed -i -e 's/$/ ut_skip_br/' /boot/cmdline.txt
 
 # install/configure dhcp service
 cp /tmp/pimd/anycast-dhcpd.conf /etc/anycast-healthchecker.d/dhcpd.conf
 apt-get install -qq -y isc-dhcp-relay isc-dhcp-server git
+cp /tmp/pimd/dhcpd.sh /usr/lib/untrustedhost/imd
 
 # install/configure chrony
 apt-get install -qq -y chrony
@@ -253,6 +258,7 @@ rm -f /etc/powerdns/pdns.d/bind.conf
 mv /tmp/pimd/pdns.local.gsqlite3.conf /etc/powerdns/pdns.d
 mkdir -p /etc/systemd/system/pdns.service.d
 mv /tmp/pimd/10-wire-namespace.conf /etc/systemd/system/pdns.service.d
+cp /tmp/pimd/dnsauth.sh /usr/lib/untrustedhost/imd
 
 # configure rsyslog
 cat <<_EOF_>/etc/rsyslog.d/logsink.conf

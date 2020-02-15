@@ -3,8 +3,8 @@
 # router id for ospf
 rtid="172.16.193.9"
 
-# bridge name:ospf zones
-ospf_zm=("ospf.garage:0.0.1.0")
+# interface name:ospf zones
+ospf_zm=("vl-ospf.garage:0.0.1.0")
 
 # ospf zone keys - shellcheck has no idea how I got these ;)
 . ./secrets/common/ospfkeys
