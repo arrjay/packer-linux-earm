@@ -203,6 +203,9 @@ sed -i -e 's/$/ ut_skip_br/' /boot/cmdline.txt
 cp /tmp/pimd/anycast-dhcpd.conf /etc/anycast-healthchecker.d/dhcpd.conf
 apt-get install -qq -y isc-dhcp-relay isc-dhcp-server git
 cp /tmp/pimd/dhcpd.sh /usr/lib/untrustedhost/imd
+mkdir -p /etc/systemd/system/isc-dhcp-server.service.d
+sed -e 's@dnsauth@dhcpd@g' < /tmp/pimd/10-wire-namespace.conf > /etc/systemd/system/isc-dhcp-server.service.d/10-wire-namespace.conf
+augtool set /files/etc/default/isc-dhcp-server/INTERFACESv4 '"dhcpd.1"'
 
 # install/configure chrony
 apt-get install -qq -y chrony

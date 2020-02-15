@@ -32,6 +32,11 @@
 		},
 		{
 			"type": "file",
+			"source": "./files/dhcpd.conf",
+			"destination": "/etc/dhcp/dhcpd.conf"
+		},
+		{
+			"type": "file",
 			"source": "./secrets/hose",
 			"destination": "/tmp"
 		},

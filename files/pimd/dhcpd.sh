@@ -11,6 +11,15 @@ dhcp_peers="${dhcp_peers:0:-1}"
 
 [[ "${dhcp_xml}" ]] && echo "${dhcp_xml}" > /etc/untrustedhost/netxml/dhcpd.xml
 
+# generate stub network for dhcpd
+[[ "${dhcp_xml}" ]] && {
+  v4slice="$(echo "${dhcp_xml}" | xmlstarlet sel -t -v address/@ipv4 )"
+  v4net="${v4slice%/*}"
+  v4netm="$(ipcalc "${v4slice}" | awk '$1 == "Netmask:" { print $2 }')"
+
+  printf 'subnet %s netmask %s { }\n' "${v4net}" "${v4netm}" > /run/untrustedhost/dhcpd-v4.interface
+}
+
 [[ "${dhcp_peers}" ]] && {
   sed -i -e '/^\(SERVERS=\).*/{s//\1"'"${dhcp_peers}"'"/;:a;n;ba;q}' -e '$aSERVERS="'"${dhcp_peers}"'"' /etc/default/isc-dhcp-relay
 }
