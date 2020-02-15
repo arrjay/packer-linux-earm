@@ -180,6 +180,8 @@ cp /tmp/pimd/zz_* /usr/lib/untrustedhost/imd
 cp /tmp/pimd/anycast-prefixes.conf /usr/lib/untrustedhost/tmpfiles-factory
 cp /tmp/pimd/anycast-healthchecker.conf /etc/tmpfiles.d/anycast-healthchecker.conf
 cp /tmp/pimd/imd.service /etc/systemd/system
+cp /tmp/pimd/systemd-netns@.service /etc/systemd/system
+cp /tmp/pimd/systemd-netns-veth@.service /etc/systemd/system
 ln -s /etc/systemd/system/imd.service /etc/systemd/system/multi-user.target.wants/imd.service
 
 # install/configure bird from/with pimd bits
