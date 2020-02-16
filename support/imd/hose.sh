@@ -115,5 +115,12 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem'
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsrecurse' '--type' 'elem' '-n' 'address' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dnsrecurse/address' '--type' 'attr' '-n' 'ipv4' '-v' "${recurse_ipv4}")
 
+# application data - metadata/dhcprelay (interfaces)
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dhcprelay' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcprelay' '--type' 'elem' '-n' 'interface' '-v' 'vl-ninf')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcprelay' '--type' 'elem' '-n' 'interface' '-v' 'vl-hv')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcprelay' '--type' 'elem' '-n' 'interface' '-v' 'vl-pln.data')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcprelay' '--type' 'elem' '-n' 'interface' '-v' 'vl-ospf.garage')
+
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
