@@ -152,6 +152,12 @@ _EOF_
 # set the hostname
 printf '%s\n' 'hose' > /etc/hostname
 
+# create firewalld zone for dhcp/ntp traffic
+firewall-offline-cmd --new-zone=netmg
+
+# create firewalld zone for ospf traffic
+firewall-offline-cmd --new-zone=ospf
+
 # walk a list of cgroup:tos field mappings
 ct=0
 for kv in "/system.slice/netdata.service:0x30" "/system.slice/isc-dhcp-server.service:0x38" "/system.slice/bind9.service:0x38" "/system.slice/chrony.service:0x38" ; do
@@ -161,6 +167,9 @@ for kv in "/system.slice/netdata.service:0x30" "/system.slice/isc-dhcp-server.se
   firewall-offline-cmd --direct --add-rule ipv4 mangle INPUT_direct  "${ct}" -m cgroup --path "${k}" -j TOS --set-tos "${v}"
   ((ct++)) || true
 done
+
+# enable ipv4 forwarding
+printf 'net.ipv4.ip_forward = %s\n' 1 >> /etc/sysctl.d/forwarding.conf
 
 # install anycast-healthchecker
 apt-get install -qq -y python3-pip python3-setuptools python3-docopt python3-wheel
@@ -203,9 +212,12 @@ sed -i -e 's/$/ ut_skip_br/' /boot/cmdline.txt
 apt-get install -qq -y isc-dhcp-relay isc-dhcp-server git
 cp /tmp/pimd/anycast-dhcpd.conf /etc/anycast-healthchecker.d/dhcpd.conf
 cp /tmp/pimd/dhcpd.sh /usr/lib/untrustedhost/imd
+cp /tmp/pimd/dhcprelay.sh /usr/lib/untrustedhost/imd
 mkdir -p /etc/systemd/system/isc-dhcp-server.service.d
 sed -e 's@dnsauth@dhcpd@g' < /tmp/pimd/10-wire-namespace.conf > /etc/systemd/system/isc-dhcp-server.service.d/10-wire-namespace.conf
 augtool set /files/etc/default/isc-dhcp-server/INTERFACESv4 '"dhcpd.1"'
+firewall-offline-cmd --zone=trusted --add-interface=dhcpd.0
+firewall-offline-cmd --zone=netmg --add-service=dhcp
 
 # install/configure chrony
 apt-get install -qq -y chrony
