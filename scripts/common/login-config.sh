@@ -35,3 +35,17 @@ chmod 0440 /etc/sudoers.d/010_$u-nopasswd
 # set password for user and root to hash from top
 usermod -p $h root
 usermod -p $h $u
+
+# reconfigure /boot filesystem to be root exclusive
+cat <<_EOF_ | augtool
+ins opt after /files/etc/fstab/*[file="/boot"]/opt[last()]
+set /files/etc/fstab/*[file="/boot"]/opt[last()] umask
+set /files/etc/fstab/*[file="/boot"]/opt[last()]/value 0077
+ins opt after /files/etc/fstab/*[file="/boot"]/opt[last()]
+set /files/etc/fstab/*[file="/boot"]/opt[last()] uid
+set /files/etc/fstab/*[file="/boot"]/opt[last()]/value 0
+ins opt after /files/etc/fstab/*[file="/boot"]/opt[last()]
+set /files/etc/fstab/*[file="/boot"]/opt[last()] gid
+set /files/etc/fstab/*[file="/boot"]/opt[last()]/value 0
+save
+_EOF_
