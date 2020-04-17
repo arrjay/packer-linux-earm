@@ -1,0 +1,34 @@
+{
+	"variables": {
+          "ups_root_password": "changeit",
+          "ups_mon_password": "public"
+	},
+        "sensitive-variables": [ "ups_root_password", "ups_mon_password" ],
+	"builders": [{
+		"type": "arm-image",
+		"image_type": "raspberrypi",
+		"iso_url": "./xfce-image/image",
+		"iso_checksum_type": "none",
+		"output_directory": "trowel"
+	}],
+	"provisioners": [
+		{
+			"type": "file",
+			"source": "./secrets/common",
+			"destination": "/tmp"
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT",
+                                              "UPS_ROOT_PASSWORD={{user `ups_root_password`}}",
+                                              "UPS_MON_PASSWORD={{user `ups_mon_password`}}" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"scripts": [
+				"./scripts/common/nutserver.sh",
+				"./scripts/common/etherwake.sh",
+				"./scripts/trowel.sh"
+			],
+			"skip_clean": true
+		}
+	]
+}

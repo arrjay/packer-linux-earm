@@ -22,6 +22,14 @@ hose/image: dterm-image/image hose.json scripts/hose.sh
 	-rm -rf hose
 	packer build hose.json
 
+aerator/image: hose/image aerator.json
+	-rm -rf aerator
+	packer build aerator.json
+
 gloves/image: xfce-image/image gloves.json scripts/gloves.sh $(GLOVES_SECRETS)
 	-rm -rf gloves
 	packer build gloves.json
+
+trowel/image: xfce-image/image trowel.json scripts/trowel.sh $(TROWEL_SECRETS)
+	-rm -rf trowel
+	packer build trowel.json

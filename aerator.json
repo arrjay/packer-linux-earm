@@ -1,0 +1,22 @@
+{
+	"builders": [{
+		"type": "arm-image",
+		"image_type": "raspberrypi",
+		"iso_url": "./hose/image",
+		"iso_checksum_type": "none",
+		"output_directory": "aerator"
+	}],
+	"provisioners": [
+		{
+			"type": "shell-local",
+			"execute_command": ["bash", "-c", "{{ .Vars }} {{ .Script }}"],
+			"environment_vars": [ "TARGET=aerator" ],
+			"scripts": [ "./support/imdwrap.sh" ]
+		},
+		{
+			"type": "file",
+			"source": "./packer_cache/imd/aerator.xml",
+			"destination": "/boot/imd/MDDATA.XML"
+		}
+	]
+}

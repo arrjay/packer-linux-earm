@@ -4,11 +4,11 @@ set -e
 
 # copy stable host keys to image
 ln -s /dev/null /etc/systemd/system/regenerate_ssh_host_keys.service
-mv /tmp/gloves/ssh_host_*_key /etc/ssh
-chmod 0600 /etc/ssh/ssh_host_*_key
-for k in /etc/ssh/ssh_host_*_key ; do
-  [[ -f $k ]] && ssh-keygen -y -f $k > $k.pub
-done
+#mv /tmp/gloves/ssh_host_*_key /etc/ssh
+#chmod 0600 /etc/ssh/ssh_host_*_key
+#for k in /etc/ssh/ssh_host_*_key ; do
+#  [[ -f $k ]] && ssh-keygen -y -f $k > $k.pub
+#done
 
 # configure ups drivers
 cat <<_EOF_> /etc/nut/ups.conf
@@ -111,17 +111,10 @@ AT NOCOMM a@localhost EXECUTE kick-ups-a
 _EOF_
 
 # set the hostname
-printf '%s\n' 'gloves' > /etc/hostname
-
-# configure networking flags
-sed -i -e 's/$/ ut_skip_br/' /boot/cmdline.txt
-
-# install synergy
-dpkg -i /tmp/synergy.deb || true
-apt-get install -qq -y -f
+printf '%s\n' 'trowel' > /etc/hostname
 
 # create gloves user
-u=gloves
+u=trowel
 
 groupadd $u
 useradd -g $u $u
@@ -143,32 +136,11 @@ printf '[SeatDefaults]\nautologin-user=%s\n' $u > /etc/lightdm/lightdm.conf.d/au
 mkdir -p /home/$u/.config/autostart
 printf '[Desktop Entry]\nHidden=true\n' > /home/$u/.config/autostart/light-locker.desktop
 
-# configure synergy key
-read sk < /tmp/gloves/synergy_key
-mkdir -p /home/$u/.config/Synergy
-cat <<_EOF_>/home/$u/.config/Synergy/Synergy.conf
-[General]
-serialKey=$sk
-startedBefore=true
-_EOF_
-
 # finish with this user.
 chown -R $u:$u /home/$u
 
-# create use for ssh tunneling of synergy
-u=tunnel
-groupadd $u
-useradd -g $u $u
-mkdir -p /home/$u/.ssh
-
-# restrict this user to allow the synergy port, 24800 via ssh authorized_key wrangling
-p=24800
-while read -r t k r ; do
-  case $t in ssh-*) : ;; *) continue ;; esac
-  printf 'command="/bin/true",restrict,port-forwarding,permitopen="localhost:%s",permitopen="127.0.0.1:%s" %s %s %s\n' $p $p $t $k $r > /home/$u/.ssh/authorized_keys
-done < /tmp/gloves/sshpub_tunnel_keys
-
-chown -R $u:$u /home/$u
-
 # configure dterm
-echo 'tractor: ttyUSB0' >> /etc/dtermrc
+#echo 'tractor: ttyUSB0' >> /etc/dtermrc
+
+# flip the screen - trowel is mounted "upside down"
+echo 'lcd_rotate=2' >> /boot/config.txt
