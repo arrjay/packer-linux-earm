@@ -60,6 +60,7 @@
 				"./scripts/common/packages.sh",
 				"./scripts/common/kernelsrc.sh",
 				"./scripts/common/xt_cgroup.sh",
+				"./scripts/common/bridge.sh",
 				"./scripts/common/crypto.sh",
 				"./scripts/common/ssm.sh",
 				"./scripts/common/base-network.sh",
