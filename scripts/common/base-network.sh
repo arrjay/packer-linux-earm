@@ -49,6 +49,9 @@ curl -L -o /tmp/networkinst.run https://arrjay.gitlab.io/hypervisor-networkd/ins
 chmod +x /tmp/networkinst.run
 /tmp/networkinst.run --ssl-pass-src file:/tmp/common/hypervisor-networkd install || true
 
+# set commandline for boot that we're using legacy bridge modes
+sed -i -e 's/$/ ut_legacy_br/' /boot/cmdline.txt
+
 # configure the wireless interface
 sed -e 's/^Name=.*/Name=wlan0/' < /etc/systemd/network/zz_default.network > /etc/systemd/network/wlan0.network
 cp /tmp/common/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
