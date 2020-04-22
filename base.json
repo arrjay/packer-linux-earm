@@ -19,7 +19,10 @@
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
-			"inline": [ "mv /etc/ld.so.preload /etc/ld.so.preload.dist" ],
+			"inline": [
+                                "mv /etc/ld.so.preload /etc/ld.so.preload.dist",
+                                "mkdir /etc/skel/.bash.d"
+                        ],
 			"skip_clean": true
 		},
 		{
@@ -53,6 +56,11 @@
 			"source": "./vendor/dotfiles/bash.d/",
 			"destination": "/etc/skel/.bash.d/"
 		},
+                {
+			"type": "file",
+			"source": "files/00_pi_onboard.link",
+			"destination": "/etc/systemd/network/00_pi_onboard.link"
+                },
 		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
@@ -79,10 +87,14 @@
 			"inline": [
                                 "mkdir -p /etc/bird",
                                 "chmod +x /tmp/imd-install.run",
-                                "/tmp/imd-install.run",
-                                "mkdir /etc/skel/.bash.d"
+                                "/tmp/imd-install.run"
                         ],
 			"skip_clean": true
+		},
+		{
+			"type": "file",
+			"source": "files/imd.conf",
+			"destination": "/etc/untrustedhost/imd.conf"
 		}
 	]
 }
