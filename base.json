@@ -22,12 +22,6 @@
 			"inline": [ "mv /etc/ld.so.preload /etc/ld.so.preload.dist" ],
 			"skip_clean": true
 		},
-                {
-                        "type": "file",
-                        "generated": true,
-                        "source": "./packer_cache/imd/install.run",
-                        "destination": "/tmp/imd-install.run"
-                },
 		{
 			"type": "file",
 			"source": "./secrets/common",
@@ -43,18 +37,12 @@
 			"source": "files/initonce.sh",
 			"destination": "/tmp/initonce.sh"
 		},
-		{
-			"type": "shell",
-			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
-			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
-			"inline": [
-                                "mkdir /etc/bird",
-                                "chmod +x /tmp/imd-install.run",
-                                "/tmp/imd-install.run",
-                                "mkdir /etc/skel/.bash.d"
-                        ],
-			"skip_clean": true
-		},
+                {
+                        "type": "file",
+                        "generated": true,
+                        "source": "./packer_cache/imd/install.run",
+                        "destination": "/tmp/imd-install.run"
+                },
 		{
 			"type": "file",
 			"source": "./vendor/dotfiles/bashrc",
@@ -82,6 +70,18 @@
 				"./scripts/common/login-config.sh",
 				"./scripts/common/netdata.sh"
 			],
+			"skip_clean": true
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+                                "mkdir -p /etc/bird",
+                                "chmod +x /tmp/imd-install.run",
+                                "/tmp/imd-install.run",
+                                "mkdir /etc/skel/.bash.d"
+                        ],
 			"skip_clean": true
 		}
 	]
