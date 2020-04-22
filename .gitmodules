@@ -1,3 +1,6 @@
 [submodule "vendor/dotfiles"]
 	path = vendor/dotfiles
 	url = http://github.com/arrjay/dotfiles.git
+[submodule "vendor/imd"]
+	path = vendor/imd
+	url = https://gitlab.com/untrustedhost/imd.git
