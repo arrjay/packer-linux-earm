@@ -39,5 +39,11 @@ done
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"]/vlan[@name="ninf"]' '--type' 'elem' '-n' 'bridge' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"]/vlan[@name="ninf"]/bridge' '--type' 'attr' '-n' 'name' '-v' 'ninf')
 
+## TEST
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]' '--type' 'elem' '-n' 'ipv4' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/ipv4[last()]' '--type' 'attr' '-n' 'address' '-v' '192.168.24.7/24')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]' '--type' 'elem' '-n' 'ipv4' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/ipv4[last()]' '--type' 'attr' '-n' 'address' '-v' '192.168.22.7/24')
+
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
