@@ -30,7 +30,7 @@ _EOF_
 cat <<_EOF_ > /etc/systemd/network/zz_default.network
 # fallback - try dhcp on it!
 [Match]
-Name=em* eth* en*
+Name=onboard wifi
 [Network]
 LinkLocalAddressing=yes
 LLMNR=true
@@ -44,18 +44,9 @@ _EOF_
 # disable ipv6 by default in interface bringup
 augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1
 
-# also drop hypervisor-networkd on the box
-curl -L -o /tmp/networkinst.run https://arrjay.gitlab.io/hypervisor-networkd/install.run
-chmod +x /tmp/networkinst.run
-/tmp/networkinst.run --ssl-pass-src file:/tmp/common/hypervisor-networkd install || true
-
-# set commandline for boot that we're using legacy bridge modes
-sed -i -e 's/$/ ut_legacy_br/' /boot/cmdline.txt
-
 # configure the wireless interface
-sed -e 's/^Name=.*/Name=wlan0/' < /etc/systemd/network/zz_default.network > /etc/systemd/network/wlan0.network
-cp /tmp/common/wpa_supplicant-wlan0.conf /etc/wpa_supplicant
-ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wlan0.service
+cp /tmp/common/wpa_supplicant-wifi.conf /etc/wpa_supplicant
+ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wifi.service
 ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
 
 # install firewalld

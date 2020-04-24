@@ -93,11 +93,6 @@
 		},
 		{
 			"type": "file",
-			"source": "files/zz_default.network",
-			"destination": "/etc/systemd/network/zz_default.network"
-		},
-		{
-			"type": "file",
 			"source": "files/imd.conf",
 			"destination": "/etc/untrustedhost/imd.conf"
 		}
