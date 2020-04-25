@@ -45,8 +45,8 @@ _EOF_
 augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1
 
 # configure the wireless interface
-cp /tmp/common/wpa_supplicant-wifi.conf /etc/wpa_supplicant
-ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wifi.service
+cp /tmp/common/wpa_supplicant-onboard-wifi.conf /etc/wpa_supplicant
+ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@onboard-wifi.service
 ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
 
 # install firewalld
