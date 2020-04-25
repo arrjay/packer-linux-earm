@@ -1,0 +1,7 @@
+[Match]
+Driver=brcmfmac
+Path=platform-3f300000.mmcnr
+
+[Link]
+Name=onboard-wifi
+MACAddressPolicy=random
