@@ -61,6 +61,11 @@
 			"source": "files/00_pi_onboard.link",
 			"destination": "/etc/systemd/network/00_pi_onboard.link"
                 },
+                {
+			"type": "file",
+			"source": "files/00_pi3_onboard.link",
+			"destination": "/etc/systemd/network/00_pi3_onboard.link"
+                },
 		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
