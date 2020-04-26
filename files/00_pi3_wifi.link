@@ -3,5 +3,5 @@ Driver=brcmfmac
 Path=platform-3f300000.mmcnr
 
 [Link]
-Name=onboard_wifi
+Name=wl
 MACAddressPolicy=random
