@@ -63,6 +63,11 @@
                 },
                 {
 			"type": "file",
+			"source": "files/00_pi2_onboard.link",
+			"destination": "/etc/systemd/network/00_pi2_onboard.link"
+                },
+                {
+			"type": "file",
 			"source": "files/00_pi3_onboard.link",
 			"destination": "/etc/systemd/network/00_pi3_onboard.link"
                 },
