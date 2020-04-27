@@ -19,7 +19,7 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/i
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]/source' '--type' 'attr' '-n' 'bridge' '-v' "onboard")
 
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]' '--type' 'elem' '-n' 'bridge' '-v' '')
-xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]/bridge' '--type' 'attr' '-n' 'name' '-v' 'ninf')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]/bridge' '--type' 'attr' '-n' 'name' '-v' 'bridge')
 
 # vlan db lives in metadata/vlan
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'vlan' -v '')
