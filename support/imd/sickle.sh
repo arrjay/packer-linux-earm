@@ -2,12 +2,13 @@
 
 . secrets/sickle/imdsecrets
 . secrets/common/vlandb
+. secrets/common/ipdb.home
 
 # deploy would be expecting a libvirt xml doc to modify, but...this isn't libvirt, so make something.
 xmlstarlet_args=()
 
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'domain' '-v' '')
-xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain' '--type' 'elem' '-n' 'name' '-v' 'trowel')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain' '--type' 'elem' '-n' 'name' '-v' 'sickle')
 
 # build devie tree for network interfaces
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain' '--type' 'elem' '-n' 'devices' '-v' '')
@@ -44,6 +45,32 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/i
 
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]' '--type' 'elem' '-n' 'ipv4' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/ipv4[last()]' '--type' 'attr' '-n' 'address' '-v' "${ipv4['ninf']}")
+
+# configure dhcp server
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dhcpserver' '-v' '')
+for vid in "${!vlan[@]}" ; do
+  xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver' '--type' 'elem' '-n' 'subnet' '-v' '')
+  xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]' '--type' 'attr' '-n' 'ipv4' '-v' "${ipv4[${vid}]}")
+  [[ "${range_start[${vid}]}" ]] && [[ "${range_end[${vid}]}" ]] && {
+    xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]' '--type' 'elem' '-n' 'range' '-v' '')
+    xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]/range[last()]' '--type' 'attr' '-n' 'begin' '-v' "${range_start[${vid}]}")
+    xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]/range[last()]' '--type' 'attr' '-n' 'end' '-v' "${range_end[${vid}]}")
+  }
+  [[ "${gateway[${vid}]}" ]] && xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]' '--type' 'attr' '-n' 'gateway' '-v' "${gateway[${vid}]}")
+  [[ "${dns[${vid}]}" ]] && {
+    for srv in "${dns[${vid}]}" ; do
+      xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]' '--type' 'attr' '-n' 'dns' '-v' "${srv}")
+    done
+  }
+  xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]' '--type' 'elem' '-n' 'ddns' '-v' '')
+  [[ "${ddnsdomain[${vid}]}" ]] && {
+    xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]/ddns' '--type' 'attr' '-n' 'domain' '-v' "${ddnsdomain[${vid}]}")
+  }
+  [[ "${revddnsdomain[${vid}]}" ]] && {
+    xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/dhcpserver/subnet[last()]/ddns' '--type' 'attr'
+                     '-n' 'revdomain' '-v' "${revddnsdomain[${vid}]}")
+  }
+done
 
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
