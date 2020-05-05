@@ -72,5 +72,14 @@ for vid in "${!vlan[@]}" ; do
   }
 done
 
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'ethers' '-v' '')
+# this is...a fun one. turn ethers into xml.
+while read -r line ; do
+  read -ra split <<<"${line}"
+  xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ethers' '--type' 'elem' '-n' 'entry' '-v' '')
+  xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ethers/entry[last()]' '--type' 'attr' '-n' 'hwaddr' '-v' "${split[0]}")
+  xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ethers/entry[last()]' '--type' 'attr' '-n' 'name' '-v' "${split[1]}")
+done < secrets/common/ethers
+
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
