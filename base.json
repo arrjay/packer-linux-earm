@@ -85,6 +85,7 @@
 				"./scripts/common/i18n.sh",
 				"./scripts/common/apt-upgrade.sh",
 				"./scripts/common/packages.sh",
+				"./scripts/common/dhcpd.sh",
 				"./scripts/common/kernelsrc.sh",
 				"./scripts/common/xt_cgroup.sh",
 				"./scripts/common/crypto.sh",
