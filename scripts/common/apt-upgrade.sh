@@ -18,4 +18,11 @@ deb http://hose.g.bbxn.us/apt/raspberrypi/debian/ buster main
 _EOF_
 
 apt-get update
+
+# HACK: rpt6 (maybe 5?) Does Not Work with my AP.
+curl -L -o /tmp/firmware-brcm80211.deb https://hose.g.bbxn.us/apt/raspberrypi/debian/pool/main/f/firmware-nonfree/firmware-brcm80211_20190114-1+rpt4_all.deb
+dpkg -i /tmp/firmware-brcm80211.deb
+apt-mark hold firmware-brcm80211
+rm /tmp/firmware-brcm80211.deb
+
 apt-get -qq -y dist-upgrade
