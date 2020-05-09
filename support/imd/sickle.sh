@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+. secrets/common/ssh_pubkey
 . secrets/sickle/imdsecrets
 . secrets/common/vlandb
 . secrets/common/ipdb.home
@@ -90,6 +91,10 @@ while read -r line ; do
   xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ethers/entry[last()]' '--type' 'attr' '-n' 'hwaddr' '-v' "${split[0]}")
   xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ethers/entry[last()]' '--type' 'attr' '-n' 'name' '-v' "${split[1]}")
 done < secrets/common/ethers
+
+# ssh userkey
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'ssh' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ssh' '--type' 'elem' '-n' 'pubkey' '-v' "${ssh_pubkey}")
 
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
