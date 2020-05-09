@@ -16,9 +16,7 @@ for g in dialout i2c systemd-journal netdev ; do
 done
 
 # create .ssh dir for that, copy the key to it
-mkdir -p /home/$u/.ssh
 rsync -a /etc/skel/ /home/$u/
-[ -f /tmp/SSH_PUB ] && mv /tmp/SSH_PUB /home/$u/.ssh/authorized_keys
 chown -R $u:$u /home/$u/
 
 # force key-only login over ssh

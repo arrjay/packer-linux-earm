@@ -32,11 +32,6 @@
 		},
 		{
 			"type": "file",
-			"source": "./ssh_id",
-			"destination": "/tmp/SSH_PUB"
-		},
-		{
-			"type": "file",
 			"source": "files/initonce.sh",
 			"destination": "/tmp/initonce.sh"
 		},
