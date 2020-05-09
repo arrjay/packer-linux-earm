@@ -72,6 +72,16 @@ for vid in "${!vlan[@]}" ; do
   }
 done
 
+# configure 'e*' - an interface to match any usb ethernet adapters
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices' '--type' 'elem' '-n' 'interface' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]' '--type' 'attr' '-n' 'type' '-v' 'bridge')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]' '--type' 'elem' '-n' 'source' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[last()]/source' '--type' 'attr' '-n' 'bridge' '-v' 'e*')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="e*"]'
+                 '--type' 'elem' '-n' 'bridge' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="e*"]/bridge'
+                 '--type' 'attr' '-n' 'name' '-v' 'bridge')
+
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'ethers' '-v' '')
 # this is...a fun one. turn ethers into xml.
 while read -r line ; do
