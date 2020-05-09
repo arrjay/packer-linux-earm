@@ -49,3 +49,6 @@ set /files/etc/fstab/*[file="/boot"]/opt[last()] gid
 set /files/etc/fstab/*[file="/boot"]/opt[last()]/value 0
 save
 _EOF_
+
+# set default target to be just multi-user
+systemctl set-default multi-user.target
