@@ -4,6 +4,9 @@ set -e
 
 # install nut for ups fun...
 apt-get install -qq -y nut nut-monitor apg
+systemctl disable nut-monitor
+systemctl disable nut-driver
+systemctl disable nut-server
 
 # generate a new root password every time idk
 upw=$(apg -M SNCL -m 21 -n 1)
