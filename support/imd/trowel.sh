@@ -42,6 +42,7 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/i
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"]/vlan[@name="ninf"]/bridge' '--type' 'attr' '-n' 'name' '-v' 'ninf')
 
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]' '--type' 'elem' '-n' 'ipv4' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/ipv4[last()]' '--type' 'attr' '-n' 'address' '-v' 'disabled')
 
 # configure dhcp server
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'dhcpserver' '-v' '')
