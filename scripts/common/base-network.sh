@@ -50,6 +50,9 @@ cp /tmp/common/wpa_supplicant-wl.conf /etc/wpa_supplicant
 ln -s /lib/systemd/system/wpa_supplicant@.service /etc/systemd/system/multi-user.target.wants/wpa_supplicant@wl.service
 ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
 
+# set permissions
+chmod a+r /etc/systemd/network/*
+
 # install firewalld
 # prereq - iptables backport
 echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/backports.list
