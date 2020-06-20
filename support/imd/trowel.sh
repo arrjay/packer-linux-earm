@@ -93,5 +93,10 @@ done < secrets/common/ethers
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'ssh' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/ssh' '--type' 'elem' '-n' 'pubkey' '-v' "${ssh_pubkey}")
 
+# flip the screen
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem' '-n' 'raspberrypi' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/raspberrypi' '--type' 'elem' '-n' 'screen' '-v' '')
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/raspberrypi/screen' '--type' 'attr' '-n' 'rotation' '-v' '180')
+
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
