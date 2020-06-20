@@ -98,5 +98,8 @@ xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata' '--type' 'elem'
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/raspberrypi' '--type' 'elem' '-n' 'screen' '-v' '')
 xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/raspberrypi/screen' '--type' 'attr' '-n' 'rotation' '-v' '180')
 
+# set the region (for wpa_supplicant) - https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements
+xmlstarlet_args=("${xmlstarlet_args[@]}" '--subnode' '/metadata/raspberrypi' '--type' 'attr' '-n' 'region' '-v' 'us')
+
 # build in an empty metadata tag...
 echo '<metadata/>' | xmlstarlet ed "${xmlstarlet_args[@]}"
