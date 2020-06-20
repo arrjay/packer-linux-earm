@@ -113,32 +113,6 @@ _EOF_
 # set the hostname
 printf '%s\n' 'trowel' > /etc/hostname
 
-# create gloves user
-u=trowel
-
-groupadd $u
-useradd -g $u $u
-rsync -a /etc/skel/ /home/$u/
-
-# tell lightdm to log in automatically
-mkdir -p /etc/lightdm/lightdm.conf.d
-printf '[SeatDefaults]\nautologin-user=%s\n' $u > /etc/lightdm/lightdm.conf.d/autologin.conf
-
-# set display time for just this user
-# classic?
-#printf 'TZ=America/Los_Angeles\n' >> /home/$u/.profile
-#printf 'export TZ=America/Los_Angeles\n' >> /home/$u/.xsessionrc
-# systemd?
-#mkdir -p /home/$u/.config/environment.d
-#printf 'TZ=America/Los_Angeles\n' > /home/$u/.config/environment.d/tz.conf
-
-# disable light-locker
-mkdir -p /home/$u/.config/autostart
-printf '[Desktop Entry]\nHidden=true\n' > /home/$u/.config/autostart/light-locker.desktop
-
-# finish with this user.
-chown -R $u:$u /home/$u
-
 # configure dterm
 #echo 'tractor: ttyUSB0' >> /etc/dtermrc
 

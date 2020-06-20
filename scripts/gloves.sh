@@ -121,27 +121,7 @@ dpkg -i /tmp/synergy.deb || true
 apt-get install -qq -y -f
 
 # create gloves user
-u=gloves
-
-groupadd $u
-useradd -g $u $u
-rsync -a /etc/skel/ /home/$u/
-
-# tell lightdm to log in automatically
-mkdir -p /etc/lightdm/lightdm.conf.d
-printf '[SeatDefaults]\nautologin-user=%s\n' $u > /etc/lightdm/lightdm.conf.d/autologin.conf
-
-# set display time for just this user
-# classic?
-#printf 'TZ=America/Los_Angeles\n' >> /home/$u/.profile
-#printf 'export TZ=America/Los_Angeles\n' >> /home/$u/.xsessionrc
-# systemd?
-#mkdir -p /home/$u/.config/environment.d
-#printf 'TZ=America/Los_Angeles\n' > /home/$u/.config/environment.d/tz.conf
-
-# disable light-locker
-mkdir -p /home/$u/.config/autostart
-printf '[Desktop Entry]\nHidden=true\n' > /home/$u/.config/autostart/light-locker.desktop
+u=gfx
 
 # configure synergy key
 read sk < /tmp/gloves/synergy_key
