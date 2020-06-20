@@ -54,7 +54,7 @@ ln -s /dev/null /etc/systemd/system/systemd-networkd-wait-online.service
 # prereq - iptables backport
 echo "deb http://deb.debian.org/debian buster-backports main" > /etc/apt/sources.list.d/backports.list
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
-apt-get -qq -y update
+apt-get -o APT::Sandbox::User=root -qq -y update
 apt-get -t buster-backports -qq -y install iptables
 
 apt-get install -qq -y firewalld

@@ -17,6 +17,6 @@ deb http://hose.g.bbxn.us/apt/raspberrypi/debian/ buster main
 #deb-src http://archive.raspberrypi.org/debian/ buster main
 _EOF_
 
-apt-get update
+apt-get -o APT::Sandbox::User=root update
 
 apt-get -qq -y dist-upgrade
