@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC2039,SC2155
 
 reboot_pi () {
   umount /boot
@@ -175,6 +176,21 @@ sed -i 's| init=/usr/lib/untrustedhost/scripts/initonce\.sh||' /boot/cmdline.txt
 sed -i 's| sdhci\.debug_quirks2=4||' /boot/cmdline.txt
 
 [ -f /etc/ld.so.preload.dist ] && mv -f /etc/ld.so.preload.dist /etc/ld.so.preload
+
+[ -f '/boot/IMD/MDDATA.XML' ] && type xmlstarlet 2>/dev/null 1>&2 && {
+  pi_rot=''
+  imd_rot="$(xmlstarlet sel -t -v 'metadata/raspberrypi/screen/@rotation' '/boot/IMD/MDDATA.XML')"
+  case "${imd_rot}" in
+    90)  pi_rot=1 ;;
+    180) pi_rot=2 ;;
+    270) pi_rot=3 ;;
+    *)   :        ;;
+  esac
+  [ "${pi_rot}" ] && {
+    # shellcheck disable=SC2016
+    sed -i -e '/^\(lcd_rotate=\).*/{s//\1'"${pi_rot}"'/;:a;n;ba;q}' -e '$alcd_rotate='"${pi_rot}" '/boot/config.txt'
+  }
+}
 
 if ! grep -q splash /boot/cmdline.txt; then
   sed -i "s/ quiet//g" /boot/cmdline.txt
