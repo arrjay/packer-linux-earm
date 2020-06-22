@@ -73,6 +73,11 @@
 			"destination": "/etc/systemd/network/00_pi3_wifi.link"
                 },
 		{
+			"type": "file",
+			"source": "./files/pimd",
+			"destination": "/tmp/pimd"
+		},
+		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
@@ -99,7 +104,11 @@
 			"inline": [
                                 "mkdir -p /etc/bird",
                                 "chmod +x /tmp/imd-install.run",
-                                "/tmp/imd-install.run"
+                                "/tmp/imd-install.run",
+				"mkdir -p /etc/systemd/system/imd.service.d",
+				"cp /tmp/pimd/10-after-wpa_supplicant.conf /etc/systemd/system/imd.service.d",
+				"cp /tmp/pimd/pi_screen_rotation /usr/lib/untrustedhost/imd/pi_screen_rotation",
+				"cp /tmp/pimd/pi_wifi_region /usr/lib/untrustedhost/imd/pi_wifi_region"
                         ],
 			"skip_clean": true
 		},

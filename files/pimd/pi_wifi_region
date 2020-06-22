@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# get the region tag and unlock wifi if needed
+pi_region="$(xmlstarlet sel -t -v 'metadata/raspberrypi/@region' "${IMD_PATH}")"
+
+# jump away if there's no raspi-config
+[[ -x /usr/bin/raspi-config ]] || exit 0
+
+[[ "${pi_region}" ]] && {
+  /usr/bin/raspi-config nonint do_wifi_country "${pi_region}"
+}
+
+exit 0

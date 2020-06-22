@@ -181,6 +181,7 @@ sed -i 's| sdhci\.debug_quirks2=4||' /boot/cmdline.txt
   pi_rot=''
   imd_rot="$(xmlstarlet sel -t -v 'metadata/raspberrypi/screen/@rotation' '/boot/IMD/MDDATA.XML')"
   case "${imd_rot}" in
+    0)   pi_rot=0 ;;
     90)  pi_rot=1 ;;
     180) pi_rot=2 ;;
     270) pi_rot=3 ;;
