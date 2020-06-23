@@ -1,0 +1,22 @@
+{
+	"variables": {
+	},
+	"builders": [{
+		"type": "arm-image",
+                "image_type": "raspberrypi",
+		"iso_url": "./lite-image/image",
+		"iso_checksum_type": "none",
+		"output_directory": "netdata-image"
+	}],
+	"provisioners": [
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"scripts": [
+				"./scripts/netdata.sh"
+			],
+			"skip_clean": true
+		}
+	]
+}

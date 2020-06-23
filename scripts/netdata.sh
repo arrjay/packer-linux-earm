@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # install netdata - omnibus install
 apt-get -qq -y install autoconf autoconf-archive autogen automake curl gcc git gzip libjudy-dev liblz4-dev libmnl-dev libssl-dev libuv1-dev lm-sensors make netcat nodejs pkg-config python python-mysqldb python-psycopg2 python-pymongo tar uuid-dev zlib1g-dev jq python-ipaddress firewalld
 cd /usr/src
