@@ -1,0 +1,39 @@
+{
+	"variables": {
+	},
+	"builders": [{
+		"type": "arm-image",
+                "image_type": "raspberrypi",
+		"iso_url": "./2020-05-27-raspios-buster-lite-armhf.zip",
+		"iso_checksum_type": "sha256",
+		"iso_checksum": "f5786604be4b41e292c5b3c711e2efa64b25a5b51869ea8313d58da0b46afc64",
+		"target_image_size": 4294967296,
+		"output_directory": "lite-image"
+	}],
+	"provisioners": [
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+                                "mv /etc/ld.so.preload /etc/ld.so.preload.dist",
+                                "mkdir /etc/skel/.bash.d"
+                        ],
+			"skip_clean": true
+		},
+		{
+			"type": "file",
+			"source": "files/initonce.sh",
+			"destination": "/tmp/initonce.sh"
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"scripts": [
+				"./scripts/lite.sh"
+			],
+			"skip_clean": true
+		}
+	]
+}
