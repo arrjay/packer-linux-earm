@@ -4,7 +4,13 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
+apt-get -qq clean
 apt-get -qq -y install xfce4 xfce4-screenshooter xfce4-terminal solaar blueman scdaemon
+apt-get -qq clean
+
+# this is done after the base xfce4 isntall because we're riding the line of image space
+apt-get -qq -y install chromium-browser
+apt-get -qq clean
 
 printf 'XFCE_PANEL_MIGRATE_DEFAULT=1\n' >> /etc/environment
 
@@ -29,3 +35,6 @@ printf '[Desktop Entry]\nHidden=true\n' > /home/$u/.config/autostart/light-locke
 
 # finish with this user.
 chown -R $u:$u /home/$u
+
+# report disk usage
+df -h
