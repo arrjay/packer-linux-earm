@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # install netdata - omnibus install
-apt-get -qq -y install autoconf autoconf-archive autogen automake curl gcc git gzip libjudy-dev liblz4-dev libmnl-dev libssl-dev libuv1-dev lm-sensors make netcat nodejs pkg-config python python-mysqldb python-psycopg2 python-pymongo tar uuid-dev zlib1g-dev jq python-ipaddress
+apt-get -qq -y install autoconf autoconf-archive autogen automake curl gcc git gzip libjudy-dev liblz4-dev libmnl-dev libssl-dev libuv1-dev lm-sensors make netcat nodejs pkg-config python python-mysqldb python-psycopg2 python-pymongo tar uuid-dev zlib1g-dev jq python-ipaddress firewalld
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
@@ -18,3 +18,5 @@ echo 0 > /usr/share/netdata/web/version.txt
 firewall-offline-cmd --new-service=netdata
 firewall-offline-cmd --service=netdata --add-port=19999/tcp
 firewall-offline-cmd --service=netdata --set-short=netdata
+
+apt-get -qq clean
