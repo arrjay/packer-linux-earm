@@ -22,3 +22,5 @@ firewall-offline-cmd --service=netdata --add-port=19999/tcp
 firewall-offline-cmd --service=netdata --set-short=netdata
 
 apt-get -qq clean
+
+df -m
