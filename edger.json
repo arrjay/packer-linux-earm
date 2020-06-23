@@ -6,7 +6,6 @@
 		"image_type": "raspberrypi",
 		"iso_url": "./dterm-image/image",
 		"iso_checksum_type": "none",
-		"target_image_size": 4294967296,
 		"output_directory": "edger"
 	}],
 	"provisioners": [

@@ -5,7 +5,7 @@ apt-get -qq -y install autoconf autoconf-archive autogen automake curl gcc git g
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
-git checkout v1.21.1
+git checkout v1.22.1
 ./netdata-installer.sh --dont-start-it --dont-wait
 
 # force old lm_sensors plugin on
