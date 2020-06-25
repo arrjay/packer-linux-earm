@@ -4,10 +4,8 @@
 	"builders": [{
 		"type": "arm-image",
                 "image_type": "raspberrypi",
-		"iso_url": "./2020-05-27-raspios-buster-lite-armhf.zip",
-		"iso_checksum_type": "sha256",
-		"iso_checksum": "f5786604be4b41e292c5b3c711e2efa64b25a5b51869ea8313d58da0b46afc64",
-		"target_image_size": 4294967296,
+		"iso_url": "./netdata-image/image",
+		"iso_checksum_type": "none",
 		"output_directory": "base-image"
 	}],
 	"provisioners": [
@@ -17,24 +15,9 @@
                         "inline": [ "p=$(pwd) && rm -f $p/packer_cache/imd/install.run && cd vendor/imd && make OUTPUTDIR=$p/packer_cache/imd/" ]
                 },
 		{
-			"type": "shell",
-			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
-			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
-			"inline": [
-                                "mv /etc/ld.so.preload /etc/ld.so.preload.dist",
-                                "mkdir /etc/skel/.bash.d"
-                        ],
-			"skip_clean": true
-		},
-		{
 			"type": "file",
 			"source": "./secrets/common",
 			"destination": "/tmp"
-		},
-		{
-			"type": "file",
-			"source": "files/initonce.sh",
-			"destination": "/tmp/initonce.sh"
 		},
                 {
                         "type": "file",
@@ -82,8 +65,6 @@
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
-				"./scripts/common/firstboot.sh",
-				"./scripts/common/i18n.sh",
 				"./scripts/common/apt-upgrade.sh",
 				"./scripts/common/packages.sh",
 				"./scripts/common/dhcpd.sh",
@@ -92,8 +73,7 @@
 				"./scripts/common/crypto.sh",
 				"./scripts/common/ssm.sh",
 				"./scripts/common/base-network.sh",
-				"./scripts/common/login-config.sh",
-				"./scripts/common/netdata.sh"
+				"./scripts/common/login-config.sh"
 			],
 			"skip_clean": true
 		},
