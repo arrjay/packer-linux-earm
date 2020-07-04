@@ -110,95 +110,13 @@ localepurge
 echo "localepurge localepurge/use-dpkg-deature boolean true" | debconf-set-selections
 dpkg-reconfigure localepurge
 
-# add hooks for resizing
-cat <<_EOF_>/etc/initramfs-tools/hooks/resize-parttbl
-#!/bin/sh
-# install in initramfs-tools/hooks/resize-parttbl
-
-set -e
-
-PREREQ=""
-
-prereqs () {
-	echo "\${PREREQ}"
-}
-
-case "\${1}" in
-	prereqs)
-		prereqs
-		exit 0
-		;;
-esac
-
-. /usr/share/initramfs-tools/hook-functions
-
-copy_exec /usr/bin/awk /usr/bin
-copy_exec /sbin/blkid /sbin
-copy_exec /bin/lsblk /bin
-copy_exec /sbin/parted /sbin
-_EOF_
-chmod 0755 /etc/initramfs-tools/hooks/resize-parttbl
-
-cat <<_EOF_>/etc/initramfs-tools/scripts/local-premount/resize-parttbl
-#!/bin/sh
-# resize partition table script
-# install in initramfs-tools/scripts/local-premount
-
-PREREQ=""
-prereqs()
-{
-     echo "\$PREREQ"
-}
-
-case \$1 in
-prereqs)
-     prereqs
-     exit 0
-     ;;
-esac
-
-. /scripts/functions
-
-# bail if we're resuming, ok?
-if [ -n "\${resume?}" ] || [ -e /sys/power/resume ]; then
-        exit 0
-fi
-
-# deps
-command -v awk >/dev/null || exit 0
-command -v blkid >/dev/null || exit 0
-command -v lsblk >/dev/null || exit 0
-command -v parted >/dev/null || exit 0
-
-# find partitions belonging to the root block device and extend them.
-log_begin_msg "resizing partitions underlying \${ROOT}"
-case "\${ROOT}" in
-  /*)
-    rootdev="\${ROOT}"
-   ;;
-  *=*) 
-    lsbk=\$(echo "\${ROOT}" | awk -F= '{ print \$1 }')
-    lsbv=\$(echo "\${ROOT}" | awk -F= '{ gsub(/"/, "", \$2) ; print \$2 }')
-    rootdev=\$(blkid | awk -F: '\$2 ~ "'"\${lsbk}"'=\"'"\${lsbv}"'\"" { print \$1 }')
-   ;;
-esac
-
-parts=\$(lsblk -Ps "\${rootdev}" | awk '\$0 ~ "TYPE=\"part\"" { e=split(\$1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
-
-for slice in \${parts} ; do
-  read -r pno < "/sys/class/block/\${slice}/partition"
-  disk=\$(lsblk -Ps "/dev/\${slice}" | awk '\$0 ~ "TYPE=\"disk\"" { e=split(\$1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
-  parted -s "/dev/\${disk}" resizepart "\${pno}" 100%
-done
-
-log_end_msg
-_EOF_
-chmod 0755 /etc/initramfs-tools/scripts/local-premount/resize-parttbl
-
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
   RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
 }
+
+# clean up the entire source directory
+rm -rf "${PFSRC}"
 
 # collect stats for next image...
 df -m
