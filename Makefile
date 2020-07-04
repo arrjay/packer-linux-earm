@@ -1,11 +1,17 @@
 .DELETE_ON_ERROR:
 
+DISPLAY := ''
+export DISPLAY
+
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
-images/lite/pi.img: lite.json scripts/lite.sh
-	-rm -rf lite-image
-	packer build -only=pi lite.json
+LITE_FILES = $(shell find files/lite -type f)
+LITE_SCRIPTS = $(shell find scripts/lite -type f)
+
+images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
+	-rm -rf images/lite/pi.img
+	packer build -only=pi packer_templates/lite.json
 
 netdata-image/image: lite-image/image netdata.json scripts/netdata.sh
 	-rm -rf netdata-image

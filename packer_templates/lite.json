@@ -47,12 +47,12 @@
 		},
 		{
 			"type": "file",
-			"source": "files/initramfs.conf",
+			"source": "files/lite/initramfs.conf",
 			"destination": "/tmp/initramfs.conf"
 		},
 		{
 			"type": "file",
-			"source": "files/{{ build_name }}/initramfs.modules",
+			"source": "files/lite/{{ build_name }}/initramfs.modules",
 			"destination": "/tmp/initramfs.modules"
 		},
 		{
@@ -61,7 +61,7 @@
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
-				"./scripts/lite.sh"
+				"./scripts/lite/lite.sh"
 			],
 			"skip_clean": true
 		}
