@@ -1,0 +1,4 @@
+# HACK: rewired sources.list to use our cache...
+deb http://hose.g.bbxn.us/apt/raspbian buster main contrib non-free rpi
+# Uncomment line below then 'apt-get update' to enable 'apt-get source'
+deb-src http://hose.g.bbxn.us/apt/raspbian buster main contrib non-free rpi

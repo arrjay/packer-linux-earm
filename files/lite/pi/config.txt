@@ -1,0 +1,19 @@
+# add initramfs for all kernels, assuming default kernel names
+# if you're tinkering with 64-bit (kernel8) you will need to change these.
+[pi0]
+initramfs initrd.img followkernel
+[pi1]
+initramfs initrd.img followkernel
+[pi2]
+initramfs initrd7.img followkernel
+[pi3]
+initramfs initrd7.img followkernel
+[pi4]
+initramfs initrd7l.img followkernel
+[all]
+# cleared filter
+
+# for serial support, do this:
+#cmdline=serial.txt
+#enable_uart=1
+

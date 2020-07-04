@@ -47,6 +47,11 @@
 		},
 		{
 			"type": "file",
+			"source": "files/lite/environment",
+			"destination": "/tmp/environment"
+		},
+		{
+			"type": "file",
 			"source": "files/lite/initramfs.conf",
 			"destination": "/tmp/initramfs.conf"
 		},
@@ -54,6 +59,32 @@
 			"type": "file",
 			"source": "files/lite/{{ build_name }}/initramfs.modules",
 			"destination": "/tmp/initramfs.modules"
+		},
+		{
+			"type": "file",
+			"sources": "files/lite/apt-{{ build_name }}",
+			"destination": "/tmp"
+		},
+		{
+			"type": "file",
+			"sources": "files/lite/apt",
+			"destination": "/tmp"
+		},
+		{
+			"type": "file",
+			"sources": "files/lite/dpkg",
+			"destination": "/tmp"
+		},
+		{
+			"type": "file",
+			"sources": "files/lite/systemd",
+			"destination": "/tmp"
+		},
+		{
+			"only": [ "pi" ],
+			"type": "file",
+			"sources": "files/lite/pi/config.txt",
+			"destination": "/tmp/pi-config.txt"
 		},
 		{
 			"only": [ "pi" ],

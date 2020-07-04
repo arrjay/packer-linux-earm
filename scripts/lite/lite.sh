@@ -8,75 +8,53 @@ export LANG=C
 # just for comparison...
 df -m
 
-# drop dist hack for init
-sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
+# install environment files by adding them
+cat /tmp/environment >> /etc/environment
+[[ -f "/tmp/environment-${PACKER_BUILD_NAME}" ]] && cat "/tmp/environment-${PACKER_BUILD_NAME}" >> /etc/environment
+chown 0:0 /etc/environment
+chmod 0644 /etc/environment
 
-# HACK: rewire sources.list to use our cache...
-cat <<_EOF_>/etc/apt/sources.list
-deb http://hose.g.bbxn.us/apt/raspbian buster main contrib non-free rpi
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-deb-src http://hose.g.bbxn.us/apt/raspbian buster main contrib non-free rpi
-_EOF_
-cat <<_EOF_>/etc/apt/sources.list.d/raspi.list
-#deb http://archive.raspberrypi.org/debian/ buster main
-deb http://hose.g.bbxn.us/apt/raspberrypi/debian/ buster main
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-#deb-src http://archive.raspberrypi.org/debian/ buster main
-_EOF_
+# load any environment things we need and export them
+. /etc/environment
+export $(awk -F= '{ print $1 }' < /etc/environment)
 
-# drop in our apt files
-cat <<_EOF_>/etc/apt/apt.conf.d/0assume-yes
-APT::Get::Assume-Yes "true";
-_EOF_
+# (rpi) drop dist hack for init, create serial-oriented command line
+[[ -f /boot/cmdline.txt ]] && {
+  sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
+  sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
+}
 
-cat <<_EOF_>/etc/apt/apt.conf.d/0quiet
-APT::GET::quiet "1";
-_EOF_
+# (rpi) append initramfs loading to config.txt
+[[ -e /tmp/pi-config.txt ]] && [[ -e /boot/config.txt ]] && cat /tmp/pi-config.txt >> /boot/config.txt
 
-cat <<_EOF_>/etc/apt/apt.conf.d/autoremove-suggests
-Apt::AutoRemove::SuggestsImportant "false";
-_EOF_
+# (rpi) configure initramfs generation
+[[ -f /etc/default/raspberrypi-kernel ]] && printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
 
-cat <<_EOF_>/etc/apt/apt.conf.d/autoclean
-DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
-APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
-Dir::Cache::pkgcache ""; Dir::Cache::srcpkgcache "";
-_EOF_
+# recursion function for walking around in /tmp, installing to /etc
+install_ef () {
+  local s d
+  while (( "$#" )) ; do
+    s="${1}"
+    [[ -e "${s}" ]] || exit 0
+    [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; return ; }
+    d="${s#/tmp}"
+    install --verbose --mode=0644 --owner=0 --group=0 -D "${s}" "/etc${d}"
+    shift
+  done
+}
 
-cat <<_EOF_>/etc/apt/apt.conf.d/gzip-indexes
-Acquire::GzipIndexes "true"; Acquire::CompressionTypes::Order:: "gz";
-_EOF_
+# install system configs from packer file provisioner
+for source in /tmp/apt /tmp/dpkg /tmp/systemd ; do
+  install_ef $source
+done
 
-cat <<_EOF_>/etc/apt/apt.conf.d/no-languages
-Acquire::Languages "none";
-_EOF_
-
-cat <<_EOF_>/etc/apt/apt.conf.d/zz-no-install-recommends
-apt::install-recommends "false";
-_EOF_
+# packer's file upload provisioner stomps on directories rather than merging, so...
+rm -rf /tmp/apt
+mv /tmp/apt-${PACKER_BUILD_NAME} /tmp/apt
+install_ef /tmp/apt
 
 # force the update as root, otherwise this fails in some packer-chroots
 apt-get -o APT::Sandbox::User=root update
-
-# drop docs, groff, lintian
-cat <<_EOF_>/etc/dpkg/dpkg.cfg.d/01_nodoc
-path-exclude /usr/share/doc/*
-# we need to keep copyright files for legal reasons
-path-include /usr/share/doc/*/copyright
-path-exclude /usr/share/man/*
-path-exclude /usr/share/groff/*
-path-exclude /usr/share/info/*
-# lintian stuff is small, but really unnecessary
-path-exclude /usr/share/lintian/*
-path-exclude /usr/share/linda/*
-_EOF_
-
-cat <<_EOF_>/etc/dpkg/dpkg.cfg.d/01_noi18n
-path-exclude /usr/share/locale/*
-path-include /usr/share/locale/en*
-path-exclude /usr/share/i18n/locales/*
-path-include /usr/share/i18n/locales/en*
-_EOF_
 
 # delete anything from that now
 find /usr/share/doc -depth -type f ! -name copyright|xargs rm || true
@@ -84,19 +62,14 @@ find /usr/share/doc -empty|xargs rmdir || true
 rm -rf /usr/share/groff/* /usr/share/info/* /usr/share/man/*
 rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
 
-# configure pi locale
-raspi-config nonint do_configure_keyboard us
-raspi-config nonint do_change_locale en_US.UTF-8
+# (rpi) configure pi locale
+type raspi-config >/dev/null 2>&1 && {
+  raspi-config nonint do_configure_keyboard us
+  raspi-config nonint do_change_locale en_US.UTF-8
+}
 
 # server runs in UCT kthxbye
 ln -sf /usr/share/zoneinfo/UCT /etc/localtime
-
-# https://blog.packagecloud.io/eng/2017/02/21/set-environment-variable-save-thousands-of-system-calls/ o_O
-mkdir -p /etc/systemd/system.conf.d
-printf '[Manager]\nDefaultEnvironment=TZ=UCT\n' > /etc/systemd/system.conf.d/TZ.conf
-
-# people run in LA...
-printf 'TZ=America/Los_Angeles\n' >> /etc/environment
 
 # configure localepurge, make ssl shut _up_
 libssl=$(dpkg -l | grep libssl | awk '{print $2}') 
@@ -114,8 +87,6 @@ localepurge
 echo "localepurge localepurge/use-dpkg-deature boolean true" | debconf-set-selections
 dpkg-reconfigure localepurge
 
-# configure initramfs generation
-printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
 cat <<_EOF_> /etc/kernel/postinst.d/rpi-initramfs
 #!/bin/sh -e
 
@@ -135,26 +106,6 @@ for kv in /lib/modules/* ; do
 done
 _EOF_
 chmod 0755 /etc/kernel/postinst.d/rpi-initramfs
-
-# append initramfs loading to config.txt
-cat <<_EOF_>>/boot/config.txt
-[pi0]
-initramfs initrd.img followkernel
-[pi1]
-initramfs initrd.img followkernel
-[pi2]
-# NOTE: if you are using a 64-bit kernel, adjust these!
-initramfs initrd7.img followkernel
-[pi3]
-initramfs initrd7.img followkernel
-[pi4]
-initramfs initrd7l.img followkernel
-[all]
-# cleared filter
-# for serial support, do this:
-#cmdline=serial.txt
-#enable_uart=1
-_EOF_
 
 # add hooks for resizing and ld.so.preload fixups
 cat <<_EOF_>/etc/initramfs-tools/hooks/resize-parttbl
@@ -271,9 +222,6 @@ chmod 0755 /etc/initramfs-tools/scripts/local-bottom/ld_preload_hack
 
 # create the initrds
 RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
-
-# create an alternate serial.txt commandline
-sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 
 # collect stats for next image...
 df -m
