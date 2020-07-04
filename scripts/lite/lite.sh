@@ -42,23 +42,37 @@ install_ef () {
     [[ -e "${s}" ]] || exit 0
     [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; continue ; }
     d="${s#/tmp}"
-    install --verbose --mode=0644 --owner=0 --group=0 -D "${s}" "/etc${d}"
+    install --verbose --mode="${INSTALL_MODE:-0644}" --owner=0 --group=0 -D "${s}" "/etc${d}"
   done
 }
 
 # install system configs from packer file provisioner
-for source in "${PFSRC}/apt" "${PFSRC}/dpkg" "${PFSRC}/systemd" ; do
-  [[ -d "${source}" ]] && cp -R "${source}" /tmp
-done
-
-# allow for build overrides on apt config
-for source in "${PFSRC}/${PACKER_BUILD_NAME}/apt" ; do
+for source in \
+  "${PFSRC}/apt" \
+  "${PFSRC}/dpkg" \
+  "${PFSRC}/systemd" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/apt" \
+ ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
 
 # install from scratch directories into filesystem, clean them back up
 for directory in /tmp/apt /tmp/dpkg /tmp/systemd ; do
   install_ef "${directory}"
+  rm -rf "${directory}"
+done
+
+# kernel/initrd hooks from packer file provisioner
+for source in \
+  "${PFSRC}/initramfs-tools" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/initramfs-tools" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/kernel" \
+ ; do
+  [[ -d "${source}" ]] && cp -R "${source}" /tmp
+done
+
+for directory in /tmp/initramfs-tools /tmp/kernel ; do
+  INSTALL_MODE=0755 install_ef "${directory}"
   rm -rf "${directory}"
 done
 
@@ -96,27 +110,7 @@ localepurge
 echo "localepurge localepurge/use-dpkg-deature boolean true" | debconf-set-selections
 dpkg-reconfigure localepurge
 
-cat <<_EOF_> /etc/kernel/postinst.d/rpi-initramfs
-#!/bin/sh -e
-
-case "\${RPI_INITRD}" in
-  Y*|y*|T*|t*|1) : ;;
-  *)             exit 0 ;;
-esac
-
-# relies on the fact pi can't have multiple kernels installed. feels bad.
-for kv in /lib/modules/* ; do
-  case "\${kv}" in
-    *-v7+)   mkinitramfs -o /boot/initrd7.img  "\${kv}" ;;
-    *-v7l+)  mkinitramfs -o /boot/initrd7l.img "\${kv}" ;;
-    *-v8+)   mkinitramfs -o /boot/initrd8.img  "\${kv}" ;;
-    *[0-9]+) mkinitramfs -o /boot/initrd.img   "\${kv}" ;;
-  esac
-done
-_EOF_
-chmod 0755 /etc/kernel/postinst.d/rpi-initramfs
-
-# add hooks for resizing and ld.so.preload fixups
+# add hooks for resizing
 cat <<_EOF_>/etc/initramfs-tools/hooks/resize-parttbl
 #!/bin/sh
 # install in initramfs-tools/hooks/resize-parttbl
@@ -201,36 +195,10 @@ log_end_msg
 _EOF_
 chmod 0755 /etc/initramfs-tools/scripts/local-premount/resize-parttbl
 
-cat <<_EOF_>/etc/initramfs-tools/scripts/local-bottom/ld_preload_hack
-#!/bin/sh
-# move ld.preload.dist back if it exists
-# install in initramfs-tools/scripts/local-bottom
-
-PREREQ=""
-prereqs()
-{
-     echo "\$PREREQ"
+# (rpi) create the initrds
+[[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
+  RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
 }
-
-case \$1 in
-prereqs)
-     prereqs
-     exit 0
-     ;;
-esac
-
-. /scripts/functions
-
-[ -f "\${rootmnt}/etc/ld.so.preload.dist" ] && {
-  mount -o rw,remount "\${rootmnt}"
-  mv "\${rootmnt}/etc/ld.so.preload.dist" "\${rootmnt}/etc/ld.so.preload"
-  mount -o ro,remount "\${rootmnt}"
-}
-_EOF_
-chmod 0755 /etc/initramfs-tools/scripts/local-bottom/ld_preload_hack
-
-# create the initrds
-RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
 
 # collect stats for next image...
 df -m

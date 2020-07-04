@@ -1,0 +1,24 @@
+#!/bin/sh
+# move ld.preload.dist back if it exists
+# install in initramfs-tools/scripts/local-bottom
+
+PREREQ=""
+prereqs()
+{
+     echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+     prereqs
+     exit 0
+     ;;
+esac
+
+. /scripts/functions
+
+[ -f "${rootmnt}/etc/ld.so.preload.dist" ] && {
+  mount -o rw,remount "${rootmnt}"
+  mv "${rootmnt}/etc/ld.so.preload.dist" "${rootmnt}/etc/ld.so.preload"
+  mount -o ro,remount "${rootmnt}"
+}

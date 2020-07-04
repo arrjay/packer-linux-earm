@@ -1,0 +1,16 @@
+#!/bin/sh -e
+
+case "${RPI_INITRD}" in
+  Y*|y*|T*|t*|1) : ;;
+  *)             exit 0 ;;
+esac
+
+# relies on the fact pi can't have multiple kernels installed. feels bad.
+for kv in /lib/modules/* ; do
+  case "${kv}" in
+    *-v7+)   mkinitramfs -o /boot/initrd7.img  "${kv}" ;;
+    *-v7l+)  mkinitramfs -o /boot/initrd7l.img "${kv}" ;;
+    *-v8+)   mkinitramfs -o /boot/initrd8.img  "${kv}" ;;
+    *[0-9]+) mkinitramfs -o /boot/initrd.img   "${kv}" ;;
+  esac
+done
