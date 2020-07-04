@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -x
+set -e
 
 # rebuild the initramfs now
 # relies on the fact pi can't have multiple kernels installed. feels bad.

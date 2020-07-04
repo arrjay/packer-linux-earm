@@ -1,0 +1,52 @@
+#!/bin/sh
+# resize partition table script
+# install in initramfs-tools/scripts/local-premount
+
+PREREQ=""
+prereqs()
+{
+     echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+     prereqs
+     exit 0
+     ;;
+esac
+
+. /scripts/functions
+
+# bail if we're resuming, ok?
+if [ -n "${resume?}" ] || [ -e /sys/power/resume ]; then
+        exit 0
+fi
+
+# deps
+command -v awk >/dev/null || exit 0
+command -v blkid >/dev/null || exit 0
+command -v lsblk >/dev/null || exit 0
+command -v parted >/dev/null || exit 0
+
+# find partitions belonging to the root block device and extend them.
+log_begin_msg "resizing partitions underlying ${ROOT}"
+case "${ROOT}" in
+  /*)
+    rootdev="${ROOT}"
+   ;;
+  *=*) 
+    lsbk=$(echo "${ROOT}" | awk -F= '{ print $1 }')
+    lsbv=$(echo "${ROOT}" | awk -F= '{ gsub(/"/, "", $2) ; print $2 }')
+    rootdev=$(blkid | awk -F: '$2 ~ "'"${lsbk}"'=\"'"${lsbv}"'\"" { print $1 }')
+   ;;
+esac
+
+parts=$(lsblk -Ps "${rootdev}" | awk '$0 ~ "TYPE=\"part\"" { e=split($1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
+
+for slice in ${parts} ; do
+  read -r pno < "/sys/class/block/${slice}/partition"
+  disk=$(lsblk -Ps "/dev/${slice}" | awk '$0 ~ "TYPE=\"disk\"" { e=split($1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
+  parted -s "/dev/${disk}" resizepart "${pno}" 100%
+done
+
+log_end_msg

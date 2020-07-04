@@ -61,6 +61,16 @@
 			"destination": "/tmp/pimd"
 		},
 		{
+			"type": "file",
+			"source": "./files/initramfs-tools/resize-parttbl.hook",
+			"destination": "/etc/initramfs-tools/hooks/resize-parttbl"
+		},
+		{
+			"type": "file",
+			"source": "./files/initramfs-tools/resize-parttbl.script",
+			"destination": "/etc/initramfs-tools/scripts/local-premount/resize-parttbl"
+		},
+		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
