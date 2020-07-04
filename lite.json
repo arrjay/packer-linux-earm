@@ -46,6 +46,16 @@
 			"skip_clean": true
 		},
 		{
+			"type": "file",
+			"source": "files/initramfs.conf",
+			"destination": "/tmp/initramfs.conf"
+		},
+		{
+			"type": "file",
+			"source": "files/{{ build_name }}/initramfs.modules",
+			"destination": "/tmp/initramfs.modules"
+		},
+		{
 			"only": [ "pi" ],
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
