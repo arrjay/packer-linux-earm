@@ -4,13 +4,14 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 export LANG=C
+PFSRC=/tmp/packer-files
 
 # just for comparison...
 df -m
 
-# install environment files by adding them
-cat /tmp/environment >> /etc/environment
-[[ -f "/tmp/environment-${PACKER_BUILD_NAME}" ]] && cat "/tmp/environment-${PACKER_BUILD_NAME}" >> /etc/environment
+# install environment files by concatenating them
+cat "${PFSRC}/environment" >> /etc/environment
+[[ -f "${PFSRC}/environment-${PACKER_BUILD_NAME}" ]] && cat "${PFSRC}/environment-${PACKER_BUILD_NAME}" >> /etc/environment
 chown 0:0 /etc/environment
 chmod 0644 /etc/environment
 
@@ -25,33 +26,41 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 }
 
 # (rpi) append initramfs loading to config.txt
-[[ -e /tmp/pi-config.txt ]] && [[ -e /boot/config.txt ]] && cat /tmp/pi-config.txt >> /boot/config.txt
+[[ -e /boot/config.txt ]] && [[ -f "${PFSRC}/${PACKER_BUILD_NAME}/config.txt" ]] && \
+  cat "${PFSRC}/${PACKER_BUILD_NAME}/config.txt" >> /boot/config.txt
 
 # (rpi) configure initramfs generation
-[[ -f /etc/default/raspberrypi-kernel ]] && printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
+[[ -f /etc/default/raspberrypi-kernel ]] && {
+  printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
+}
 
 # recursion function for walking around in /tmp, installing to /etc
 install_ef () {
   local s d
   while (( "$#" )) ; do
-    s="${1}"
+    s="${1}" ; shift
     [[ -e "${s}" ]] || exit 0
-    [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; return ; }
+    [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; continue ; }
     d="${s#/tmp}"
     install --verbose --mode=0644 --owner=0 --group=0 -D "${s}" "/etc${d}"
-    shift
   done
 }
 
 # install system configs from packer file provisioner
-for source in /tmp/apt /tmp/dpkg /tmp/systemd ; do
-  install_ef $source
+for source in "${PFSRC}/apt" "${PFSRC}/dpkg" "${PFSRC}/systemd" ; do
+  [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
 
-# packer's file upload provisioner stomps on directories rather than merging, so...
-rm -rf /tmp/apt
-mv /tmp/apt-${PACKER_BUILD_NAME} /tmp/apt
-install_ef /tmp/apt
+# allow for build overrides on apt config
+for source in "${PFSRC}/${PACKER_BUILD_NAME}/apt" ; do
+  [[ -d "${source}" ]] && cp -R "${source}" /tmp
+done
+
+# install from scratch directories into filesystem, clean them back up
+for directory in /tmp/apt /tmp/dpkg /tmp/systemd ; do
+  install_ef "${directory}"
+  rm -rf "${directory}"
+done
 
 # force the update as root, otherwise this fails in some packer-chroots
 apt-get -o APT::Sandbox::User=root update

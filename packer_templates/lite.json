@@ -46,45 +46,19 @@
 			"skip_clean": true
 		},
 		{
-			"type": "file",
-			"source": "files/lite/environment",
-			"destination": "/tmp/environment"
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT",
+						"DEBIAN_FRONTEND=noninteractive", "LANG=C" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+				"mkdir /tmp/packer-files"
+			],
+			"skip_clean": true
 		},
 		{
 			"type": "file",
-			"source": "files/lite/initramfs.conf",
-			"destination": "/tmp/initramfs.conf"
-		},
-		{
-			"type": "file",
-			"source": "files/lite/{{ build_name }}/initramfs.modules",
-			"destination": "/tmp/initramfs.modules"
-		},
-		{
-			"type": "file",
-			"sources": "files/lite/apt-{{ build_name }}",
-			"destination": "/tmp"
-		},
-		{
-			"type": "file",
-			"sources": "files/lite/apt",
-			"destination": "/tmp"
-		},
-		{
-			"type": "file",
-			"sources": "files/lite/dpkg",
-			"destination": "/tmp"
-		},
-		{
-			"type": "file",
-			"sources": "files/lite/systemd",
-			"destination": "/tmp"
-		},
-		{
-			"only": [ "pi" ],
-			"type": "file",
-			"sources": "files/lite/pi/config.txt",
-			"destination": "/tmp/pi-config.txt"
+			"source": "files/lite/",
+			"destination": "/tmp/packer-files"
 		},
 		{
 			"only": [ "pi" ],
