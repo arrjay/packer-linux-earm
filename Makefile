@@ -13,6 +13,10 @@ images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img
 	packer build -only=pi packer_templates/lite.json
 
+images/lite/sheeva.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
+	-rm -rf images/lite/sheeva.img
+	packer build -only=sheeva packer_templates/lite.json
+
 netdata-image/image: lite-image/image netdata.json scripts/netdata.sh
 	-rm -rf netdata-image
 	packer build netdata.json
