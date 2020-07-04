@@ -71,6 +71,11 @@
 			"destination": "/etc/initramfs-tools/scripts/local-premount/resize-parttbl"
 		},
 		{
+			"type": "file",
+			"source": "./files/initramfs-tools/ld_preload_hack.script",
+			"destination": "/etc/initramfs-tools/scripts/local-bottom/ld_preload_hack"
+		},
+		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",

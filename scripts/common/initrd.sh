@@ -31,3 +31,6 @@ initramfs initrd7l.img followkernel
 [all]
 # cleared filter
 _EOF_
+
+# drop the init= script from cmdline
+sed -ie 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
