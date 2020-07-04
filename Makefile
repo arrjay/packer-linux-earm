@@ -3,9 +3,9 @@
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
-lite-image/image: lite.json scripts/lite.sh
+images/lite/pi.img: lite.json scripts/lite.sh
 	-rm -rf lite-image
-	packer build lite.json
+	packer build -only=pi lite.json
 
 netdata-image/image: lite-image/image netdata.json scripts/netdata.sh
 	-rm -rf netdata-image

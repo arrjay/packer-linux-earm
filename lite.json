@@ -15,16 +15,17 @@
 			"name": "sheeva",
 			"type": "arm-image",
 			"image_mounts": [ "/boot", "/" ],
-			"iso_url": "./images/bootstrap/sheevaplug.img",
+			"iso_url": "./images/upstream/sheevaplug-s1.img",
 			"iso_checksum_type": "none",
-			"output_filename": "images/lite/sheevaplug.img"
+			"output_filename": "images/lite/sheeva.img"
 		}
 	],
 	"provisioners": [
 		{
 			"only": [ "pi" ],
 			"type": "shell",
-			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT",
+						"DEBIAN_FRONTEND=noninteractive", "LANG=C" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"inline": [
                                 "mv /etc/ld.so.preload /etc/ld.so.preload.dist"
@@ -32,6 +33,20 @@
 			"skip_clean": true
 		},
 		{
+			"only": [ "sheeva" ],
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT",
+						"DEBIAN_FRONTEND=noninteractive", "LANG=C" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+				"chmod 0755 /",
+				"chown 0:0 /",
+				"/debootstrap/debootstrap --second-stage --merged-usr"
+			],
+			"skip_clean": true
+		},
+		{
+			"only": [ "pi" ],
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",

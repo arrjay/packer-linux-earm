@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# old bash? go away.
+[[ ${BASH_VERSINFO[0]} -le 2 ]] && echo 'No BASH_SOURCE array variable' && exit 1
+
+# not sourced? go away.
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] || { echo "script is intended to be sourced." && exit 1 ; }
+
+__warn_msg () { echo "${@}" 1>&2 ; }
+
+__fail_msg () { __warn_msg "${@}" ; return 1 ; }
+
+# check for needed binaries
+__check_progs () {
+  local prog proglist rc
+  rc=0
+  proglist=("${@}")
+  for prog in "${proglist[@]}" ; do
+    type "${prog}" > /dev/null 2>&1 || { __warn_msg "missing ${prog}" ; rc=126 ; }
+  done
+  return "${rc}"
+}
+
+# get checkout directory git revision information
+__get_cr () {
+  local cr
+  # initial shortrev
+  cr="$(git rev-parse --short HEAD)"
+  # check for uncommitted files
+  { git diff-index --quiet --cached HEAD -- &&
+    # check for extra files
+    git diff-files --quiet ; } || cr="${cr}-DIRTY"
+  echo "${cr}"
+}
+
+# I'm the operator of my sudo emulator...
+
+# we emulate sudo if we're already root
+sudo () { env "$@"; }
+
+# if we're not root, bring sudo to $sudo
+# also, check for sudo
+{
+  [ "$(id -u)" != "0" ] && {
+    __warn_msg "you are not root, wrapping commands in sudo..."
+    __check_progs sudo || exit "${?}"
+    sudo () { command sudo env "$@"; }
+  } ;
+} || echo "your are already root, 'sudo' is env in this script."
+
+# derive build stamps here
+[ -n "${CODEREV}" ]         || CODEREV="$(__get_cr)"
+[ -n "${BUILD_TIMESTAMP}" ] || BUILD_TIMESTAMP="$(date +%s)"
+
