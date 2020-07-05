@@ -39,7 +39,7 @@ install_ef () {
   local s d
   while (( "$#" )) ; do
     s="${1}" ; shift
-    [[ -e "${s}" ]] || exit 0
+    [[ -e "${s}" ]] || continue
     [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; continue ; }
     d="${s#/tmp}"
     install --verbose --mode="${INSTALL_MODE:-0644}" --owner=0 --group=0 -D "${s}" "/etc${d}"
@@ -109,6 +109,24 @@ apt-get install localepurge
 localepurge
 echo "localepurge localepurge/use-dpkg-deature boolean true" | debconf-set-selections
 dpkg-reconfigure localepurge
+
+# if we don't have /bin -> /usr/bin and such, install usrmerge
+readlink /bin > /dev/null || apt-get install usrmerge
+
+# common packages to all systems at this point.
+apt-get install \
+ systemd systemd-sysv \
+ mawk util-linux parted \
+ iproute2 bind9utils dnsutils \
+ openssh-client openssh-server openssh-sftp-server
+
+# (sheeva) install a kernel, flash-tools
+case "${PACKER_BUILD_NAME}" in
+  sheeva)
+    # HACK: install the kernel and utils here
+    FK_MACHINE=none apt-get install u-boot-tools flash-kernel linux-image-marvell
+  ;;
+esac
 
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
