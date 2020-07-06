@@ -133,6 +133,24 @@ esac
   RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
 }
 
+# (sheeva) assemble the kernel and initrd - these values are hardcoded for a sheevaplug (kirkwood)
+# all this is assuming there is exactly one kernel installed.
+case "${PACKER_BUILD_NAME}" in
+  sheeva)
+    kblob="$(mktemp)"
+    cat /boot/vmlinuz-* /usr/lib/linux-image-*/kirkwood-sheevaplug.dtb > "${kblob}"
+    # for the initrd, wire it to locate rootfs by LABEL (which was wired back in stage1)
+    rfs="$(grep ' / ' /etc/fstab | cut -d' ' -f1)"
+    for v in /lib/modules/* ; do
+      k="${v##*/}"
+      mkinitramfs -o "/boot/initrd.img-${k}" -r "${rfs}" "${k}"
+    done
+    mkimage -A arm -O linux -T kernel -C none -a 0x00008000 -e 0x00008000 -n kernel -d "${kblob}" /boot/uImage
+    mkimage -A arm -O linux -T ramdisk -C none -a 0x0 -e 0x0 -n ramdisk -d /boot/initrd.img-* /boot/uInitrd
+    rm "${kblob}"
+  ;;
+esac
+
 # clean up the entire source directory
 rm -rf "${PFSRC}"
 
