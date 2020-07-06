@@ -29,7 +29,7 @@ command -v lsblk >/dev/null || exit 0
 command -v parted >/dev/null || exit 0
 
 # find partitions belonging to the root block device and extend them.
-log_begin_msg "resizing partitions underlying \${ROOT}"
+log_begin_msg "resizing partitions underlying ${ROOT}"
 case "${ROOT}" in
   /*)
     rootdev="${ROOT}"
