@@ -1,0 +1,13 @@
+# MMC
+mvsdio
+mmc_block
+orion_nand
+# USB
+ehci_orion
+usb_storage
+uas
+sd_mod
+# NET
+mv643xx_eth
+# FS
+ext4
