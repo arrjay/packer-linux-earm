@@ -1,0 +1,11 @@
+# fallback - try dhcp on it!
+[Match]
+Name=onboard wl eth* em* en*
+[Network]
+LinkLocalAddressing=yes
+LLMNR=true
+IPv6AcceptRA=yes
+DHCP=yes
+MulticastDNS=yes
+LLDP=yes
+EmitLLDP=yes

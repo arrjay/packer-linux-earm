@@ -76,8 +76,21 @@ for directory in /tmp/initramfs-tools /tmp/kernel ; do
   rm -rf "${directory}"
 done
 
+# temporarily move backports.list away while installing the key for it
+[[ -f /etc/apt/sources.list.d/backports.list ]] && {
+  mv /etc/apt/sources.list.d/backports.list /etc/apt/sources.list.d/backports.list.disabled
+}
+
 # force the update as root, otherwise this fails in some packer-chroots
 apt-get -o APT::Sandbox::User=root update
+
+# install backports key, move backports back, update again
+[[ -f /etc/apt/sources.list.d/backports.list.disabled ]] && {
+  apt-get install gnupg2
+  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+  mv /etc/apt/sources.list.d/backports.list.disabled /etc/apt/sources.list.d/backports.list
+  apt-get -o APT::Sandbox::User=root update
+}
 
 # delete anything from that now
 find /usr/share/doc -depth -type f ! -name copyright|xargs rm || true

@@ -1,0 +1,9 @@
+[Unit]
+Description=/etc/resolv.conf link mangler
+Before=systemd-resolved.service
+ConditionPathIsSymbolicLink=!/etc/resolv.conf
+ConditionPathIsReadWrite=/etc
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf

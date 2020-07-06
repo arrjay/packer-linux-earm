@@ -62,7 +62,8 @@
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
-				"./scripts/lite/0_init.sh"
+				"./scripts/lite/0_init.sh",
+				"./scripts/lite/network-setup.sh"
 			]
 		}
 	]
