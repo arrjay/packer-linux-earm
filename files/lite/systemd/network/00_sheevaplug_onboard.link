@@ -1,0 +1,7 @@
+[Match]
+Driver=mv643xx_eth
+Path=platform-mv643xx_eth_port.0
+
+[Link]
+Name=onboard
+MACAddressPolicy=random
