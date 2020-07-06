@@ -76,6 +76,9 @@ for directory in /tmp/initramfs-tools /tmp/kernel ; do
   rm -rf "${directory}"
 done
 
+# reset hostnames for these to the builder name
+echo "${PACKER_BUILD_NAME}" > /etc/hostname
+
 # temporarily move backports.list away while installing the key for it
 [[ -f /etc/apt/sources.list.d/backports.list ]] && {
   mv /etc/apt/sources.list.d/backports.list /etc/apt/sources.list.d/backports.list.disabled
