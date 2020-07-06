@@ -45,7 +45,7 @@ parts=$(lsblk -Ps "${rootdev}" | awk '$0 ~ "TYPE=\"part\"" { e=split($1, o, "=")
 
 for slice in ${parts} ; do
   read -r pno < "/sys/class/block/${slice}/partition"
-  disk=$(lsblk -Ps "/dev/${slice}" | awk '$0 ~ "TYPE=\"disk\"" { e=split(\$1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
+  disk=$(lsblk -Ps "/dev/${slice}" | awk '$0 ~ "TYPE=\"disk\"" { e=split($1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
   parted -s "/dev/${disk}" resizepart "${pno}" 100%
 done
 
