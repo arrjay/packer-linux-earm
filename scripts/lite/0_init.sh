@@ -150,6 +150,8 @@ install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/sshd-keygen" "/us
 
 # wipe any ssh keys
 rm -rf /etc/ssh/ssh_host_*_key*
+# and disable rpi's service that makes them.
+rm -rf /etc/systemd/system/multi-user.target.wants/regenerate_ssh_host_keys.service
 
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
