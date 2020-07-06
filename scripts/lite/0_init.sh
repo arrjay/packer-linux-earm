@@ -144,8 +144,9 @@ case "${PACKER_BUILD_NAME}" in
   ;;
 esac
 
-# install the resize-rootfs service script now
+# install the resize-rootfs, sshd-keygen service scripts now
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/resize-rootfs.sh" "/usr/lib/untrustedhost/scripts/resize-rootfs.sh"
+install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/sshd-keygen" "/usr/lib/untrustedhost/scripts/sshd-keygen"
 
 # wipe any ssh keys
 rm -rf /etc/ssh/ssh_host_*_key*
