@@ -144,6 +144,9 @@ esac
 # install the resize-rootfs service script now
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/resize-rootfs.sh" "/usr/lib/untrustedhost/scripts/resize-rootfs.sh"
 
+# wipe any ssh keys
+rm -rf /etc/ssh/ssh_host_*_key*
+
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
   RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
