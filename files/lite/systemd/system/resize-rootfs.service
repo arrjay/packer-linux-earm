@@ -1,0 +1,8 @@
+[Unit]
+Description=resize root filesystem
+ConditionPathIsReadWrite=/
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/untrustedhost/scripts/resize-rootfs.sh

@@ -141,6 +141,9 @@ case "${PACKER_BUILD_NAME}" in
   ;;
 esac
 
+# install the resize-rootfs service script now
+install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/resize-rootfs.sh" "/usr/lib/untrustedhost/scripts/resize-rootfs.sh"
+
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
   RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
