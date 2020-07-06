@@ -7,3 +7,5 @@ ConditionPathIsReadWrite=/etc
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+[Install]
+WantedBy=multi-user.target

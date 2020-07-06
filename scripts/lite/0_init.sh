@@ -148,6 +148,10 @@ esac
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/resize-rootfs.sh" "/usr/lib/untrustedhost/scripts/resize-rootfs.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/sshd-keygen" "/usr/lib/untrustedhost/scripts/sshd-keygen"
 
+# install our custom services
+systemctl enable resize-rootfs.service
+systemctl enable resolvlink.service
+
 # wipe any ssh keys
 rm -rf /etc/ssh/ssh_host_*_key*
 # and disable rpi's service that makes them.

@@ -6,3 +6,6 @@ ConditionPathIsReadWrite=/
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/lib/untrustedhost/scripts/resize-rootfs.sh
+
+[Install]
+WantedBy=multi-user.target
