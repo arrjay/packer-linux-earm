@@ -56,7 +56,7 @@ parted "${temp_image}" toggle 1 boot
 
 sudo kpartx -a "${temp_image}"
 lo_device=$(losetup -a | grep -F '('"${temp_image}"')' | cut -d: -f1 | cut -d/ -f3)
-sudo mkfs.ext2 -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super "/dev/mapper/${lo_device}p1"
+sudo mkfs.ext2 -L "bfs-${BUILD_TIMESTAMP}" -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super "/dev/mapper/${lo_device}p1"
 sudo mkfs.ext4 -L "rfs-${BUILD_TIMESTAMP}" "/dev/mapper/${lo_device}p2"
 
 newsys="$(mktemp -d)"
@@ -67,7 +67,8 @@ sudo mount "/dev/mapper/${lo_device}p1" "${newsys}/boot"
 
 (cd "${temp_chroot}" && sudo tar cpf - .) | sudo tar xpf - -C "${newsys}"
 
-printf 'LABEL=%s / ext4 defaults,noatime 0 0\n' "rfs-${BUILD_TIMESTAMP}" | sudo tee "${newsys}/etc/fstab" > /dev/null
+printf 'LABEL=%s / ext4 defaults,noatime 0 1\n' "rfs-${BUILD_TIMESTAMP}" | sudo tee "${newsys}/etc/fstab" > /dev/null
+printf 'LABEL=%s /boot ext2 defaults,noatime 0 2\n' "bfs-${BUILD_TIMESTAMP}" | sudo tee "${newsys}/etc/fstab" > /dev/null
 
 sudo umount "${newsys}/boot"
 sudo umount "${newsys}"
