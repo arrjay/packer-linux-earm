@@ -68,7 +68,7 @@ sudo mount "/dev/mapper/${lo_device}p1" "${newsys}/boot"
 (cd "${temp_chroot}" && sudo tar cpf - .) | sudo tar xpf - -C "${newsys}"
 
 printf 'LABEL=%s / ext4 defaults,noatime 0 1\n' "rfs-${BUILD_TIMESTAMP}" | sudo tee "${newsys}/etc/fstab" > /dev/null
-printf 'LABEL=%s /boot ext2 defaults,noatime 0 2\n' "bfs-${BUILD_TIMESTAMP}" | sudo tee "${newsys}/etc/fstab" > /dev/null
+printf 'LABEL=%s /boot ext2 defaults,noatime 0 2\n' "bfs-${BUILD_TIMESTAMP}" | sudo tee -a "${newsys}/etc/fstab" > /dev/null
 
 sudo umount "${newsys}/boot"
 sudo umount "${newsys}"
