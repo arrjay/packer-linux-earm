@@ -134,6 +134,7 @@ apt-get install \
  systemd systemd-sysv \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
+ vim \
  openssh-client openssh-server openssh-sftp-server
 
 # (sheeva) install a kernel, flash-tools
@@ -141,12 +142,15 @@ case "${PACKER_BUILD_NAME}" in
   sheeva)
     # HACK: install the kernel and utils here
     FK_MACHINE=none apt-get install u-boot-tools flash-kernel linux-image-marvell
+    # also the addswap service
+    systemctl enable addswap.service
   ;;
 esac
 
 # install the resize-rootfs, sshd-keygen service scripts now
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/resize-rootfs.sh" "/usr/lib/untrustedhost/scripts/resize-rootfs.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/sshd-keygen" "/usr/lib/untrustedhost/scripts/sshd-keygen"
+install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/addswap.sh" "/usr/lib/untrustedhost/scripts/addswap.sh"
 
 # install our custom services
 systemctl enable resize-rootfs.service

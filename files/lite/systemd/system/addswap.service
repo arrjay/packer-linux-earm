@@ -1,0 +1,11 @@
+[Unit]
+Description=add swap partition
+ConditionPathIsReadWrite=/
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/untrustedhost/scripts/addswap.sh
+
+[Install]
+WantedBy=multi-user.target
