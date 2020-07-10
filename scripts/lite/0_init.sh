@@ -135,7 +135,7 @@ apt-get install \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
  vim \
- openssh-client openssh-server openssh-sftp-server
+ ca-certificates openssh-client openssh-server openssh-sftp-server
 
 # (sheeva) install a kernel, flash-tools
 case "${PACKER_BUILD_NAME}" in
