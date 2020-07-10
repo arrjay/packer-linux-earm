@@ -137,6 +137,9 @@ apt-get install \
  vim \
  ca-certificates openssh-client openssh-server openssh-sftp-server
 
+# force ca certificate rebuild
+update-ca-certificates --fresh
+
 # (sheeva) install a kernel, flash-tools
 case "${PACKER_BUILD_NAME}" in
   sheeva)
