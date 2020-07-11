@@ -23,6 +23,7 @@ rm -f /etc/network/interfaces
 systemctl enable systemd-networkd.service
 systemctl enable systemd-resolved.service
 systemctl mask systemd-networkd-wait-online.service
+systemctl enable ssh.service
 
 # disable ipv6
 apt-get install augeas-tools
