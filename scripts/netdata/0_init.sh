@@ -29,6 +29,8 @@ case "${PACKER_BUILD_NAME}" in
   pi)
     # force old lm_sensors plugin on
     echo sensors=force >> /etc/netdata/charts.d.conf
+    chown netdata:netdata /etc/netdata/charts.d.conf
+    chmod 0644 /etc/netdata/charts.d.conf
    ;;
 esac
 
