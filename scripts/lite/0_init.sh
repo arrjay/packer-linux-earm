@@ -134,11 +134,19 @@ apt-get install \
  systemd systemd-sysv \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
- vim \
+ vim curl \
  ca-certificates openssh-client openssh-server openssh-sftp-server
 
-# force ca certificate rebuild
-update-ca-certificates --fresh
+# do exceedingly wacky thing in case c_rehash just...didn't do anything
+for f in /etc/ssl/certs/* ; do
+  case "${f}" in
+    *.0) continue ;;
+  esac
+  hf="$(openssl x509 -hash -noout -in "${f}").0"
+  [[ -e "/etc/ssl/certs/${hf}" ]] || {
+    ln -s ".${f#/etc/ssl/certs}" "/etc/ssl/certs/${hf}"
+  }
+done
 
 # (sheeva) install a kernel, flash-tools
 case "${PACKER_BUILD_NAME}" in
