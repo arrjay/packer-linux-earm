@@ -6,7 +6,7 @@
 			"name": "pi",
 			"type": "arm-image",
 			"image_type": "raspberrypi",
-			"iso_url": "./2020-05-27-raspios-buster-lite-armhf.zip",
+			"iso_url": "./images/upstream/2020-05-27-raspios-buster-lite-armhf.zip",
 			"iso_checksum_type": "sha256",
 			"iso_checksum": "f5786604be4b41e292c5b3c711e2efa64b25a5b51869ea8313d58da0b46afc64",
 			"output_filename": "images/lite/pi.img"
