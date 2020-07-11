@@ -8,6 +8,7 @@ GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
 LITE_FILES = $(shell find files/lite -type f)
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
+NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
 
 images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img
@@ -17,9 +18,13 @@ images/lite/sheeva.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/sheeva.img
 	packer build -only=sheeva packer_templates/lite.json
 
-netdata-image/image: lite-image/image netdata.json scripts/netdata.sh
+images/netdata/pi.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img
 	-rm -rf netdata-image
-	packer build netdata.json
+	packer build -only=pi packer_templates/netdata.json
+
+images/netdata/sheeva.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/sheeva.img
+	-rm -rf netdata-image
+	packer build -only=sheeva packer_templates/netdata.json
 
 base-image/image: base.json $(COMMON_SCRIPTS)
 	-rm -rf base-image
