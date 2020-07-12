@@ -25,7 +25,3 @@ chmod 0440 /etc/sudoers.d/ssm-agent-users
 curl -L -o /tmp/amazon-ssm-agent.deb https://s3.$AWS_DEFAULT_REGION.amazonaws.com/amazon-ssm-$AWS_DEFAULT_REGION/latest/debian_arm/amazon-ssm-agent.deb
 dpkg -i /tmp/amazon-ssm-agent.deb || true
 apt-get install -qq -y -f
-
-# wire all STS endpoints to regional logic
-mkdir -p /etc/systemd/system.conf.d
-printf '[Manager]\nDefaultEnvironment="AWS_STS_REGIONAL_ENDPOINTS=regional"\n' > /etc/systemd/system.conf.d/AWS_STS_REGIONAL_ENDPOINTS.conf

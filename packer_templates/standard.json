@@ -41,15 +41,11 @@
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
-				"./scripts/common/apt-upgrade.sh",
-				"./scripts/common/packages.sh",
-				"./scripts/common/dhcpd.sh",
-				"./scripts/common/kernelsrc.sh",
-				"./scripts/common/xt_cgroup.sh",
-				"./scripts/common/crypto.sh",
-				"./scripts/common/ssm.sh",
-				"./scripts/common/base-network.sh",
-				"./scripts/common/login-config.sh"
+				"./scripts/standard/0_init.sh",
+				"./scripts/standard/packages.sh",
+				"./scripts/standard/xt_cgroup.sh",
+				"./scripts/standard/ssm.sh",
+				"./scripts/standard/login-config.sh"
 			]
 		},
 		{

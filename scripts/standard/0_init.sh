@@ -25,11 +25,27 @@ install_ef () {
   done
 }
 
+# HACK: imd expects bird. that's not gonna happen, so...
+mkdir -p /etc/bird
+chown 0:0 /etc/bird
+chmod 0755 /etc/bird
+
+# install imd kit now
+chmod +x "${PFSRC}/cache/imd/install.run"
+"${PFSRC}/cache/imd/install.run"
+
 # install system configs from packer file provisioner
 for source in \
   "${PFSRC}/etc/skel" \
   "${PFSRC}/systemd" \
   "${PFSRC}/untrustedhost" \
+ ; do
+  [[ -d "${source}" ]] && cp -R "${source}" /tmp
+done
+
+# if we have a platform directory, arrange for that too
+for source in \
+  "${PFSRC}/${PACKER_BUILD_NAME}/untrustedhost" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done

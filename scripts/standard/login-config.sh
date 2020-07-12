@@ -22,9 +22,6 @@ chown -R $u:$u /home/$u/
 # force key-only login over ssh
 augtool set /files/etc/ssh/sshd_config/PasswordAuthentication no
 
-# enable ssh pi-style
-touch /boot/ssh
-
 # reconfigure sudoers
 rm -f /etc/sudoers.d/010_pi-nopasswd
 printf '%s ALL=(ALL) NOPASSWD: ALL\n' $u > /etc/sudoers.d/010_$u-nopasswd
@@ -34,7 +31,9 @@ chmod 0440 /etc/sudoers.d/010_$u-nopasswd
 usermod -p $h root
 usermod -p $h $u
 
-# reconfigure /boot filesystem to be root exclusive
+# (rpi) reconfigure /boot filesystem to be root exclusive
+case "${PACKER_BUILD_NAME}" in
+  pi)
 cat <<_EOF_ | augtool
 ins opt after /files/etc/fstab/*[file="/boot"]/opt[last()]
 set /files/etc/fstab/*[file="/boot"]/opt[last()] umask
@@ -47,6 +46,8 @@ set /files/etc/fstab/*[file="/boot"]/opt[last()] gid
 set /files/etc/fstab/*[file="/boot"]/opt[last()]/value 0
 save
 _EOF_
+  ;;
+esac
 
 # set default target to be just multi-user
 systemctl set-default multi-user.target
