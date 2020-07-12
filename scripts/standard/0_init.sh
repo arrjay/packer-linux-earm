@@ -21,14 +21,12 @@ install_ef () {
     [[ -e "${s}" ]] || continue
     [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; continue ; }
     d="${s#/tmp}"
-    install --verbose --mode="${INSTALL_MODE:-0644}" --owner=0 --group=0 -D "${s}" "/etc${d}"
+    install --verbose --mode="${INSTALL_MODE:-0644}" --owner=0 --group=0 -D "${s}" "${TARGET_DIR:-/etc}${d}"
   done
 }
 
 # HACK: imd expects bird. that's not gonna happen, so...
-mkdir -p /etc/bird
-chown 0:0 /etc/bird
-chmod 0755 /etc/bird
+install --verbose -o 0 -g 0 -d /etc/bird
 
 # install imd kit now
 chmod +x "${PFSRC}/cache/imd/install.run"
@@ -39,6 +37,7 @@ for source in \
   "${PFSRC}/etc/skel" \
   "${PFSRC}/systemd" \
   "${PFSRC}/untrustedhost" \
+  "${PFSRC}/imd" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
@@ -58,5 +57,10 @@ done
 
 for directory in /tmp/skel ; do
   INSTALL_MODE=0755 install_ef "${directory}"
+  rm -rf "${directory}"
+done
+
+for directory in /tmp/imd ; do
+  INSTALL_MODE=0755 TARGET_DIR=/usr/lib/untrustedhost install_ef "${directory}"
   rm -rf "${directory}"
 done
