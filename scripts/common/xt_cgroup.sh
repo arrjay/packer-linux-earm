@@ -2,7 +2,7 @@
 
 set -ex
 
-apt-get install -qq -y dkms
+apt-get install -qq -y dkms raspberrypi-kernel-headers
 
 # pry xt_cgroup module out of kernel tree and build with dkms
 MVER=0.1

@@ -1,0 +1,69 @@
+{
+	"variables": {
+	},
+	"builders": [
+		{
+			"name": "pi",
+			"type": "arm-image",
+			"image_type": "raspberrypi",
+			"iso_url": "./images/netdata/pi.img",
+			"iso_checksum_type": "none",
+			"output_filename": "images/standard/pi.img",
+			"target_image_size": 3221225472
+		}
+	],
+	"provisioners": [
+                {
+                        "type": "shell-local",
+                        "execute_command": ["bash", "-c", "{{ .Vars }} {{ .Script }}"],
+                        "inline": [
+				"p=$(pwd) && rm -f $p/files/standard/cache/imd/install.run && pushd vendor/imd && make OUTPUTDIR=$p/files/standard/cache/imd/ && popd",
+				"mkdir -p $p/files/standard/cache/etc/skel",
+				"cp vendor/dotfiles/bashrc $p/files/standard/cache/etc/skel/.bashrc",
+				"cp -R vendor/dotfiles/bash.d $p/files/standard/cache/etc/skel/.bash.d"
+			]
+                },
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+				"mkdir -p /tmp/packer-files"
+			]
+		},
+		{
+			"type": "file",
+			"source": "files/standard/",
+			"destination": "/tmp/packer-files"
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"scripts": [
+				"./scripts/common/apt-upgrade.sh",
+				"./scripts/common/packages.sh",
+				"./scripts/common/dhcpd.sh",
+				"./scripts/common/kernelsrc.sh",
+				"./scripts/common/xt_cgroup.sh",
+				"./scripts/common/crypto.sh",
+				"./scripts/common/ssm.sh",
+				"./scripts/common/base-network.sh",
+				"./scripts/common/login-config.sh"
+			]
+		},
+		{
+			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+                                "mkdir -p /etc/bird",
+                                "chmod +x /tmp/packer-files/cache/imd/install.run",
+                                "/tmp/packer-files/cache/imd/install.run",
+				"df -m",
+				"ls -l /boot",
+				"cat /boot/config.txt"
+                        ]
+		}
+	]
+}
