@@ -53,9 +53,6 @@
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"inline": [
-                                "mkdir -p /etc/bird",
-                                "chmod +x /tmp/packer-files/cache/imd/install.run",
-                                "/tmp/packer-files/cache/imd/install.run",
 				"df -m",
 				"ls -l /boot",
 				"cat /boot/config.txt"
