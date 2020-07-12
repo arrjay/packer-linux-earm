@@ -1,8 +1,18 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
 
-apt-get -qq -y install pi-bluetooth tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server
+case "${PACKER_BUILD_NAME}" in
+  pi) ADDITIONAL_PACKAGES=(
+        'pi-bluetooth'
+      )
+   ;;
+  *)  ADDITIONAL_PACKAGES=(
+      )
+   ;;
+esac
+
+apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server "${ADDITIONAL_PACKAGES[*]}"
 
 # disable installed services for imd management
 systemctl disable chrony

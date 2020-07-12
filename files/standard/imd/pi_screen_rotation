@@ -14,7 +14,9 @@ case "${imd_rot}" in
 esac
 [ "${pi_rot}" ] && {
   # shellcheck disable=SC2016
-  sed -i -e '/^\(lcd_rotate=\).*/{s//\1'"${pi_rot}"'/;:a;n;ba;q}' -e '$alcd_rotate='"${pi_rot}" '/boot/config.txt'
+  [ -e /boot/config.txt ] && {
+    sed -i -e '/^\(lcd_rotate=\).*/{s//\1'"${pi_rot}"'/;:a;n;ba;q}' -e '$alcd_rotate='"${pi_rot}" '/boot/config.txt'
+  }
 }
 
 exit 0

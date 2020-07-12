@@ -38,7 +38,12 @@
 		},
 		{
 			"type": "shell",
-			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
+			"environment_vars": [
+				"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+				"TZ=UCT",
+				"XT_CGROUP_DKMS_VERSION=0.1",
+				"UPSTREAM_KVER=4.19.132"
+			],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/standard/0_init.sh",
