@@ -134,7 +134,7 @@ apt-get install \
  systemd systemd-sysv \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
- vim curl \
+ sudo vim curl \
  ca-certificates openssh-client openssh-server openssh-sftp-server
 
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
