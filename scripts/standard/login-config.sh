@@ -6,13 +6,13 @@ u=ejusdem
 h='$6$6fGmOsJL.Ql5uGyI$GLLkrlJRnvkqKDf35.3QfI219fD1/RYTaV1qbHk9Mm.tuMDF17tQ38pPoD/inTo633u8Yq36FDyirlVJKQ3ed.'
 
 # disable pi user
-passwd -l pi
+getent passwd pi && passwd -l pi
 
 # add ejusdem user
 groupadd $u
 useradd -g $u $u
 for g in dialout i2c systemd-journal netdev ; do
-  usermod -a -G $g $u
+  getent group $g && usermod -a -G $g $u
 done
 
 # create .ssh dir for that, copy the key to it

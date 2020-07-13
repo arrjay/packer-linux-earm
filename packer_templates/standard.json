@@ -10,6 +10,15 @@
 			"iso_checksum_type": "none",
 			"output_filename": "images/standard/pi.img",
 			"target_image_size": 3221225472
+		},
+		{
+			"name": "sheeva",
+			"type": "arm-image",
+			"image_mounts": [ "/boot", "/" ],
+			"iso_url": "./images/netdata/sheeva.img",
+			"iso_checksum_type": "none",
+			"output_filename": "images/standard/sheeva.img",
+			"target_image_size": 3221225472
 		}
 	],
 	"provisioners": [
@@ -59,9 +68,7 @@
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"inline": [
 				"rm -rf /tmp/packer-files",
-				"df -m",
-				"ls -l /boot",
-				"cat /boot/config.txt"
+				"df -m"
                         ]
 		}
 	]

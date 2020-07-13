@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 MOD=xt_cgroup
 MVER="${XT_CGROUP_DKMS_VERSION}"
 PFSRC=/tmp/packer-files
