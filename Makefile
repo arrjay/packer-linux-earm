@@ -9,6 +9,8 @@ GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 LITE_FILES = $(shell find files/lite -type f)
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
+STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
+STANDARD_FILES = $(shell find files/standard -type f)
 
 images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img
@@ -19,16 +21,20 @@ images/lite/sheeva.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	packer build -only=sheeva packer_templates/lite.json
 
 images/netdata/pi.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img
-	-rm -rf netdata-image
+	-rm -rf images/netdata/pi.img
 	packer build -only=pi packer_templates/netdata.json
 
 images/netdata/sheeva.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/sheeva.img
-	-rm -rf netdata-image
+	-rm -rf images/netdata/sheeva.img
 	packer build -only=sheeva packer_templates/netdata.json
 
-base-image/image: base.json $(COMMON_SCRIPTS)
-	-rm -rf base-image
-	packer build base.json
+images/standard/pi.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/pi.img
+	-rm -rf images/standard/pi.img
+	packer build -only=pi packer_templates/standard.json
+
+images/standard/sheeva.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/sheeva.img
+	-rm -rf images/standard/sheeva.img
+	packer build -only=sheeva packer_templates/standard.json
 
 dterm-image/image: base-image/image dterm.json scripts/install-dterm.sh
 	-rm -rf dterm-image
