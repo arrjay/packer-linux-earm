@@ -2,7 +2,7 @@
 
 set -e
 
-apt-get -qq -y install libreadline-dev
+apt-get install libreadline-dev
 
 curl -L -o /tmp/dterm.tgz http://www.knossos.net.nz/downloads/dterm-0.5.tgz
 
