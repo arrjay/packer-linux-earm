@@ -25,10 +25,11 @@ for slice in ${parts} ; do
   # Number  Start   End     Size    Type     File system  Flags
   #         32.3kB  1049kB  1016kB           Free Space
   #  1      1049kB  230MB   229MB   primary  ext2         boot
-  #         230MB   768MB   538MB            Free Space
-  #  2      768MB   15.5GB  14.7GB  primary  ext4
+  #  2      230MB   238MB   8389kB  primary               lba
+  #         238MB   768MB   530MB            Free Space
+  #  3      768MB   15.5GB  14.7GB  primary  ext4
   disk=$(lsblk -Ps "/dev/${slice}" | awk '$0 ~ "TYPE=\"disk\"" { e=split($1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
-  candidate=$(parted -s "/dev/${disk}" print free | awk '/^ 1 /{f=1;next}/^ 2 /{f=0}f')
+  candidate=$(parted -s "/dev/${disk}" print free | awk '/^ 2 /{f=1;next}/^ 3 /{f=0}f')
   case "${candidate}" in
     *"Free Space"*)
       read -r start end size rest <<<$candidate
