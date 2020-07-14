@@ -13,7 +13,7 @@
 		{
 			"name": "sheeva",
 			"type": "arm-image",
-			"image_mounts": [ "/boot", "/" ],
+			"image_mounts": [ "/boot", "/boot/IMD", "/" ],
 			"iso_url": "./images/lite/sheeva.img",
 			"iso_checksum_type": "none",
 			"output_filename": "images/netdata/sheeva.img"

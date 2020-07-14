@@ -50,6 +50,7 @@ temp_image="$(mktemp)"
 truncate -s 2G "${temp_image}"
 parted "${temp_image}" mklabel msdos
 parted "${temp_image}" mkpart pri ext2 1m 230m
+parted "${temp_image}" mkpart pri fat16 230m 238m
 # MIND THE GAP (for a swap partition)
 parted "${temp_image}" mkpart pri ext4 768m 100%
 parted "${temp_image}" toggle 1 boot
@@ -57,13 +58,15 @@ parted "${temp_image}" toggle 1 boot
 sudo kpartx -a "${temp_image}"
 lo_device=$(losetup -a | grep -F '('"${temp_image}"')' | cut -d: -f1 | cut -d/ -f3)
 sudo mkfs.ext2 -L "bfs-${BUILD_TIMESTAMP}" -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super "/dev/mapper/${lo_device}p1"
-sudo mkfs.ext4 -L "rfs-${BUILD_TIMESTAMP}" "/dev/mapper/${lo_device}p2"
+sudo mkfs.vfat -F16 -n IMD "/dev/mapper/${lo_device}p2"
+sudo mkfs.ext4 -L "rfs-${BUILD_TIMESTAMP}" "/dev/mapper/${lo_device}p3"
 
 newsys="$(mktemp -d)"
 
-sudo mount "/dev/mapper/${lo_device}p2" "${newsys}"
+sudo mount "/dev/mapper/${lo_device}p3" "${newsys}"
 sudo mkdir -p "${newsys}/boot"
 sudo mount "/dev/mapper/${lo_device}p1" "${newsys}/boot"
+sudo mkdir -p "${newsys}/boot/IMD"
 
 (cd "${temp_chroot}" && sudo tar cpf - .) | sudo tar xpf - -C "${newsys}"
 
