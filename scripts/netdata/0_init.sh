@@ -23,7 +23,7 @@ cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
 git checkout v1.23.1
-./netdata-installer.sh --dont-start-it --dont-wait
+./netdata-installer.sh --dont-start-it --dont-wait --disable-ebpf
 
 case "${PACKER_BUILD_NAME}" in
   pi)
