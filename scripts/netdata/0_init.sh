@@ -23,6 +23,7 @@ cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
 git checkout v1.23.1
+# HACK: currently ebpf is disabled because it doesn't work on arm.
 ./netdata-installer.sh --dont-start-it --dont-wait --disable-ebpf
 
 case "${PACKER_BUILD_NAME}" in
@@ -36,6 +37,13 @@ esac
 
 # disable version check in web dashboard
 echo 0 > /usr/share/netdata/web/version.txt
+
+# HACK 2: disable ebpf plugin by just...writing a config file. sure.
+cat<<EOF>/etc/netdata/netdata.conf
+[plugins]
+  ebpf = no
+EOF
+chown 0:0 /etc/netdata/netdata.conf ; chmod 0644 /etc/netdata/netdata.conf
 
 # add firewalld service
 firewall-offline-cmd --new-service=netdata
