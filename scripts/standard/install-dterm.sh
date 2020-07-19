@@ -20,3 +20,4 @@ cat << _EOF_ > /etc/dtermrc
 # below sets dterm attn key to ctrl-n idek
 esc=.
 _EOF_
+chmod 0644 /etc/dtermrc

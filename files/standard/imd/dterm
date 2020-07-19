@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -x
+
+session_ct="$(xmlstarlet sel -t -c 'count(metadata/serial/session)' "${IMD_PATH}")"
+
+[[ "${session_ct}" -le 0 ]] && exit 0
+
+systemctl start tmux-console
+
+while [[ "${session_ct}" -ne 0 ]] ; do
+  dname="$(xmlstarlet sel -t -v 'metadata/serial/session['"${session_ct}"']/@name' "${IMD_PATH}")"
+  dpath="$(xmlstarlet sel -t -v 'metadata/serial/session['"${session_ct}"']/@device' "${IMD_PATH}")"
+  dspeed="$(xmlstarlet sel -t -v 'metadata/serial/session['"${session_ct}"']/@speed' "${IMD_PATH}")"
+  ((session_ct--))
+  [[ "${dname}" == '' ]] && { [[ "${dpath}" == '' ]] && continue ; }
+  tmux -L console new-window -d -n "${dname}" 'dterm '"${dpath}"' '"${dspeed}"
+done
+

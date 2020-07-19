@@ -1,0 +1,6 @@
+[Unit]
+Description=tmux console
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/tmux -L console new-session -d -s console bash
+RemainAfterExit=yes
