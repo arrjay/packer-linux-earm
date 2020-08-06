@@ -5,7 +5,7 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get -qq clean
-apt-get -qq -y install xfce4 xfce4-screenshooter xfce4-terminal solaar blueman scdaemon
+apt-get -qq -y install xfce4 xfce4-screenshooter xfce4-terminal solaar blueman scdaemon virt-manager
 apt-get -qq clean
 
 # this is done after the base xfce4 isntall because we're riding the line of image space

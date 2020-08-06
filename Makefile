@@ -11,6 +11,8 @@ LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
 STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
 STANDARD_FILES = $(shell find files/standard -type f)
+XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
+XFCE_FILES = $(shell find files/xfce -type f)
 
 images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img
@@ -36,13 +38,9 @@ images/standard/sheeva.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $
 	-rm -rf images/standard/sheeva.img
 	packer build -only=sheeva packer_templates/standard.json
 
-dterm-image/image: base-image/image dterm.json scripts/install-dterm.sh
-	-rm -rf dterm-image
-	packer build dterm.json
-
-xfce-image/image: dterm-image/image xfce.json scripts/install-xfce.sh
-	-rm -rf xfce-image
-	packer build xfce.json
+images/xfce/pi.img: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img
+	-rm -rf images/xfce/pi.img
+	packer build -only=pi packer_templates/xfce.json
 
 edger/image: dterm-image/image edger.json scripts/edger.sh
 	-rm -rf edger

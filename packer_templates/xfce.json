@@ -1,22 +1,24 @@
 {
 	"variables": {
 	},
-	"builders": [{
-		"type": "arm-image",
-		"image_type": "raspberrypi",
-		"iso_url": "./dterm-image/image",
-		"iso_checksum_type": "none",
-		"output_directory": "xfce-image"
-	}],
+	"builders": [
+		{
+			"name": "pi",
+			"type": "arm-image",
+			"image_type": "raspberrypi",
+			"iso_url": "./images/standard/pi.img",
+			"iso_checksum_type": "none",
+			"output_filename": "./images/xfce/pi.img"
+		}
+	],
 	"provisioners": [
 		{
 			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
-				"./scripts/install-xfce.sh"
-			],
-			"skip_clean": true
+				"./scripts/xfce/0_init.sh"
+			]
 		}
 	]
 }
