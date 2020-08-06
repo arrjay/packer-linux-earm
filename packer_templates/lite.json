@@ -15,7 +15,7 @@
 			"name": "sheeva",
 			"type": "arm-image",
 			"image_mounts": [ "/boot", "/boot/IMD", "/" ],
-			"iso_url": "./images/upstream/sheevaplug-s1.img",
+			"iso_url": "./images/upstream/sheevaplug-s1.img.xz",
 			"iso_checksum_type": "none",
 			"output_filename": "images/lite/sheeva.img"
 		}
