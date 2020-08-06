@@ -12,6 +12,11 @@ for kv in /lib/modules/* ; do
 done
 [[ "${haz}" -gt 0 ]] && exit 0
 
+case "${PACKER_BUILD_NAME}" in
+  pi) KH_PKG=("raspberrypi-kernel" "raspberrypi-kernel-headers") ; UPSTREAM_KVER=5.4.56 ;;
+  *)  echo "missing xt_group and not sure about kernel header package, oop." 1>&2 ; exit 1 ;;
+esac
+
 # the raspberry pi kernel sources from apt-get are a mess, and using git to retrieve kernel sources is silly.
 # have a... "close enough"
 [[ ! -d /usr/src/linux-upstream ]] && {
@@ -22,12 +27,7 @@ done
   rm /root/kernel.txz
 }
 
-case "${PACKER_BUILD_NAME}" in
-  pi) KH_PKG="raspberrypi-kernel-headers" ;;
-  *)  echo "missing xt_group and not sure about kernel header package, oop." 1>&2 ; exit 1 ;;
-esac
-
-apt-get install -qq -y dkms "${KH_PKG}"
+apt-get install -qq -y dkms "${KH_PKG[@]}"
 
 # pry xt_cgroup module out of kernel tree and build with dkms
 cp -R "${PFSRC}/dkms/${MOD}-${MVER}" /usr/src

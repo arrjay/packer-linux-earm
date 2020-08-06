@@ -177,7 +177,15 @@ systemctl disable resize2fs_once.service
 
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
-  RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs
+  for kv in /lib/modules/* ; do
+    case "${kv}" in
+      *-v7+)   kimage=kernel7.img  ;;
+      *-v7l+)  kimage=kernel7l.img ;;
+      *-v8+)   kimage=kernel8.img  ;;
+      *[0-9]+) kimage=kernel.img   ;;
+    esac
+    RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs "${kv##*/}" "/boot/${kimage}"
+  done
 }
 
 # (sheeva) assemble the kernel and initrd - these values are hardcoded for a sheevaplug (kirkwood)

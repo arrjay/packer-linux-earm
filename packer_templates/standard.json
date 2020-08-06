@@ -9,7 +9,7 @@
 			"iso_url": "./images/netdata/pi.img",
 			"iso_checksum_type": "none",
 			"output_filename": "images/standard/pi.img",
-			"target_image_size": 3221225472
+			"target_image_size": 4294967296
 		},
 		{
 			"name": "sheeva",
