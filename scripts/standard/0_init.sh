@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+shopt -s dotglob
 
 export DEBIAN_FRONTEND=noninteractive
 export LANG=C
@@ -34,7 +35,7 @@ chmod +x "${PFSRC}/cache/imd/install.run"
 
 # install system configs from packer file provisioner
 for source in \
-  "${PFSRC}/etc/skel" \
+  "${PFSRC}/cache/etc/skel" \
   "${PFSRC}/systemd" \
   "${PFSRC}/untrustedhost" \
   "${PFSRC}/imd" \

@@ -6,13 +6,14 @@ export DISPLAY
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
-LITE_FILES = $(shell find files/lite -type f)
+LITE_FILES = $(shell find files/lite -path files/lite/cache -prune -o -print -type f)
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
+NETDATA_FILES = $(shell find files/netdata -path files/netdata/cache -prune -o -print -type f)
 STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
-STANDARD_FILES = $(shell find files/standard -type f)
+STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -o -print -type f)
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
-XFCE_FILES = $(shell find files/xfce -type f)
+XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -print -type f)
 
 images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img
