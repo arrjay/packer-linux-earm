@@ -14,6 +14,19 @@
 	"provisioners": [
 		{
 			"type": "shell",
+			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
+			"inline": [
+				"mkdir -p /tmp/packer-files"
+			]
+		},
+		{
+			"type": "file",
+			"source": "files/xfce/",
+			"destination": "/tmp/packer-files"
+		},
+		{
+			"type": "shell",
 			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT" ],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [

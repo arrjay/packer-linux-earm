@@ -1,12 +1,40 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -e
+shopt -s dotglob
 
 export DEBIAN_FRONTEND=noninteractive
+PFSRC=/tmp/packer-files
+
+# recursion function for walking around in /tmp, installing to /etc
+install_ef () {
+  local s d
+  while (( "$#" )) ; do
+    s="${1}" ; shift
+    [[ -e "${s}" ]] || continue
+    [[ -d "${s}" ]] && { "${FUNCNAME[0]}" "${s}"/* ; continue ; }
+    d="${s#/tmp}"
+    install --verbose --mode="${INSTALL_MODE:-0644}" --owner=0 --group=0 -D "${s}" "/etc${d}"
+  done
+}
+
+# install system configs from packer file provisioner
+for source in \
+  "${PFSRC}/skel" \
+ ; do
+  [[ -d "${source}" ]] && cp -R "${source}" /tmp
+done
+
+# install from scratch directories into filesystem, clean them back up
+for directory in /tmp/skel ; do
+  install_ef "${directory}"
+  rm -rf "${directory}"
+done
 
 apt-get -qq clean
 apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-all \
                lightdm xfce4 xfce4-screenshooter xfce4-terminal \
+               xfonts-terminus \
                solaar blueman scdaemon virt-manager
 apt-get -qq clean
 
