@@ -71,4 +71,4 @@ firewall-offline-cmd --add-service=mdns --zone=public
 
 # install additional scripts
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/attach-hidups.sh" "/usr/lib/untrustedhost/scripts/attach-hidups.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/write-upsd-config.sh" "/usr/lib/untrustedhost/scripts/write-upsd.config.sh"
+install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/write-upsd-config.sh" "/usr/lib/untrustedhost/scripts/write-upsd-config.sh"
