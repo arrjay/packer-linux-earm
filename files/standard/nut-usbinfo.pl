@@ -108,11 +108,11 @@ sub gen_usb_files
 	# Udev file header
 	open my $outUdev, ">$outputUdev" || die "error $outputUdev : $!";
 	print $outUdev '# This file is generated and installed by the Network UPS Tools package.'."\n\n";
-	print $outUdev 'ACTION!="add|change", GOTO="nut-usbups_rules_end"'."\n";
-	print $outUdev 'SUBSYSTEM=="usb_device", GOTO="nut-usbups_rules_real"'."\n";
-	print $outUdev 'SUBSYSTEM=="usb", GOTO="nut-usbups_rules_real"'."\n";
-	print $outUdev 'SUBSYSTEM!="usb", GOTO="nut-usbups_rules_end"'."\n\n";
-	print $outUdev 'LABEL="nut-usbups_rules_real"'."\n";
+	print $outUdev 'ACTION!="add|change", GOTO="nut-usbups_hook_rules_end"'."\n";
+	print $outUdev 'SUBSYSTEM=="usb_device", GOTO="nut-usbups_hook_rules_real"'."\n";
+	print $outUdev 'SUBSYSTEM=="usb", GOTO="nut-usbups_hook_rules_real"'."\n";
+	print $outUdev 'SUBSYSTEM!="usb", GOTO="nut-usbups_hook_rules_end"'."\n\n";
+	print $outUdev 'LABEL="nut-usbups_hook_rules_real"'."\n";
 
 	open my $out_devd, ">$output_devd" || die "error $output_devd : $!";
 	print $out_devd '# This file is generated and installed by the Network UPS Tools package.'."\n";
@@ -173,7 +173,7 @@ sub gen_usb_files
 			print $outUdev "# ".$vendor{$vendorId}{$productId}{"comment"}.' - '.$vendor{$vendorId}{$productId}{"driver"}."\n";
 			print $outUdev "ATTR{idVendor}==\"".removeHexPrefix($vendorId);
 			print $outUdev "\", ATTR{idProduct}==\"".removeHexPrefix($productId)."\",";
-			print $outUdev ' MODE="664", GROUP="@RUN_AS_GROUP@"'."\n";
+			print $outUdev ' TAG+="systemd", ENV{SYSTEMD_WANTS}="attach-hidups@%E{ID_VENDOR_ID}-%E{ID_SERIAL_SHORT}"'."\n";
 			
 			# devd device entry
 			print $out_devd "# ".$vendor{$vendorId}{$productId}{"comment"}.' - '.$vendor{$vendorId}{$productId}{"driver"}."\n";
@@ -208,7 +208,7 @@ sub gen_usb_files
 		}
 	}
 	# Udev footer
-	print $outUdev "\n".'LABEL="nut-usbups_rules_end"'."\n";
+	print $outUdev "\n".'LABEL="nut-usbups_hook_rules_end"'."\n";
 
 	# UPower...
 	# ...flush device table

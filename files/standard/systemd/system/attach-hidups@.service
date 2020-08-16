@@ -1,0 +1,6 @@
+[Unit]
+Description=attach-hidups for %I
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/echo %i

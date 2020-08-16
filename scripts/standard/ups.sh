@@ -24,7 +24,7 @@ pushd /usr/src
 git clone --depth 1 --branch v2.7.4 https://github.com/networkupstools/nut
 cd nut
 TOP_SRCDIR=. TOP_BUILDDIR=. perl "${PFSRC}/nut-usbinfo.pl"
-ls -l scripts/udev/nut-usbups.rules.in
+install -o 0 -g 0 -m 0644 scripts/udev/nut-usbups.rules.in /etc/udev/rules.d/attach-hidups.rules
 popd
 
 # configure that entire stack
