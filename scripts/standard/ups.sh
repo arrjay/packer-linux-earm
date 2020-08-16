@@ -5,6 +5,7 @@ set -e
 # prereq - install mdns-publisher
 pushd /usr/src
 git clone https://github.com/carlosefr/mdns-publisher
+cd mdns-publisher
 python setup.py build
 python setup.py install
 popd
