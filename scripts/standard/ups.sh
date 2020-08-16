@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 set -e
+PFSRC=/tmp/packer-files
 
 # prereq - install mdns-publisher
 pushd /usr/src
-git clone https://github.com/carlosefr/mdns-publisher
+git clone --depth 1 --branch 0.9.2 https://github.com/carlosefr/mdns-publisher
 cd mdns-publisher
 python setup.py build
 python setup.py install
@@ -15,6 +16,16 @@ apt-get install nut nut-monitor apg
 systemctl disable nut-monitor
 systemctl disable nut-driver
 systemctl disable nut-server
+
+# clone the nut sources for reference
+nut_ver=$(upsd -V)
+nut_ver="${nut_ver##* }"
+pushd /usr/src
+git clone --depth 1 --branch v2.7.4 https://github.com/networkupstools/nut
+cd nut
+TOP_SRCDIR=. TOP_BUILDDIR=. perl "${PFSRC}/nut-usbinfo.pl"
+ls -l scripts/udev/nut-usbups.rules.in
+popd
 
 # configure that entire stack
 printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
