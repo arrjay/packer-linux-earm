@@ -1,0 +1,7 @@
+[Match]
+Driver=brcmfmac
+Path=platform-fe300000.mmcnr
+
+[Link]
+Name=wl
+MACAddressPolicy=random

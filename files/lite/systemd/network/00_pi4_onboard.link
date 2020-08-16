@@ -1,0 +1,7 @@
+[Match]
+Driver=bcmgenet
+Path=platform-fd5800000.ethernet
+
+[Link]
+Name=onboard
+MACAddressPolicy=random
