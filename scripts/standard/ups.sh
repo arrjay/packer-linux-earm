@@ -29,7 +29,9 @@ popd
 
 # configure that entire stack
 printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
-# ups.conf is the ups service drivers
+
+# ups.conf is the ups service drivers - dynamically generated
+ln -sf /run/untrustedhost/nut/ups.conf /etc/nut/ups.conf
 
 # upsd.conf is the network ups control plane
 cat <<_EOF_> /etc/nut/upsd.conf

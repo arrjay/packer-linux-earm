@@ -1,0 +1,8 @@
+[Unit]
+Description=concatenate ups driver files to ups.conf
+Wants=nut-driver.service
+Before=nut-driver.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/untrustedhost/scripts/write-upsd-config.sh

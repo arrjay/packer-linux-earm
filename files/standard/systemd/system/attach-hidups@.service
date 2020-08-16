@@ -1,6 +1,8 @@
 [Unit]
 Description=attach-hidups for %I
+Wants=write-upsd-config.service
+Before=write-upsd-config.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/echo %i
+ExecStart=/usr/lib/untrustedhost/scripts/attach-hidups.sh %i
