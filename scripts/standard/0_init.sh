@@ -65,3 +65,6 @@ for directory in /tmp/imd ; do
   INSTALL_MODE=0755 TARGET_DIR=/usr/lib/untrustedhost install_ef "${directory}"
   rm -rf "${directory}"
 done
+
+# enable mdns to pass through firewalld
+firewall-offline-cmd --add-service=mdns --zone=public
