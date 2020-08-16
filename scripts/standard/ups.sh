@@ -2,14 +2,18 @@
 
 set -e
 
+# prereq - install mdns-publisher
+pushd /usr/src
+git clone https://github.com/carlosefr/mdns-publisher
+python setup.py build
+python setup.py install
+popd
+
 # install nut for ups fun...
-apt-get install -qq -y nut nut-monitor apg
+apt-get install nut nut-monitor apg
 systemctl disable nut-monitor
 systemctl disable nut-driver
 systemctl disable nut-server
-
-# generate a new root password every time idk
-upw=$(apg -M SNCL -m 21 -n 1)
 
 # configure that entire stack
 printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
@@ -32,20 +36,4 @@ cat <<_EOF_> /etc/nut/upsd.users
 [upsmon]
   password = $UPS_UPSMON_PASSWORD
   upsmon slave
-_EOF_
-
-# save the root pw under /root as well
-printf '%s\n' $upw > /root/upsd-pw
-
-# a little systemd housekeeping
-mkdir -p /etc/systemd/system/nut-{monitor,driver}.service.d
-cat <<_EOF_> /etc/systemd/system/nut-monitor.service.d/10-dependency.conf
-[Unit]
-After=nut-driver.service
-_EOF_
-
-cat <<_EOF_> /etc/systemd/system/nut-driver.service.d/10-sleep.conf
-[Service]
-# give the ups drivers time to settle
-ExecStartPost=/bin/sleep 1
 _EOF_
