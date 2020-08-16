@@ -22,7 +22,7 @@ apt-get install autoconf autoconf-archive autogen automake curl cmake gcc git gz
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
-git checkout v1.23.2
+git checkout v1.24.0
 # HACK: currently ebpf is disabled because it doesn't work on arm.
 ./netdata-installer.sh --dont-start-it --dont-wait --disable-ebpf
 
