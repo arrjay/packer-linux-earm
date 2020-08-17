@@ -1,7 +1,7 @@
 [Unit]
 Description=concatenate ups driver files to ups.conf
-Wants=nut-driver.service
-Before=nut-driver.service
+Wants=nut-driver.service nut-server.service
+Before=nut-driver.service nut-server.service
 
 [Service]
 Type=oneshot

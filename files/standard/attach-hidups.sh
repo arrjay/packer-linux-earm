@@ -9,9 +9,11 @@ mkdir -p /run/untrustedhost/nut/ups.conf.d
 
 cat <<EOF>"/run/untrustedhost/nut/ups.conf.d/${vendorid}-${serialno}.conf"
 [${vendorid}-${serialno}]
-  driver   = usbhid-ups
-  port     = auto
-  vendorid = ${vendorid}
+  driver       = usbhid-ups
+  port         = auto
+  vendorid     = ${vendorid}
+  pollinterval = 2
+  pollfreq     = 15
 EOF
 
 case "${vendorid}" in
