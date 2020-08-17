@@ -1,6 +1,6 @@
 [Match]
 Driver=bcmgenet
-Path=platform-fd5800000.ethernet
+Path=platform-fd580000.ethernet
 
 [Link]
 Name=onboard
