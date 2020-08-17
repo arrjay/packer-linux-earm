@@ -33,6 +33,14 @@ printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
 # ups.conf is the ups service drivers - dynamically generated
 ln -sf /run/untrustedhost/nut/ups.conf /etc/nut/ups.conf
 
+# HACK: currently we hardwire firewalld and interface interop to this.
+firewall-offline-cmd --new-zone=hv
+firewall-offline-cmd --zone=hv --add-interface=onboard-vl-hv
+firewall-offline-cmd --zone=hv --add-service=nut
+firewall-offline-cmd --new-zone=ninf
+firewall-offline-cmd --zone=ninf --add-interface=onboard-vl-ninf
+firewall-offline-cmd --zone=ninf --add-service=nut
+
 # upsd.conf is the network ups control plane
 cat <<_EOF_> /etc/nut/upsd.conf
 LISTEN 0.0.0.0 3493
