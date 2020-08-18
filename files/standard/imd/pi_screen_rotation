@@ -4,7 +4,7 @@
 # for the _next_ boot.
 
 # extracted from initonce.
-imd_rot="$(xmlstarlet sel -t -v 'metadata/raspberrypi/screen/@rotation' '/boot/IMD/MDDATA.XML')"
+imd_rot="$(xmlstarlet sel -t -v 'metadata/raspberrypi/screen/@rotation' "${IMD_PATH}")"
 case "${imd_rot}" in
   0)   pi_rot=0 ;;
   90)  pi_rot=1 ;;
