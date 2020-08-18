@@ -36,6 +36,9 @@ ln -sf /run/untrustedhost/nut/ups.conf /etc/nut/ups.conf
 # upsd.users is wired in via xml or a local one-time generator.
 ln -sf /run/untrustedhost/nut/upsd.users /etc/nut/upsd.users
 
+# ditto upsmon.conf
+ln -sf /run/untrustedhost/nut/upsmon.conf /etc/nut/upsmon.conf
+
 # HACK: currently we hardwire firewalld and interface interop to this.
 firewall-offline-cmd --new-zone=hv
 firewall-offline-cmd --zone=hv --add-interface=onboard-vl-hv
@@ -48,17 +51,4 @@ firewall-offline-cmd --zone=ninf --add-service=nut
 cat <<_EOF_> /etc/nut/upsd.conf
 LISTEN 0.0.0.0 3493
 LISTEN :: 3493
-_EOF_
-
-# upsd.users is for ~the children~ authentication
-cat <<_EOF_> /etc/nut/upsd.users
-[root]
-  password = $upw
-  actions = set fsd
-  instcmds = all
-  upsmon master
-
-[upsmon]
-  password = $UPS_UPSMON_PASSWORD
-  upsmon slave
 _EOF_

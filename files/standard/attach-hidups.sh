@@ -6,6 +6,13 @@ serialno="${1#*-}"
 
 # drag dynamic device setup over to nut, ffs this is annoying
 mkdir -p /run/untrustedhost/nut/ups.conf.d
+mkdir -p /run/untrustedhost/nut/discovered-ups.xml.d
+
+# make an xml fragment for later.
+echo '<ups/>' | xmlstarlet ed -s 'ups' -t 'attr' -n 'vendor' -v "${vendorid}" \
+                  -s 'ups' -t 'attr' -n 'serial' -v "${serialno}" \
+                  -s 'ups' -t 'attr' -n 'name' -v "${vendorid}-${serialno}" \
+  > "/run/untrustedhost/nut/discovered-ups.xml.d/${vendorid}-${serialno}.xml"
 
 cat <<EOF>"/run/untrustedhost/nut/ups.conf.d/${vendorid}-${serialno}.conf"
 [${vendorid}-${serialno}]
