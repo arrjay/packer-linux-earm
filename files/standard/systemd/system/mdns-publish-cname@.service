@@ -1,0 +1,8 @@
+[Unit]
+Description=publish mDNS CNAME for %I
+Wants=avahi-daemon.service
+After=avahi-daemon.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/mdns-publish-cname %i.local

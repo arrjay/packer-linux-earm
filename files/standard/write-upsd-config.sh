@@ -69,6 +69,8 @@ for f in /run/untrustedhost/nut/discovered-ups.xml.d/*.xml ; do
   [[ "${myups}" -ne 0 ]] && ((MINSUPPLIES++))
   printf 'MONITOR %s@localhost %s upsctrl %s master\n' "${upsname}" "${myups}" "${upsctrl_pw}" \
    >> /run/untrustedhost/nut/upsmon.conf
+  # hook in the mdns alias job here, I don't really have a better place for it.
+  systemd-run --on-active=1m systemctl start mdns-publish-cname@"ups-${upsname}"
 done
 
 cat <<EOF>>/run/untrustedhost/nut/upsmon.conf
