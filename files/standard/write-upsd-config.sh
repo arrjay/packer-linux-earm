@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+discovered_ups_list=()
+
 # unwind any aliases now
 mkdir -p /run/untrustedhost/nut/alias.conf.d
 for f in /run/untrustedhost/nut/discovered-ups.xml.d/*.xml ; do
@@ -22,6 +24,20 @@ printf 'maxretry = %s\n' 3 > /run/untrustedhost/nut/ups.conf
 cat /run/untrustedhost/nut/ups.conf.d/*.conf /run/untrustedhost/nut/alias.conf.d/*.conf >> /run/untrustedhost/nut/ups.conf
 chgrp nut /run/untrustedhost/nut/ups.conf
 chmod 0660 /run/untrustedhost/nut/ups.conf
+
+# start 'real' (discovered) ups units now. however, if we never did have any discovered ups units, die.
+for f in /run/untrustedhost/nut/discovered-ups.xml.d/*.xml ; do
+  [[ -f "${f}" ]] || exit 1
+  upsname=''
+  upsname="$(xmlstarlet sel -t -v 'ups/@name' "${f}")"
+  systemd-run --on-active=1s systemctl start "nut-driver@${upsname}"
+  discovered_ups_list=("${discovered_ups_list[@]}" "${upsname}")
+done
+
+# wire a netdata config for the nut plugin with only discovered upsen
+mkdir -p /run/untrustedhost/netdata
+printf 'nut_clients_chart=1\nnut_ups=%s\n' "${discovered_ups_list[*]}" > /run/untrustedhost/netdata/nut.conf
+[[ -d /etc/netdata/charts.d ]] && ln -sf /run/untrustedhost/netdata/nut.conf /etc/netdata/charts.d/nut.conf
 
 # create upsd.users - always assume three - admin, upsctrl, and upsuser
 # appropriate for ups administration, monitor master, monitor slave.
