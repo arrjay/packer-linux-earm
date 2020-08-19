@@ -13,8 +13,8 @@ for f in /run/untrustedhost/nut/discovered-ups.xml.d/*.xml ; do
   aliasct="$(xmlstarlet sel -t -v 'count(nut/ups[@vendor="'"${upsvend}"'"][@serial="'"${upsser}"'"]/alias)' /run/untrustedhost/nut/conf.xml)"
   while [[ "${aliasct}" -gt 0 ]] ; do
     aliasname="$(xmlstarlet sel -t -v 'nut/ups[@vendor="'"${upsvend}"'"][@serial="'"${upsser}"'"]/alias['"${aliasct}"']' /run/untrustedhost/nut/conf.xml)"
-    printf '[%s]\n  driver = dummy-ups\n  port = %s@localhost\n' "${aliasname}" "${upsname}" > "/run/untrustedhost/nut/alias.conf.d/${aliasname}.conf"
-    systemd-run --on-active=1m systemctl start "mdns-publish-cname@ups-${aliasname}"
+    printf '[alias-%s]\n  driver = dummy-ups\n  port = %s@localhost\n' "${aliasname}" "${upsname}" > "/run/untrustedhost/nut/alias.conf.d/alias-${aliasname}.conf"
+    systemd-run --on-active=1m systemctl start "mdns-publish-cname@alias-ups-${aliasname}"
     ((aliasct--))
   done
 done

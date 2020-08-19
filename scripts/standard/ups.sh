@@ -14,7 +14,8 @@ popd
 # install nut for ups fun...
 apt-get install nut nut-monitor apg
 systemctl disable nut-monitor
-systemctl disable nut-driver
+# nut-driver is masked due to alias startup issues. we use the nut-driver@ template instead.
+systemctl mask nut-driver
 systemctl disable nut-server
 
 # clone the nut sources for reference

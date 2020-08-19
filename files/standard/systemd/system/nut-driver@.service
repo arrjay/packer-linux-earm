@@ -1,0 +1,10 @@
+[Unit]
+Description=start UPS driver for %I
+After=local-fs.target network.target systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+
+[Service]
+ExecStart=/sbin/upsdrvctl start %i
+ExecStartPost=/bin/sleep 1
+ExecStop=/sbin/upsdrvctl stop %i
+Type=forking
