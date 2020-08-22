@@ -31,6 +31,9 @@ for directory in /tmp/skel ; do
   rm -rf "${directory}"
 done
 
+# blueman will not shut up about this
+mkdir /etc/skel/Downloads
+
 apt-get -qq clean
 apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-all \
                lightdm xfce4 xfce4-screenshooter xfce4-terminal \
