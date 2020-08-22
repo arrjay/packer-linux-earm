@@ -12,7 +12,8 @@ case "${PACKER_BUILD_NAME}" in
    ;;
 esac
 
-apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server python-dbus python-setuptools "${ADDITIONAL_PACKAGES[*]}"
+apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
+  python-dbus python-setuptools mtools "${ADDITIONAL_PACKAGES[*]}"
 
 # disable installed services for imd management
 systemctl disable chrony

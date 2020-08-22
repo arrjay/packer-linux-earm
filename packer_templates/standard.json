@@ -58,6 +58,7 @@
 				"./scripts/standard/0_init.sh",
 				"./scripts/standard/packages.sh",
 				"./scripts/standard/xt_cgroup.sh",
+				"./scripts/standard/rescue-initrd.sh",
 				"./scripts/standard/install-dterm.sh",
 				"./scripts/standard/ssm.sh",
 				"./scripts/standard/ups.sh",

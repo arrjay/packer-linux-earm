@@ -98,6 +98,13 @@ find_onboard_if () {
             break
           ;;
         esac
+      */devices/platform/scb/fd580000.ethernet* # pi4 network
+        case "${drv}" in
+          */bcmgenet) # pi4
+            ifname="${ifp#/sys/class/net/}"
+            break
+          ;;
+        esac
       ;;
     esac
   done
