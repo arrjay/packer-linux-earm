@@ -35,7 +35,7 @@ done
 mkdir /etc/skel/Downloads
 
 apt-get -qq clean
-apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-all \
+apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-all xserver-xorg-video-fbturbo \
                lightdm xfce4 xfce4-screenshooter xfce4-terminal \
                xfonts-terminus \
                solaar blueman scdaemon virt-manager
