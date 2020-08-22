@@ -48,6 +48,12 @@ firewall-offline-cmd --new-zone=ninf
 firewall-offline-cmd --zone=ninf --add-interface=onboard-vl-ninf
 firewall-offline-cmd --zone=ninf --add-service=nut
 
+# copy the services from public to here as well.
+for service in $(firewall-offline-cmd --list-services --zone=public) ; do
+  firewall-offline-cmd --zone=hv   --add-service="${service}"
+  firewall-offline-cmd --zone=ninf --add-service="${service}"
+done
+
 # upsd.conf is the network ups control plane
 cat <<_EOF_> /etc/nut/upsd.conf
 LISTEN 0.0.0.0 3493
