@@ -5,3 +5,6 @@ mkdir -p /run/untrustedhost/nut
 touch /run/untrustedhost/nut/conf.xml
 chmod 0600 /run/untrustedhost/nut/conf.xml
 xmlstarlet sel -t -c metadata/nut "${IMD_PATH}" > /run/untrustedhost/nut/conf.xml
+
+# always return ok though - it's ok :)
+exit 0

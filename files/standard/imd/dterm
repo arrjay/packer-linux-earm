@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -x
-
 session_ct="$(xmlstarlet sel -t -c 'count(metadata/serial/session)' "${IMD_PATH}")"
 
 [[ "${session_ct}" -le 0 ]] && exit 0
@@ -17,3 +15,4 @@ while [[ "${session_ct}" -ne 0 ]] ; do
   tmux -L console new-window -d -n "${dname}" 'dterm '"${dpath}"' '"${dspeed}"
 done
 
+exit 0
