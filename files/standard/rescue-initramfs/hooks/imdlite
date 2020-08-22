@@ -37,7 +37,7 @@ find -L "$LIBC_DIR" -maxdepth 1 -name 'libnss_files.*' -type f | while read so; 
     copy_exec "$so"
 done
 for x in passwd group; do echo "$x: files"; done >"$DESTDIR/etc/nsswitch.conf"
-echo "root:*:0:0::/:/bin/bash" >"$DESTDIR/etc/passwd"
+echo "root:*:0:0::/:/bin/sh" >"$DESTDIR/etc/passwd"
 echo "root:!:0:" >"$DESTDIR/etc/group"
 copy_exec /usr/bin/ssh /usr/bin
 manual_add_modules 8021q
