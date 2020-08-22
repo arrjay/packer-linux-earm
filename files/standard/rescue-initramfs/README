@@ -1,0 +1,2 @@
+this is an alternate initramfs-tools config directory
+used to generate the minimal dropbear+vlan networking setup

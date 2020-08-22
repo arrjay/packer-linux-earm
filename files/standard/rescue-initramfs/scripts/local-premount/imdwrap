@@ -1,0 +1,22 @@
+#!/bin/sh
+
+PREREQ=""
+
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+# get pre-requisites
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+. /scripts/functions
+. /scripts/local
+
+# this exists so that initramfs-tools stops trying to fucking run imdlite directly.
+/scripts/local-premount/imdlite

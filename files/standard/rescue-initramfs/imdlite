@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+# configure network and ssh using imd metadata
+
+# initramfs-hooks are still maddening
+case "$1" in
+  prereqs)
+    exit 0
+  ;;
+esac
+
+# step 1 - finding a filesystem labeled boot or IMD
+boot_or_imd_parts () {
+  # list partitions labeled IMD or boot - return an error if we find more than one
+  local line bootct=0 imdct=0
+  while read -r line ; do
+    case $line in
+      *'LABEL="IMD"'*)  echo "${line%: *}:imd"  ; ((imdct++))  ;;
+      *'LABEL="boot"'*) echo "${line%: *}:boot" ; ((bootct++)) ;;
+    esac
+  done < <(blkid)
+  [[ "${imdct}"  -gt 2 ]] && return 1
+  [[ "${bootct}" -gt 2 ]] && return 1
+  return 0
+}
+
+get_driveletter () {
+  # return a drive letter match for mtools.conf
+  local MTOOLSRC="${MTOOLSRC:-/etc/mtools.conf}"
+  local line src=$1 res
+  while read -r line ; do
+    case $line in
+      *' file="'"${src}"'"') res="${line:6:1}" ;;
+    esac
+  done < "${MTOOLSRC}"
+  [[ "${res}" ]] || return 1
+  echo "${res}"
+}
+
+check_imd_file () {
+  # walk partition list and check for MDDATA.XML - priority is IMD, BOOT
+  # or we try boot:IMD/MDDATA.XML
+  local table drive
+  table=$(boot_or_imd_parts) || return 1
+  local row bootpart imdpart imdfile=''
+  for row in ${table} ; do
+    case $row in
+      *:boot) bootpart="${row%:*}" ;;
+      *:imd)  imdpart="${row%:*}"  ;;
+    esac
+  done
+
+  [[ "${imdpart}" ]] && {
+    drive="$(get_driveletter "${imdpart}")"
+    mdir "${drive}:MDDATA.XML" > /dev/null && imdfile="${drive}:MDDATA.XML"
+  }
+
+  [[ "${imdfile}" ]] || {
+    [[ "${bootpart}" ]] && {
+      drive="$(get_driveletter "${bootpart}")"
+      mdir "${drive}:IMD/MDDATA.XML" > /dev/null && imdfile="${drive}:IMD/MDDATA.XML"
+    }
+  }
+  [[ "${imdfile}" ]] && {
+    echo "${imdfile}"
+    return 0
+  }
+  return 1
+}
+
+copy_imd_file () {
+  # copy an imd file to /run/MDDATA.XML
+  local fsrc
+  fsrc="$(check_imd_file)"
+  [[ "${fsrc}" ]] || return 1
+  mcopy "${fsrc}" /run/MDDATA.XML
+}
+
+find_onboard_if () {
+  # first, spin on /sys/class/net to get a device :/
+  local iflist
+  iflist=(/sys/class/net/*)
+  while [[ "${#iflist[@]}" -lt 2 ]] ; do
+    sleep 1
+    iflist=(/sys/class/net/*)
+  done
+  # find 'onboard' interface for renaming
+  # currently just a collection of hacks to match sysfs things (model specific)
+  local ifp spath drv ifname
+  for ifp in /sys/class/net/* ; do
+    spath="$(readlink "${ifp}")"
+    [[ -e "${ifp}/device/driver" ]] && drv="$(readlink "${ifp}/device/driver")"
+    case "${spath}" in
+      */devices/platform/soc/3f980000.usb/usb1/1-1/1-1.1/1-1.1.1/1-1.1.1:1.0*) ## pi2/3 usb
+        case "${drv}" in
+          */lan78xx|*/smsc95xx) # pi3|pi2
+            ifname="${ifp#/sys/class/net/}"
+            break
+          ;;
+        esac
+      ;;
+    esac
+  done
+  [[ "${ifname}" ]] && echo "${ifname}"
+}
+
+rename_onboard_if () {
+  local oldif
+  oldif="$(find_onboard_if)" || return 1
+  ip link set dev "${oldif}" down
+  ip link set dev "${oldif}" name onboard
+  ip link set dev onboard up
+}
+
+create_onboard_vlans () {
+  [[ -f /run/MDDATA.XML ]] || return 1
+  local vlcount vlname vlid v4addrs ipadd
+  vlcount="$(xmlstarlet sel -t -v 'count(metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/vlan)' /run/MDDATA.XML)"
+  while [[ "${vlcount}" -gt 0 ]] ; do
+    v4addrs="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/vlan['"${vlcount}"']/ipv4/@address' /run/MDDATA.XML)"
+    vlname="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface[@type="bridge"][source/@bridge="onboard"]/vlan['"${vlcount}"']/@name' /run/MDDATA.XML)"
+    ((vlcount--))
+    case "${v4addrs}" in */*) : ;; *) continue ;; esac
+    vlid="$(xmlstarlet sel -t -v 'metadata/vlan/map[@name="'"${vlname}"'"]/@id' /run/MDDATA.XML)"
+    ip link add link onboard name "vl-${vlname}" type vlan id "${vlid}"
+    ip link set dev "vl-${vlname}" up
+    for ipadd in ${v4addrs} ; do
+      ip addr add "${ipadd}" dev "vl-${vlname}"
+    done
+  done
+}
+
+create_dropbear_keys () {
+  local rsa_key dss_key ecdsa_key authorized_keys
+  mkdir -p /etc/dropbear
+  [[ -f /etc/dropbear/dropbear_rsa_host_key ]] || {
+    rsa_key="$(xmlstarlet sel -t -v 'metadata/ssh/hostkey[@type="rsa"]' /run/MDDATA.XML)"
+    [[ "${rsa_key}" ]] || {
+      dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
+    }
+  }
+  [[ -f /etc/dropbear/dropbear_dss_host_key ]] || {
+    dss_key="$(xmlstarlet sel -t -v 'metadata/ssh/hostkey[@type="dss"]' /run/MDDATA.XML)"
+    [[ "${dss_key}" ]] || {
+      dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+    }
+  }
+  [[ -f /etc/dropbear/dropbear_ecdsa_host_key ]] || {
+    ecdsa_key="$(xmlstarlet sel -t -v 'metadata/ssh/hostkey[@type="ecdsa"]' /run/MDDATA.XML)"
+    [[ "${ecdsa_key}" ]] || {
+      dropbearkey -t ecdsa -f /etc/dropbear/dropbear_ecdsa_host_key
+    }
+  }
+  mkdir -p /.ssh
+  authorized_keys="$(xmlstarlet sel -t -v 'metadata/ssh/pubkey' /run/MDDATA.XML)"
+  [[ "${authorized_keys}" ]] && echo "${authorized_keys}" > /.ssh/authorized_keys
+  chmod 0700 /.ssh
+  chmod 0600 /.ssh/authorized_keys
+}
+
+start_dropbear () {
+  dropbear -gE
+}
+
+copy_imd_file
+rename_onboard_if
+create_onboard_vlans
+create_dropbear_keys
+start_dropbear

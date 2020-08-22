@@ -1,0 +1,43 @@
+#!/bin/sh
+# install in initramfs-tools/hooks/resize-parttbl
+
+set -e
+
+PREREQ=""
+
+prereqs () {
+	echo "${PREREQ}"
+}
+
+case "${1}" in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+copy_file config /etc/rescue-initramfs/mtools.conf /etc
+# mtools dynamically loads this one, ow.
+copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so
+copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gconv-modules /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gconv-modules
+copy_exec /etc/rescue-initramfs/imdlite /scripts/local-premount/imdlite
+copy_exec /usr/bin/xmlstarlet /usr/bin
+copy_exec /usr/bin/bash /bin
+copy_exec /sbin/blkid /sbin
+copy_exec /bin/lsblk /bin
+copy_exec /usr/bin/mdir /usr/bin
+copy_exec /usr/bin/mcopy /usr/bin
+copy_exec /usr/lib/dropbear/dropbearconvert /usr/bin
+copy_exec /usr/bin/dropbearkey /usr/bin
+copy_exec /usr/sbin/dropbear /usr/sbin
+# this is from the upstream dropbear initramfs stuff
+LIBC_DIR=$(ldd /usr/sbin/dropbear | sed -nr 's#.* => (/lib.*)/libc\.so\.[0-9.-]+ \(0x[[:xdigit:]]+\)$#\1#p')
+find -L "$LIBC_DIR" -maxdepth 1 -name 'libnss_files.*' -type f | while read so; do
+    copy_exec "$so"
+done
+for x in passwd group; do echo "$x: files"; done >"$DESTDIR/etc/nsswitch.conf"
+echo "root:*:0:0::/:/bin/bash" >"$DESTDIR/etc/passwd"
+echo "root:!:0:" >"$DESTDIR/etc/group"
+copy_exec /usr/bin/ssh /usr/bin
+manual_add_modules 8021q
