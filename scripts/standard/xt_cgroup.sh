@@ -13,14 +13,14 @@ done
 [[ "${haz}" -gt 0 ]] && exit 0
 
 case "${PACKER_BUILD_NAME}" in
-  pi) KH_PKG=("raspberrypi-kernel" "raspberrypi-kernel-headers") ; UPSTREAM_KVER=5.4.56 ;;
+  pi) KH_PKG=("raspberrypi-kernel" "raspberrypi-kernel-headers") ; UPSTREAM_KVER=5.4.60 ;;
   *)  echo "missing xt_group and not sure about kernel header package, oop." 1>&2 ; exit 1 ;;
 esac
 
 # the raspberry pi kernel sources from apt-get are a mess, and using git to retrieve kernel sources is silly.
 # have a... "close enough"
 [[ ! -d /usr/src/linux-upstream ]] && {
-  curl -L -o /root/kernel.txz "https://hose.g.bbxn.us/linux/kernel/v${UPSTREAM_KVER%%.*}.x/linux-${UPSTREAM_KVER}.tar.xz"
+  curl -L -o /root/kernel.txz "https://cdn.kernel.org/pub/linux/kernel/v${UPSTREAM_KVER%%.*}.x/linux-${UPSTREAM_KVER}.tar.xz"
   mkdir /usr/src/linux-upstream
   cd /usr/src/linux-upstream
   tar x --strip-components=1 -f /root/kernel.txz -C .
