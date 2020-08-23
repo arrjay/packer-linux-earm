@@ -44,7 +44,21 @@ apt-get -qq clean
 # disable the newer vc4 graphics stack. reasons.
 [[ -e /boot/config.txt ]] && sed -ie 's/^dtoverlay=vc4-/#dtoverlay=vc4-/g' /boot/config.txt
 
-# this is done after the base xfce4 isntall because we're riding the line of image space
+# the multihead setup is only test on pi. anything else is hopefully not this silly.
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    ln -sf /run/untrustedhost/xorg.conf.d /etc/X11/xorg.conf.d
+    mkdir -p /usr/lib/untrustedhost/xorg.conf.d
+    for f in "${PFSRC}/xorg.conf.d"/* ; do
+      [[ -f "${f}" ]] && install --verbose --mode=0644 --owner=0 --group=0 "${f}" "/usr/lib/untrustedhost/xorg.conf.d/${f##*/}"
+    done
+    for f in "${PFSRC}/imd"/* ; do
+      [[ -f "${f}" ]] && install --verbose --mode=0755 --owner=0 --group=0 "${f}" "/usr/lib/untrustedhost/imd/${f##*/}"
+    done
+    ;;
+esac
+
+# this is done after the base xfce4 install because we're riding the line of image space
 apt-get -qq -y install chromium-browser
 apt-get -qq clean
 

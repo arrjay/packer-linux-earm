@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# configure xorg layout and (potentially) inputtransformationmatrix using metadata/screenlayout
+# also drop the xorg.conf.d snippets in.
+mkdir -p /run/untrustedhost/xorg.conf.d
+
+headcount="$(xmlstarlet sel -t -v 'count(/metadata/screenlayout/screen)' "${IMD_PATH}")"
+
+[[ "${headcount}" -gt 1 ]] && {
+  ln -sf /usr/lib/untrustedhost/xorg.conf.d/* /run/untrustedhost/xorg.conf.d
+}
+
+# create the multihead layout here...
+printf 'Section "ServerLayout"\n  Identifier "Multihead"\n  Option "Xinerama" "true"\n' > /run/untrustedhost/xorg.conf.d/10-layout.conf
+for id in $(seq 1 "${headcount}") ; do
+  step=$((id - 1))
+  name="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen['"${id}"']/@name' "${IMD_PATH}")"
+  posxml="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen['"${id}"']/@position' "${IMD_PATH}")"
+  posarg=''
+  case "${posxml}" in
+    *:*) posarg=" ${posxml%:*} "'"'"${posxml#*:}"'"'
+  esac
+  printf '  Screen %s "%s"%s\n' "${step}" "${name}" "${posarg}" >> /run/untrustedhost/xorg.conf.d/10-layout.conf
+done
+printf 'EndSection\n' >> /run/untrustedhost/xorg.conf.d/10-layout.conf
