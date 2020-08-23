@@ -1,7 +1,11 @@
 path-exclude /usr/share/doc/*
 # we need to keep copyright files for legal reasons
 path-include /usr/share/doc/*/copyright
+# we need to keep the rpi-eeprom-images package because the packagers are..questionable.
+path-include /usr/share/doc/rpi-eeprom-images/*
+path-include /usr/share/doc/rpi-eeprom/*
 path-exclude /usr/share/man/*
+path-include /usr/share/man/man1/rpi-eeprom-*
 path-exclude /usr/share/groff/*
 path-exclude /usr/share/info/*
 # lintian stuff is small, but really unnecessary

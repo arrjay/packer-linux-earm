@@ -116,6 +116,7 @@ rename_onboard_if () {
   oldif="$(find_onboard_if)" || return 1
   ip link set dev "${oldif}" down
   ip link set dev "${oldif}" name onboard
+  sleep 3 # WHY, PI4?
   ip link set dev onboard up
 }
 
@@ -130,6 +131,7 @@ create_onboard_vlans () {
     case "${v4addrs}" in */*) : ;; *) continue ;; esac
     vlid="$(xmlstarlet sel -t -v 'metadata/vlan/map[@name="'"${vlname}"'"]/@id' /run/MDDATA.XML)"
     ip link add link onboard name "vl-${vlname}" type vlan id "${vlid}"
+    ip link set dev onboard up
     ip link set dev "vl-${vlname}" up
     for ipadd in ${v4addrs} ; do
       ip addr add "${ipadd}" dev "vl-${vlname}"

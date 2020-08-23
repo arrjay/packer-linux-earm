@@ -107,6 +107,12 @@ type raspi-config >/dev/null 2>&1 && {
   raspi-config nonint do_change_locale en_US.UTF-8
 }
 
+# (rpi) reinstall rpi-eeprom-images, this packaging sucks with nodoc
+mkdir /usr/share/man/man1
+chmod 0755 /usr/share/man/man1
+dpkg -l rpi-eeprom-images > /dev/null && apt-get reinstall rpi-eeprom-images
+dpkg -l rpi-eeprom        > /dev/null && apt-get reinstall rpi-eeprom
+
 # server runs in UCT kthxbye
 ln -sf /usr/share/zoneinfo/UCT /etc/localtime
 

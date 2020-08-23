@@ -1,2 +1,20 @@
 this is an alternate initramfs-tools config directory
 used to generate the minimal dropbear+vlan networking setup
+
+- creating the initramfs
+  # mkinitramfs -o /boot/rescue.img -d /etc/rescue-initramfs
+  edit config.txt to load this initrd last
+- logging in to the initramfs
+  assuming it successfully parses an IMD config, you should be able to do
+  ssh root@static.ip with the authorized key and go.
+
+NOTES ON INITRAMFS
+  you have a copy of ssh and some of mtools. you have busybox dd, though.
+  basically, here's what I do:
+  - ssh user@gen cat /path/to/image | dd of=/dev/mmcblk0
+  - mcopy g:config.txt /run
+  - ssh user@gen cat /path/to/append-config >> /run/config.txt
+  - mcopy /run/config.txt g:
+  - ssh user@gen cat /path/to/MDDATA.XML >> /run/MDDATA.XML
+  - mmd g:IMD
+  - mcopy /run/MDDATA.XML g:IMD/MDDATA.XML

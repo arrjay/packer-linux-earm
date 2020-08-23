@@ -28,6 +28,7 @@ copy_exec /sbin/blkid /sbin
 copy_exec /bin/lsblk /bin
 copy_exec /usr/bin/mdir /usr/bin
 copy_exec /usr/bin/mcopy /usr/bin
+copy_exec /usr/bin/mmd /usr/bin
 copy_exec /usr/lib/dropbear/dropbearconvert /usr/bin
 copy_exec /usr/bin/dropbearkey /usr/bin
 copy_exec /usr/sbin/dropbear /usr/sbin
