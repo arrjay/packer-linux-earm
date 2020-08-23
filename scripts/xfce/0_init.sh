@@ -41,6 +41,9 @@ apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-
                solaar blueman scdaemon virt-manager
 apt-get -qq clean
 
+# disable the newer vc4 graphics stack. reasons.
+[[ -e /boot/config.txt ]] && sed -ie 's/^dtoverlay=vc4-/#dtoverlay=vc4-/g' /boot/config.txt
+
 # this is done after the base xfce4 isntall because we're riding the line of image space
 apt-get -qq -y install chromium-browser
 apt-get -qq clean
