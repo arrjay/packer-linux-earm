@@ -4,6 +4,8 @@
 # also drop the xorg.conf.d snippets in.
 mkdir -p /run/untrustedhost/xorg.conf.d
 
+xmlstarlet sel -t -c '/metadata/screenlayout' "${IMD_PATH}" > /run/untrustedhost/screenlayout.xml
+
 headcount="$(xmlstarlet sel -t -v 'count(/metadata/screenlayout/screen)' "${IMD_PATH}")"
 
 [[ "${headcount}" -gt 1 ]] && {
@@ -18,8 +20,63 @@ for id in $(seq 1 "${headcount}") ; do
   posxml="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen['"${id}"']/@position' "${IMD_PATH}")"
   posarg=''
   case "${posxml}" in
-    *:*) posarg=" ${posxml%:*} "'"'"${posxml#*:}"'"'
+    *:*) posarg=" ${posxml%:*} "'"'"${posxml#*:}"'"' ;;
   esac
   printf '  Screen %s "%s"%s\n' "${step}" "${name}" "${posarg}" >> /run/untrustedhost/xorg.conf.d/10-layout.conf
 done
 printf 'EndSection\n' >> /run/untrustedhost/xorg.conf.d/10-layout.conf
+
+# touchpad support wired to any display?
+rpi_ts="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen[@input="raspberrypi-ts"]/@id' "${IMD_PATH}")"
+
+[[ "${rpi_ts}" ]] && [[ "${headcount}" -gt 1 ]] && {
+  ts_screen="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen[@id="'"${rpi_ts}"'"]/@name' "${IMD_PATH}")"
+  ts_fb="${ts_screen##*[^0-9]}"
+  total_horiz=0 ; total_vert=0
+  while read -r line ; do
+    case "${line}" in
+      geometry*) read -r scratch ts_horiz ts_vert rest <<<"${line}" ;;
+    esac
+  done < <(fbset -fb "/dev/fb${ts_fb}")
+  total_horiz=$((total_horiz + ts_horiz))
+  total_vert=$((total_vert + ts_vert))
+  # FIXME: currently we only handle leftof/rightof
+  y_offset=0
+  for sct in $(seq 1 "${headcount}") ; do
+    sid="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen['"${sct}"']/@id' "${IMD_PATH}")"
+    [[ "${sid}" -eq "${rpi_ts}" ]] && continue
+    add_screen="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen['"${sct}"']/@name' "${IMD_PATH}")"
+    add_fb="${add_screen##*[^0-9]}"
+    pos="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen['"${sct}"']/@position' "${IMD_PATH}")"
+    case "${pos}" in
+      *:"${ts_screen}")
+        case "${pos%:*}" in
+          RightOf)
+            x_offset=0
+          ;&
+          LeftOf)
+            while read -r line ; do
+              case "${line}" in
+                geometry*) read -r scratch x_horiz x_vert rest <<<"${line}" ;;
+              esac
+            done < <(fbset -fb "/dev/fb${add_fb}")
+            total_horiz=$((total_horiz + x_horiz))
+            [[ "${x_vert}" -gt "${total_vert}" ]] && total_vert=x_vert
+            [[ "${x_offset}" ]] || x_offset="${x_horiz}"
+          ;;
+        esac
+      ;;
+    esac
+  done
+  # okay, compute the transformation matrix...
+  xfrm=("$(awk 'BEGIN{print('"${ts_horiz}"'/'"${total_horiz}"')}')" 0 "$(awk 'BEGIN{print('"${x_offset}"'/'"${total_horiz}"')}')"
+        0 "$(awk 'BEGIN{print('"${ts_vert}"'/'"${total_vert}"')}')" "$(awk 'BEGIN{print('"${y_offset}"'/'"${total_vert}"')}')"
+        0 0 1)
+  {
+    printf 'Section "InputClass"\n'
+    printf '\tMatchProduct "raspberrypi-ts"\n'
+    printf '\tIdentifier "rpi-ts"\n'
+    printf '\tOption "TransformationMatrix" "%s"\n' "${xfrm[*]}"
+    printf 'EndSection\n'
+  } > /run/untrustedhost/xorg.conf.d/50-raspberrypi-ts.conf
+}
