@@ -2,7 +2,9 @@
 
 dns_xml=$(xmlstarlet sel -t -c metadata/dnsauth/address "${IMD_PATH}")
 
-[[ "${dns_xml}" ]] && echo "${dns_xml}" > /run/untrustedhost/netxml/dnsauth.xml
+[[ "${dns_xml}" ]] || exit 0
+
+echo "${dns_xml}" > /run/untrustedhost/netxml/dnsauth.xml
 
 # create pdns db if it does not exist
 [[ ! -f /var/lib/powerdns/pdns.sqlite3 ]] && {
