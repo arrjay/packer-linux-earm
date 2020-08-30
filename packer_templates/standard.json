@@ -62,6 +62,7 @@
 				"./scripts/standard/install-dterm.sh",
 				"./scripts/standard/ssm.sh",
 				"./scripts/standard/ups.sh",
+				"./scripts/standard/pdns.sh",
 				"./scripts/standard/login-config.sh"
 			]
 		},
