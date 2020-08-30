@@ -49,6 +49,7 @@ server_addr4=''
   case "${server_addr4}" in
     127.*) printf 'local-address=%s\n' "${server_addr4}" ;;
   esac
+  printf 'dnsupdate=%s\n' 'yes'
 } > /run/untrustedhost/powerdns/pdns.conf
 
 # override the pdns command
@@ -220,5 +221,7 @@ add_somewhere_rec() {
 for k in "${zones[@]}" ; do
   add_somewhere_rec "${k}" NS "${server_fqdn}." 1
 done
+
+systemd-run --on-active=30s systemctl start untrustedhost-pdns
 
 exit 0
