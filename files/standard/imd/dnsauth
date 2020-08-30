@@ -4,6 +4,11 @@ dns_xml=$(xmlstarlet sel -t -c metadata/dnsauth/address "${IMD_PATH}")
 
 [[ "${dns_xml}" ]] || exit 0
 
+# copy the entire dnsauth node out.
+dnsauth_xml=$(xmlstarlet sel -t -c metadata/dnsauth "${IMD_PATH}")
+
+[[ "${dnsauth_xml}" ]] && echo "${dnsauth_xml}" > /run/untrustedhost/dnsauth.xml
+
 echo "${dns_xml}" > /run/untrustedhost/netxml/dnsauth.xml
 
 # create pdns db if it does not exist
@@ -22,6 +27,16 @@ id pdns 2> /dev/null 1>&2 && pdns_euid=pdns
 
 mkdir -p /run/untrustedhost/powerdns
 
+# grovel server address from XML.
+server_range4="$(echo "${dnsauth_xml}" | xmlstarlet sel -t -v 'dnsauth/address/@ipv4')"
+server_addr4=''
+[[ "${server_range4}" ]] && {
+  case "${server_range4}" in
+    */*) server_addr4=$(ipcalc "${server_range4}" | awk '$1 == "HostMax:" { print $2 }') ;;
+    *.*.*.*) server_addr4="${server_range4}"
+  esac
+}
+
 # generate a pdns config with the reference to the sqlite schema
 {
   printf 'security-poll-suffix=\n' # :( package maintainer has currently disabled this, so.
@@ -31,17 +46,15 @@ mkdir -p /run/untrustedhost/powerdns
     printf 'setgid=%s\n' "${pdns_euid}"
     printf 'setuid=%s\n' "${pdns_euid}"
   }
+  case "${server_addr4}" in
+    127.*) printf 'local-address=%s\n' "${server_addr4}" ;;
+  esac
 } > /run/untrustedhost/powerdns/pdns.conf
 
 # override the pdns command
 pdnsutil () {
   command pdnsutil --config-dir /run/untrustedhost/powerdns "${@}"
 }
-
-# copy the entire dnsauth node out.
-dnsauth_xml=$(xmlstarlet sel -t -c metadata/dnsauth "${IMD_PATH}")
-
-[[ "${dnsauth_xml}" ]] && echo "${dnsauth_xml}" > /run/untrustedhost/dnsauth.xml
 
 tsigkeys=($(echo "${dnsauth_xml}" | xmlstarlet sel -t -v dnsauth/tsigkey/@name))
 oldkeys=()
@@ -189,15 +202,12 @@ add_somewhere_rec() {
 }
 
 # finally, do we have a zone that matches _us_? if we do, go add to that. longest match wins.
-server_range4="$(echo "${dnsauth_xml}" | xmlstarlet sel -t -v 'dnsauth/address/@ipv4')"
-server_addr4=''
-[[ "${server_range4}" ]] && {
-  case "${server_range4}" in
-    */*) server_addr4=$(ipcalc "${server_range4}" | awk '$1 == "HostMax:" { print $2 }') ;;
-    *.*.*.*) server_addr4="${server_range4}"
+[[ "${server_addr4}" ]] && {
+  case "${server_addr4}" in
+    127*) : ;;
+    *) add_somewhere_rec "${server_fqdn}" A "${server_addr4}" ;;
   esac
 }
-[[ "${server_addr4}" ]] && add_somewhere_rec "${server_fqdn}" A "${server_addr4}"
 
 # reverse lookup too!
 [[ "${server_addr4}" ]] && {
