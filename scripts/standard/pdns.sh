@@ -6,6 +6,7 @@ printf '%s\n' "pdns-backend-sqlite3 pdns-backend-sqlite3/dbconfig-install boolea
      | debconf-set-selections
 
 apt-get install pdns-backend-sqlite3 sqlite3
+systemctl disable pdns
 
 mkdir -p /usr/lib/untrustedhost/share
 
