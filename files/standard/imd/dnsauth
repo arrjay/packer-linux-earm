@@ -47,7 +47,10 @@ server_addr4=''
     printf 'setuid=%s\n' "${pdns_euid}"
   }
   case "${server_addr4}" in
-    127.*) printf 'local-address=%s\n' "${server_addr4}" ;;
+    127.*)
+      printf 'local-address=%s\n' "${server_addr4}"
+      printf 'local-ipv6=\n'
+    ;;
   esac
   printf 'dnsupdate=%s\n' 'yes'
 } > /run/untrustedhost/powerdns/pdns.conf
