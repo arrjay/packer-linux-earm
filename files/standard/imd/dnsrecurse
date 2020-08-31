@@ -27,6 +27,8 @@ mkdir -p /run/untrustedhost/bind
 } > /run/untrustedhost/bind/named.conf
 
 : > /run/untrustedhost/bind/named.conf.options
+fwdct="$(xmlstarlet sel -t -v 'count(/dnsrecurse/forwarder)' '/run/untrustedhost/dnsrecurse.xml')"
+[[ "${fwdct}" ]] || fwdct=0
 {
   printf 'options {\n'
   printf '  directory "%s";\n' '/var/cache/bind'
@@ -35,6 +37,14 @@ mkdir -p /run/untrustedhost/bind
   [[ "${listen_on}" ]] && {
     printf '  listen-on port 53 {\n'
     printf '    %s;\n' "${listen_on}"
+    printf '  };\n'
+  }
+  [[ "${fwdct}" -gt 0 ]] && {
+    printf '  forwarders {\n'
+    while [[ "${fwdct}" -gt 0 ]] ; do
+      printf '    %s;\n' "$(xmlstarlet sel -t -v '/dnsrecurse/forwarder['"${fwdct}"']' '/run/untrustedhost/dnsrecurse.xml')"
+      fwdct=$((fwdct - 1))
+    done
     printf '  };\n'
   }
   printf '};\n'
