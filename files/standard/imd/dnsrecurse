@@ -22,7 +22,6 @@ mkdir -p /run/untrustedhost/bind
   printf 'include "%s";\n' \
     '/run/untrustedhost/bind/named.conf.options' \
     '/run/untrustedhost/bind/named.conf.forwarding' \
-    '/etc/bind/zones.rfc1918' \
     '/etc/bind/named.conf.default-zones'
 } > /run/untrustedhost/bind/named.conf
 
@@ -51,6 +50,22 @@ fwdct="$(xmlstarlet sel -t -v 'count(/dnsrecurse/forwarder)' '/run/untrustedhost
 } > /run/untrustedhost/bind/named.conf.options
 
 : > /run/untrustedhost/bind/named.conf.forwarding
+zonect="$(xmlstarlet sel -t -v 'count(/dnsrecurse/zone)' '/run/untrustedhost/dnsrecurse.xml')"
+[[ "${zonect}" ]] || zonect=0
+{
+  while [[ "${zonect}" -gt 0 ]] ; do
+    printf 'zone "%s" {\n' "$(xmlstarlet sel -t -v '/dnsrecurse/zone['"${zonect}"']/@name' '/run/untrustedhost/dnsrecurse.xml')"
+    printf '  type forward;\n'
+    printf '  forward only;\n'
+    printf '  forwarders {\n'
+    for fwdr in $(xmlstarlet sel -t -v '/dnsrecurse/zone['"${zonect}"']/@ns' '/run/untrustedhost/dnsrecurse.xml') ; do
+      printf '    %s;\n' "${fwdr}"
+    done
+    printf '  };\n'
+    printf '};\n'
+    zonect=$((zonect - 1))
+  done
+} > /run/untrustedhost/bind/named.conf.forwarding
 
 # sanity check...
 named-checkconf /run/untrustedhost/bind/named.conf || exit 1
