@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# configure a recursing dns cache using BIND
+
+case "${1:-init}" in
+  # handle forwarder updates here...
+  fwdupdate)
+    :
+  ;;
+  # called by imd
+  init)
+    xmlcfg="$(xmlstarlet sel -t -c '/metadata/dnsrecurse' "${IMD_PATH}")"
+    [[ "${xmlcfg}" ]] || exit 0
+    <<<"${xmlcfg}" cat > /run/untrustedhost/dnsrecurse.xml
+  ;;
+esac
+
+[[ -f /run/untrustedhost/dnsrecurse.xml ]] || exit 0
+
+mkdir -p /run/untrustedhost/bind
+{
+  printf 'include "%s";\n' \
+    '/run/untrustedhost/bind/named.conf.options' \
+    '/run/untrustedhost/bind/named.conf.forwarding' \
+    '/etc/bind/zones.rfc1918' \
+    '/etc/bind/named.conf.default-zones'
+} > /run/untrustedhost/bind/named.conf
+
+: > /run/untrustedhost/bind/named.conf.options
+{
+  printf 'options {\n'
+  printf '  directory "%s";\n' '/var/cache/bind'
+  printf '  dnssec-validation %s;\n' 'auto'
+  listen_on="$(xmlstarlet sel -t -v '/dnsrecurse/address/@ipv4' '/run/untrustedhost/dnsrecurse.xml')"
+  [[ "${listen_on}" ]] && {
+    printf '  listen-on port 53 {\n'
+    printf '    %s;\n' "${listen_on}"
+    printf '  };\n'
+  }
+  printf '};\n'
+} > /run/untrustedhost/bind/named.conf.options
+
+: > /run/untrustedhost/bind/named.conf.forwarding
+
+# sanity check...
+named-checkconf /run/untrustedhost/bind/named.conf || exit 1
+
+# okay, for init, schedule a start. otherwise bounce it.
+case "${1:-init}" in
+  fwdupdate)
+    systemctl restart untrustedhost-bind
+  ;;
+  init)
+    systemd-run --on-active=5s systemctl start untrustedhost-bind
+  ;;
+esac
