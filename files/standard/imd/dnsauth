@@ -225,6 +225,6 @@ for k in "${zones[@]}" ; do
   add_somewhere_rec "${k}" NS "${server_fqdn}." 1
 done
 
-systemd-run --on-active=30s systemctl start untrustedhost-pdns
+systemd-run --on-active=3s systemctl start untrustedhost-pdns
 
 exit 0
