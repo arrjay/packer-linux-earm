@@ -47,6 +47,9 @@ fwdct="$(xmlstarlet sel -t -v 'count(/dnsrecurse/forwarder)' '/run/untrustedhost
     printf '  };\n'
   }
   printf '};\n'
+  printf 'statistics-channels {\n'
+  printf '  inet 127.0.0.1 port 8888 allow { 127.0.0.1; };\n'
+  printf '};\n'
 } > /run/untrustedhost/bind/named.conf.options
 
 : > /run/untrustedhost/bind/named.conf.forwarding
