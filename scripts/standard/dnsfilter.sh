@@ -6,7 +6,8 @@ apt-get install unbound
 
 systemctl disable unbound
 
-unbound-anchor
+# this thing exits nonzero if it updates the anchor. I hate it.
+unbound-anchor -vv || true
 
 cd /usr/src
 git clone https://github.com/arrjay/unbound-hosts-blocklists/
