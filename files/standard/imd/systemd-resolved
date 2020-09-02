@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# configure systemd-resolved to inject our DNS servers as at least the default.
+resolved_cfg="$(xmlstarlet sel -t -c '/metadata/dnsresolve' "${IMD_PATH}")"
+
+[[ "${resolved_cfg}" ]] && {
+  domain="$(xmlstarlet sel -t -v '/dnsresolve/@domain' <<<"${resolved_cfg}")"
+  cache="$(xmlstarlet sel -t -v '/dnsresolve/@cache' <<<"${resolved_cfg}")"
+  forwarder="$(xmlstarlet sel -t -v '/dnsresolve/forwarder' <<<"${resolved_cfg}")"
+
+  {
+    printf '[%s]\n' 'Resolve'
+    [[ "${domain}" ]] && printf 'Domains=%s\n' "${domain}"
+    [[ "${cache}" ]]  && printf 'Cache=%s\n' "${cache}"
+    [[ "${forwarder}" ]] && {
+      printf 'DNS='
+      for fwdr in ${forwarder} ; do
+        printf '%s ' "${fwdr}"
+      done
+      printf '\n'
+    }
+  } > /run/untrustedhost/systemd-resolved.conf
+  ln -sf /run/untrustedhost/systemd-resolved.conf /etc/systemd/resolved.conf
+}
+
+exit 0
