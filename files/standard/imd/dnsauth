@@ -66,7 +66,7 @@ mkdir -p /run/untrustedhost/netdata
   printf 'localhost:\n'
   printf ' autodetection_retry: %s\n' '5'
   printf ' name : '\''local'\''\n'
-  printf ' url  : '\''http://127.0.0.1:8081/api/v1/servers/localhost/statistics'
+  printf ' url  : '\''http://127.0.0.1:8081/api/v1/servers/localhost/statistics'\''\n'
   printf ' header:\n'
   printf '  X-API-Key: '\''%s'\''\n' "${api_key}"
 } > /run/untrustedhost/netdata/powerdns.conf
