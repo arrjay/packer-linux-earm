@@ -12,6 +12,8 @@ case "${PACKER_BUILD_NAME}" in
    ;;
 esac
 
+apt-get -o APT::Sandbox::User=root update
+
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
   python-dbus python-setuptools mtools "${ADDITIONAL_PACKAGES[*]}"
 
