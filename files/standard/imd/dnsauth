@@ -37,11 +37,17 @@ server_addr4=''
   esac
 }
 
+# do I have an api key?
+api_key="$(xmlstarlet sel -t -v 'dnsauth/@apikey' <<<"${dnsauth_xml}")"
+[[ "${api_key}" ]] || api_key="$(uuid)"
+
 # generate a pdns config with the reference to the sqlite schema
 {
   printf 'security-poll-suffix=\n' # :( package maintainer has currently disabled this, so.
   printf 'launch=gsqlite3\n'
   printf 'gsqlite3-database=%s\n' '/var/lib/powerdns/pdns.sqlite3'
+  printf 'api=%s\n' 'yes'
+  printf 'api-key=%s\n' "${api_key}"
   [[ "${pdns_euid}" ]] && {
     printf 'setgid=%s\n' "${pdns_euid}"
     printf 'setuid=%s\n' "${pdns_euid}"
@@ -54,6 +60,16 @@ server_addr4=''
   esac
   printf 'dnsupdate=%s\n' 'yes'
 } > /run/untrustedhost/powerdns/pdns.conf
+
+mkdir -p /run/untrustedhost/netdata
+{
+  printf 'localhost:\n'
+  printf ' autodetection_retry: %s\n' '5'
+  printf ' name : '\''local'\''\n'
+  printf ' url  : '\''http://127.0.0.1:8081/api/v1/servers/localhost/statistics'
+  printf ' header:\n'
+  printf '  X-API-Key: '\''%s'\''\n' "${api_key}"
+} > /run/untrustedhost/netdata/powerdns.conf
 
 # override the pdns command
 pdnsutil () {
@@ -224,6 +240,10 @@ add_somewhere_rec() {
 for k in "${zones[@]}" ; do
   add_somewhere_rec "${k}" NS "${server_fqdn}." 1
 done
+
+[[ -e /etc/netdata/python.d ]] && {
+  ln -sf /run/untrustedhost/netdata/powerdns.conf /etc/netdata/python.d/powerdns.conf
+}
 
 systemd-run --on-active=3s systemctl start untrustedhost-pdns
 
