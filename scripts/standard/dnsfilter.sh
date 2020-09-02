@@ -4,6 +4,8 @@ set -e
 
 apt-get install unbound
 
+usermod -a -G unbound netdata
+
 systemctl disable unbound
 
 # this thing exits nonzero if it updates the anchor. I hate it.

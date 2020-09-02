@@ -56,6 +56,24 @@ while [[ "${zonect}" -gt 0 ]] ; do
   zonect=$((zonect - 1))
 done > /run/untrustedhost/unbound.conf.d/zones.conf
 
+# wire the remote for netdata monitoring
+{
+  printf 'remote-control:\n'
+  printf '  control-enable: %s\n' 'yes'
+  printf '  control-interface: %s\n' '/run/unbound.sock'
+} > /run/untrustedhost/unbound.conf.d/remote.conf
+
+mkdir -p /run/untrustedhost/netdata
+{
+  printf 'jobs:\n'
+  printf '  - name: %s\n' 'local'
+  printf '    address: %s\n' '/run/unbound.sock'
+} > /run/untrustedhost/netdata/unbound.conf
+
 unbound-checkconf /run/untrustedhost/unbound.conf || exit 1
+
+[[ -d /etc/netdata/go.d ]] && {
+  ln -sf /run/untrustedhost/netdata/unbound.conf /etc/netdata/go.d/unbound.conf
+}
 
 systemd-run --on-active=5s systemctl start untrustedhost-unbound
