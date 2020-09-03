@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# plug interfaces into zones by name
+bridges="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface/source/@bridge' "${IMD_PATH}")"
+# add vlan tags here as bridge considerates too
+bridges="${bridges} $(xmlstarlet sel -N 'untrustedhost=https://untrusted.host/xml' -t -v 'metadata/domain/metadata/untrustedhost:vlan/bridge/@vlan' "${IMD_PATH}")"
+
+set -o noglob
+for b in ${bridges} ; do
+  set +o noglob
+  firewall_zone="$(xmlstarlet sel -t -v '/metadata/domain/devices/interface[@type="bridge"][source/@bridge="'"${b}"'"]/firewall/@zone' "${IMD_PATH}")"
+  [[ "${firewall_zone}" ]] && {
+    firewall-cmd "--zone=${firewall_zone}" "--add-interface=${b}"
+  }
+done
+
+set +o noglob
