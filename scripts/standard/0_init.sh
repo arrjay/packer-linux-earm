@@ -69,6 +69,9 @@ done
 # enable mdns to pass through firewalld
 firewall-offline-cmd --add-service=mdns --zone=public
 
+# disable ssh in external zone
+firewall-offline-cmd --remove-service=ssh --zone=external
+
 # install additional scripts
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/attach-hidups.sh" "/usr/lib/untrustedhost/scripts/attach-hidups.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/start-upsd-aliases.sh" "/usr/lib/untrustedhost/scripts/start-upsd-aliases.sh"

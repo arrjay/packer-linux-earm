@@ -20,3 +20,7 @@ apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dh
 # disable installed services for imd management
 systemctl disable chrony
 systemctl disable isc-dhcp-server
+
+# allow dhcp, dns through the trusted zone in firewalld
+firewall-offline-cmd --zone=trusted --add-service=dhcp
+firewall-offline-cmd --zone=trusted --add-service=dns

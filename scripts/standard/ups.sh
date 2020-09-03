@@ -47,6 +47,7 @@ firewall-offline-cmd --zone=hv --add-service=nut
 firewall-offline-cmd --new-zone=ninf
 firewall-offline-cmd --zone=ninf --add-interface=onboard-vl-ninf
 firewall-offline-cmd --zone=ninf --add-service=nut
+firewall-offline-cmd --zone=trusted --add-service=nut
 
 # copy the services from public to here as well.
 for service in $(firewall-offline-cmd --list-services --zone=public) ; do
