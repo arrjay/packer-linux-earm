@@ -70,7 +70,7 @@ done
 firewall-offline-cmd --add-service=mdns --zone=public
 
 # disable ssh in external zone
-firewall-offline-cmd --remove-service=ssh --zone=external
+firewall-offline-cmd --zone=external --remove-service-from-zone=ssh
 
 # install additional scripts
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/attach-hidups.sh" "/usr/lib/untrustedhost/scripts/attach-hidups.sh"
