@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# we assume kinda explicit instructions from xml, as dns may not be fully working.
+dnsu_xml="$(xmlstarlet sel -t -c /metadata/dns-update "${IMD_PATH}")"
+
+[[ "${dnsu_xml}" ]] && {
+  # write dns update xml files and schedule nsupdate to run after 2m.
+  cat <<<"${dnsu_xml}" > /run/untrustedhost/dns-update.xml
+  systemd-run --on-active=10s systemctl start untrustedhost-dnsupdate
+}
