@@ -73,6 +73,8 @@ mkdir -p /run/untrustedhost/netdata
   printf '    address: %s\n' '/run/unbound.sock'
 } > /run/untrustedhost/netdata/unbound.conf
 
+chmod a+r /var/lib/unbound/root.key
+
 unbound-checkconf /run/untrustedhost/unbound.conf || exit 1
 
 [[ -d /etc/netdata/go.d ]] && {
