@@ -13,6 +13,9 @@ server_addrs=("$(xmlstarlet sel -t -v dnsfilter/address/@ipv4 <<<"${dns_xml}")"
 {
   printf 'server:\n'
 
+  # cache is set to 0 because the forwarder does it
+  printf '  cache-max-ttl: %s\n' '0'
+
   # listening addresses
   [[ "${server_addrs[*]}" ]] && {
     for address_list in "${server_addrs[@]}" ; do

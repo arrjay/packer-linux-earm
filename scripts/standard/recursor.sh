@@ -4,3 +4,5 @@
 apt-get install bind9
 
 systemctl disable bind9
+
+firewall-offline-cmd --zone=internal --add-service=dns
