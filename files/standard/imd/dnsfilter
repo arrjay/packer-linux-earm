@@ -30,6 +30,8 @@ server_addrs=("$(xmlstarlet sel -t -v dnsfilter/address/@ipv4 <<<"${dns_xml}")"
 
   # logging
   printf '  logfile: %s\n' '/var/log/unbound.log'
+  printf '  verbosity: %s\n' '1'
+  printf '  log-queries: %s\n' 'yes'
 
   printf 'include: "%s"\n' \
     '/run/untrustedhost/unbound.conf.d/*.conf' \
