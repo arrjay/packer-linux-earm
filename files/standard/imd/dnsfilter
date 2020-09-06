@@ -28,6 +28,9 @@ server_addrs=("$(xmlstarlet sel -t -v dnsfilter/address/@ipv4 <<<"${dns_xml}")"
   # acl
   printf '  access-control: %s %s\n' '0.0.0.0/0' 'allow'
 
+  # logging
+  printf '  logfile: %s\n' '/var/log/unbound.log'
+
   printf 'include: "%s"\n' \
     '/run/untrustedhost/unbound.conf.d/*.conf' \
     '/etc/unbound/unbound.conf.d/*.conf'
@@ -74,6 +77,8 @@ mkdir -p /run/untrustedhost/netdata
 } > /run/untrustedhost/netdata/unbound.conf
 
 chmod a+r /var/lib/unbound/root.key
+touch /var/log/unbound.log
+chown unbound:unbound /var/log/unbound.log
 
 unbound-checkconf /run/untrustedhost/unbound.conf || exit 1
 

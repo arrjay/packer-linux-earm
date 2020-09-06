@@ -39,6 +39,7 @@ for source in \
   "${PFSRC}/systemd" \
   "${PFSRC}/untrustedhost" \
   "${PFSRC}/imd" \
+  "${PFSRC}/logrotate.d" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
@@ -51,7 +52,7 @@ for source in \
 done
 
 # install from scratch directories into filesystem, clean them back up
-for directory in /tmp/systemd /tmp/untrustedhost ; do
+for directory in /tmp/systemd /tmp/untrustedhost /tmp/logrotate.d ; do
   install_ef "${directory}"
   rm -rf "${directory}"
 done

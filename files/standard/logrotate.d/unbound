@@ -1,0 +1,14 @@
+/var/log/unbound.log
+{
+  rotate 4
+  daily
+  compress
+  notifempty
+  missingok
+  create 644 unbound unbound
+  sharedscripts
+  postrotate
+    unbound-control -c /run/untrustedhost/unbound.conf log_reopen > /dev/null
+  endscript
+  maxage 7
+}
