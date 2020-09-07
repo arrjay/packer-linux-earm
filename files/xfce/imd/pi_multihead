@@ -80,3 +80,5 @@ rpi_ts="$(xmlstarlet sel -t -v '/metadata/screenlayout/screen[@input="raspberryp
     printf 'EndSection\n'
   } > /run/untrustedhost/xorg.conf.d/50-raspberrypi-ts.conf
 }
+
+exit 0
