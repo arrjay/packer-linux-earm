@@ -63,6 +63,7 @@
 				"./scripts/standard/ssm.sh",
 				"./scripts/standard/ups.sh",
 				"./scripts/standard/pdns.sh",
+				"./scripts/standard/miniupnpd.sh",
 				"./scripts/standard/recursor.sh",
 				"./scripts/standard/dnsfilter.sh",
 				"./scripts/standard/login-config.sh"
