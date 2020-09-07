@@ -1,7 +1,7 @@
 [Unit]
 Description=Unbound DNS server
 Documentation=man:unbound(8)
-After=network.target
+After=network.target untrustedhost-bind.service
 Before=nss-lookup.target
 Wants=nss-lookup.target
 
