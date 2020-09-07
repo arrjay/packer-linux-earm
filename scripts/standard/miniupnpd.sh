@@ -8,3 +8,5 @@ printf '%s\n' "miniupnpd miniupnpd/ip6script boolean false" \
   | debconf-set-selections
 
 apt-get install miniupnpd
+
+systemctl enable untrustedhost-miniupnpd

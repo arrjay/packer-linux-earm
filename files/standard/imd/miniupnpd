@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# if we are handed an address/interface to bind upnpd to, set up miniupnpd
+listen_addr="$(xmlstarlet sel -t -v '/metadata/upnpd/address/@ipv4' "${IMD_PATH}")"
+allowed_subnets="$(xmlstarlet sel -t -v '/metadata/upnpd/allow' "${IMD_PATH}")"
+
+[[ "${listen_addr}" ]] || exit 0
+[[ "${allowed_subnets}" ]] || exit 1
+
+[[ -f /root/.miniupnp-uuid ]] || uuidgen > /root/.miniupnp-uuid
+read -r upnp_uuid < /root/.miniupnp-uuid
+
+{
+  # boilerplate
+  printf 'enable_natpmp=%s\n' 'yes'
+  printf 'enable_upnp=%s\n' 'yes'
+  printf 'friendly_name=%s\n' 'a tiny linux router'
+  printf 'manufacturer_name=%s\n' 'untrusted-hosts'
+  printf 'manufacturer_url=%s\n' 'https://gitlab.com/untrustedhost/packer-linux-earm'
+  printf 'model_url=%s\n' 'https://gitlab.com/untrustedhost/packer-linux-earm'
+  printf 'model_description=%s\n' "$(awk -F': ' '$1 ~ "Model" { print $2 }' < /proc/cpuinfo)"
+  printf 'model_name=%s\n' "$(uname -m)"
+  printf 'secure_mode=%s\n' 'yes'
+  printf 'system_uptime=%s\n' 'yes'
+  printf 'uuid=%s\n' "${upnp_uuid}"
+
+  # listener
+  printf 'listening_ip=%s\n' "${listen_addr}"
+
+  # acl
+  for net in $allowed_subnets ; do
+    printf 'allow 1024-65535 %s 1024-65535\n' "${net}"
+  done
+  printf 'deny 0-65535 0.0.0.0/0 0-65535\n'
+
+} > /run/untrustedhost/miniupnpd.conf

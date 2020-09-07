@@ -1,0 +1,20 @@
+[Unit]
+Description=UPnP Internet Gateway Device Daemon
+Documentation=man:miniupnpd(8)
+After=network-online.target imd.service
+ConditionPathExists=/run/untrustedhost/miniupnpd.conf
+
+[Service]
+Type=forking
+EnvironmentFile=-/etc/default/miniupnpd
+EnvironmentFile=/run/untrustedhost/miniupnpd.conf
+ExecStartPre=/etc/miniupnpd/iptables_init.sh -i $ext_ifname
+ExecStartPre=/bin/sh -c "[ \"$MiniUPnPd_ip6tables_enable\" != 1 ] || /etc/miniupnpd/ip6tables_init.sh -i $ext_ifname"
+ExecStart=/usr/sbin/miniupnpd -f /run/untrustedhost/miniupnpd.conf $MiniUPnPd_OTHER_OPTIONS
+ExecStopPost=/etc/miniupnpd/iptables_removeall.sh -i $ext_ifname
+ExecStopPost=/bin/sh -c "[ \"$MiniUPnPd_ip6tables_enable\" != 1 ] || /etc/miniupnpd/ip6tables_removeall.sh -i $ext_ifname"
+PrivateTmp=yes
+PIDFile=/run/miniupnpd.pid
+
+[Install]
+WantedBy=multi-user.target
