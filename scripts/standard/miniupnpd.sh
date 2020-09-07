@@ -10,3 +10,5 @@ printf '%s\n' "miniupnpd miniupnpd/ip6script boolean false" \
 apt-get install miniupnpd
 
 systemctl enable untrustedhost-miniupnpd
+
+firewall-offline-cmd --zone=trusted --add-service=upnp-client

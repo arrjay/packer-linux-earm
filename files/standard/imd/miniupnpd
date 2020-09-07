@@ -3,9 +3,11 @@
 # if we are handed an address/interface to bind upnpd to, set up miniupnpd
 listen_addr="$(xmlstarlet sel -t -v '/metadata/upnpd/address/@ipv4' "${IMD_PATH}")"
 allowed_subnets="$(xmlstarlet sel -t -v '/metadata/upnpd/allow' "${IMD_PATH}")"
+ext_if="$(xmlstarlet sel -t -v '/metadata/upnpd/external/@interface' "${IMD_PATH}")"
 
 [[ "${listen_addr}" ]] || exit 0
 [[ "${allowed_subnets}" ]] || exit 1
+[[ "${ext_if}" ]] || exit 1
 
 [[ -f /root/.miniupnp-uuid ]] || uuidgen > /root/.miniupnp-uuid
 read -r upnp_uuid < /root/.miniupnp-uuid
@@ -26,6 +28,9 @@ read -r upnp_uuid < /root/.miniupnp-uuid
 
   # listener
   printf 'listening_ip=%s\n' "${listen_addr}"
+
+  # external iface
+  printf 'ext_ifname=%s\n' "${ext_if}"
 
   # acl
   for net in $allowed_subnets ; do
