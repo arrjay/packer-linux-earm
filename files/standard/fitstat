@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+read -r currstat < /run/untrustedhost/sys_status
+[[ "${currstat}" ]] || currstat="UNKNOWN"
+
+case "${currstat}" in
+  GOOD)    fitstr='#004400' ;;
+  FAILED)  fitstr='B#440000-1000#000000-1000' ;;
+  NOROUTE) fitstr='B#444400-1000#004400-1000' ;;
+  UNKNOWN) fitstr='B#444400-1000#000000-1000' ;;
+  *)       fitstr='B#440044-1000#000000-1000' ;;
+esac
+
+for fitstat in /dev/fitusb/* ; do
+  [[ -e "${fitstat}" ]] || continue
+  printf '%s\n' "${fitstr}" > "${fitstat}"
+done

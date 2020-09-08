@@ -1,0 +1,2 @@
+/dev/fitusb IN_CREATE /usr/lib/untrustedhost/scripts/fitstat
+/run/untrustedhost/sys_status IN_CLOSE_WRITE /usr/lib/untrustedhost/scripts/fitstat

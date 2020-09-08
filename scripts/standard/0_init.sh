@@ -41,6 +41,7 @@ for source in \
   "${PFSRC}/imd" \
   "${PFSRC}/logrotate.d" \
   "${PFSRC}/udev" \
+  "${PFSRC}/incron.d" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
@@ -53,7 +54,7 @@ for source in \
 done
 
 # install from scratch directories into filesystem, clean them back up
-for directory in /tmp/systemd /tmp/untrustedhost /tmp/logrotate.d /tmp/udev ; do
+for directory in /tmp/systemd /tmp/untrustedhost /tmp/logrotate.d /tmp/udev /tmp/incron.d ; do
   install_ef "${directory}"
   rm -rf "${directory}"
 done
@@ -79,3 +80,6 @@ install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/attach-hidups.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/start-upsd-aliases.sh" "/usr/lib/untrustedhost/scripts/start-upsd-aliases.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/write-upsd-config.sh" "/usr/lib/untrustedhost/scripts/write-upsd-config.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/dns-update.sh" "/usr/lib/untrustedhost/scripts/dns-update.sh"
+install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/fitstat" "/usr/lib/untrustedhost/scripts/fitstat"
+
+systemctl enable untrustedhost-fitstat

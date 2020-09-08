@@ -1,0 +1,10 @@
+[Unit]
+Description=oneshot to update status LED
+After=incron.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/untrustedhost/scripts/fitstat
+
+[Install]
+WantedBy=multi-user.target
