@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+mkdir -p /run/untrustedhost
+ip route get 8.8.8.8 && echo 'GOOD' > /run/untrustedhost/sys_status
+
+exit 0

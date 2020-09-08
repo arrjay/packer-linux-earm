@@ -15,7 +15,7 @@ esac
 apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
-  python-dbus python-setuptools mtools telnet incron "${ADDITIONAL_PACKAGES[*]}"
+  python-dbus python-setuptools mtools telnet incron networkd-dispatcher "${ADDITIONAL_PACKAGES[*]}"
 
 # disable installed services for imd management
 systemctl disable chrony

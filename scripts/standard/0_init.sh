@@ -42,6 +42,7 @@ for source in \
   "${PFSRC}/logrotate.d" \
   "${PFSRC}/udev" \
   "${PFSRC}/incron.d" \
+  "${PFSRC}/networkd-dispatcher" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
@@ -59,7 +60,7 @@ for directory in /tmp/systemd /tmp/untrustedhost /tmp/logrotate.d /tmp/udev /tmp
   rm -rf "${directory}"
 done
 
-for directory in /tmp/skel ; do
+for directory in /tmp/skel /tmp/networkd-dispatcher ; do
   INSTALL_MODE=0755 install_ef "${directory}"
   rm -rf "${directory}"
 done
