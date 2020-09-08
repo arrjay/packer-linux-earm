@@ -1,4 +1,4 @@
-SUBSYSTEMS=="usb", ATTRS{idVendor}=="2047", ATTRS{idProduct}=="03df", KERNEL=="ttyACM*", GOTO="fitusb_start"
+ACTION=="add", SUBSYSTEMS=="usb", ATTRS{idVendor}=="2047", ATTRS{idProduct}=="03df", KERNEL=="ttyACM*", GOTO="fitusb_start"
 
 GOTO="fitusb_end"
 
@@ -6,5 +6,7 @@ LABEL="fitusb_start"
 IMPORT{builtin}="path_id"
 ENV{ID_PATH}=="?*", ENV{.ID_PORT}=="", SYMLINK+="fitusb/$env{ID_PATH}"
 ENV{ID_PATH}=="?*", ENV{.ID_PORT}=="?*", SYMLINK+="fitusb/$env{ID_PATH}-port$env{.ID_PORT}"
+
+RUN+="/usr/bin/stty -F /dev/$name 9600 raw -echo -echoe -echok -echoctl -echoke"
 
 LABEL="fitusb_end"
