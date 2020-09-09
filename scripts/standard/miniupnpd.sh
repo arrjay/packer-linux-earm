@@ -11,4 +11,7 @@ apt-get install miniupnpd
 
 systemctl enable untrustedhost-miniupnpd
 
+firewall-offline-cmd --new-service=natpmp
+firewall-offline-cmd --service=natpmp --add-port=5351/udp
+firewall-offline-cmd --zone=trusted --add-service=natpmp
 firewall-offline-cmd --zone=trusted --add-service=upnp-client
