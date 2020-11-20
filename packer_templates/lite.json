@@ -6,9 +6,8 @@
 			"name": "pi",
 			"type": "arm-image",
 			"image_type": "raspberrypi",
-			"iso_url": "./images/upstream/2020-05-27-raspios-buster-lite-armhf.zip",
-			"iso_checksum_type": "sha256",
-			"iso_checksum": "f5786604be4b41e292c5b3c711e2efa64b25a5b51869ea8313d58da0b46afc64",
+			"iso_url": "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2020-08-24/2020-08-20-raspios-buster-armhf-lite.zip",
+			"iso_checksum": "sha256:4522df4a29f9aac4b0166fbfee9f599dab55a997c855702bfe35329c13334668",
 			"output_filename": "images/lite/pi.img"
 		},
 		{
@@ -28,7 +27,8 @@
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"inline": [
                                 "mv /etc/ld.so.preload /etc/ld.so.preload.dist"
-                        ]
+                        ],
+			"skip_clean": true
 		},
 		{
 			"only": [ "sheeva" ],
@@ -42,7 +42,8 @@
 				"/debootstrap/debootstrap --second-stage --merged-usr",
 				"# set root password to nosoup4u (sheevaplug image default)",
 				"usermod -p '$6$fFo1kfYxV7aTJbir$LpccRu/YSjF/7Ih2NOBhmlcZumM3lhQsbvUXIdkwyuzTVJdTgf5rlOKRRUwUwyqwFxCHQV1Tsio1El0jWNbea.' root"
-			]
+			],
+			"skip_clean": true
 		},
 		{
 			"type": "shell",
@@ -50,7 +51,8 @@
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"inline": [
 				"mkdir -p /tmp/packer-files"
-			]
+			],
+			"skip_clean": true
 		},
 		{
 			"type": "file",
