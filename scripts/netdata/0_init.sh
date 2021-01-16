@@ -17,12 +17,12 @@ case "${PACKER_BUILD_NAME}" in
 esac
 
 # install netdata - omnibus install
-apt-get install autoconf autoconf-archive autogen automake curl cmake gcc git gzip libjudy-dev liblz4-dev libmnl-dev libssl-dev libuv1-dev lm-sensors make netcat pkg-config python python-mysqldb python-psycopg2 python-pymongo tar uuid-dev zlib1g-dev jq python-ipaddress firewalld "${extrapkgs}"
+apt-get install autoconf autoconf-archive autogen automake curl cmake gcc git gzip libjudy-dev libelf-dev liblz4-dev libmnl-dev libssl-dev libuv1-dev lm-sensors make netcat pkg-config python python-mysqldb python-psycopg2 python-pymongo tar uuid-dev zlib1g-dev jq python-ipaddress firewalld "${extrapkgs}"
 
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
-git checkout v1.26.0
+git checkout v1.28.0
 ./netdata-installer.sh --dont-start-it --dont-wait
 
 case "${PACKER_BUILD_NAME}" in
