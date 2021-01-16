@@ -15,12 +15,12 @@ STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
 XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -print -type f)
 
-images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
-	-rm -rf images/lite/pi.img
+images/lite/pi.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
+	-rm -rf images/lite/pi.img*
 	packer build -only=pi packer_templates/lite.json
 
-images/lite/sheeva.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
-	-rm -rf images/lite/sheeva.img
+images/lite/sheeva.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
+	-rm -rf images/lite/sheeva.img*
 	packer build -only=sheeva packer_templates/lite.json
 
 images/netdata/pi.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img

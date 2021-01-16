@@ -86,3 +86,4 @@ esac
 
 mkdir -p images/upstream
 mv "${temp_image}" images/upstream/sheevaplug-s1.img
+xz -T0 images/upstream/sheevaplug-s1.img

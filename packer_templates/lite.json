@@ -68,5 +68,12 @@
 				"./scripts/lite/network-setup.sh"
 			]
 		}
-	]
+	],
+        "post-processors": [
+                {
+                        "type": "compress",
+                        "format": "xz",
+                        "output": "images/lite/{{.BuildName}}.img.xz"
+                }
+        ]
 }
