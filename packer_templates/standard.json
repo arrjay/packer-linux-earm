@@ -6,7 +6,7 @@
 			"name": "pi",
 			"type": "arm-image",
 			"image_type": "raspberrypi",
-			"iso_url": "./images/netdata/pi.img",
+			"iso_url": "./images/netdata/pi.img.xz",
 			"iso_checksum_type": "none",
 			"output_filename": "images/standard/pi.img",
 			"target_image_size": 4294967296
@@ -15,7 +15,7 @@
 			"name": "sheeva",
 			"type": "arm-image",
 			"image_mounts": [ "/boot", "/boot/IMD", "/" ],
-			"iso_url": "./images/netdata/sheeva.img",
+			"iso_url": "./images/netdata/sheeva.img.xz",
 			"iso_checksum_type": "none",
 			"output_filename": "images/standard/sheeva.img",
 			"target_image_size": 3221225472
@@ -78,5 +78,13 @@
 				"df -m"
                         ]
 		}
-	]
+	],
+        "post-processors": [
+                {
+                        "type": "compress",
+                        "format": "xz",
+                        "output": "images/standard/{{.BuildName}}.img.xz"
+                }
+        ]
+
 }

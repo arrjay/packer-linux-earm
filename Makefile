@@ -31,12 +31,12 @@ images/netdata/sheeva.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) i
 	-rm -rf images/netdata/sheeva.img*
 	packer build -only=sheeva packer_templates/netdata.json
 
-images/standard/pi.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/pi.img
-	-rm -rf images/standard/pi.img
+images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/pi.img.xz
+	-rm -rf images/standard/pi.img*
 	packer build -only=pi packer_templates/standard.json
 
-images/standard/sheeva.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/sheeva.img
-	-rm -rf images/standard/sheeva.img
+images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/sheeva.img.xz
+	-rm -rf images/standard/sheeva.img*
 	packer build -only=sheeva packer_templates/standard.json
 
 images/xfce/pi.img: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img
