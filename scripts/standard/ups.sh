@@ -42,10 +42,10 @@ ln -sf /run/untrustedhost/nut/upsmon.conf /etc/nut/upsmon.conf
 
 # HACK: currently we hardwire firewalld and interface interop to this.
 firewall-offline-cmd --new-zone=hv
-firewall-offline-cmd --zone=hv --add-interface=onboard-vl-hv
+firewall-offline-cmd --zone=hv --add-interface=be-vl-hv
 firewall-offline-cmd --zone=hv --add-service=nut
 firewall-offline-cmd --new-zone=ninf
-firewall-offline-cmd --zone=ninf --add-interface=onboard-vl-ninf
+firewall-offline-cmd --zone=ninf --add-interface=be-vl-ninf
 firewall-offline-cmd --zone=ninf --add-service=nut
 firewall-offline-cmd --zone=trusted --add-service=nut
 
