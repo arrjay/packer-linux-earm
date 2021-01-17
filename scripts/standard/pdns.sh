@@ -2,6 +2,10 @@
 
 set -e
 
+case "${PACKER_BUILD_NAME}" in
+  sheeva) exit 0 ;;
+esac
+
 printf '%s\n' "pdns-backend-sqlite3 pdns-backend-sqlite3/dbconfig-install boolean false" \
      | debconf-set-selections
 
