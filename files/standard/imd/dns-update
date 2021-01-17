@@ -8,3 +8,5 @@ dnsu_xml="$(xmlstarlet sel -t -c /metadata/dns-update "${IMD_PATH}")"
   cat <<<"${dnsu_xml}" > /run/untrustedhost/dns-update.xml
   systemd-run --on-active=10s systemctl start untrustedhost-dnsupdate
 }
+
+exit 0
