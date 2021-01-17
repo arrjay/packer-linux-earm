@@ -3,5 +3,5 @@ Driver=bcmgenet
 Path=platform-fd580000.ethernet
 
 [Link]
-Name=onboard
+Name=be
 MACAddressPolicy=random

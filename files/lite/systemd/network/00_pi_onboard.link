@@ -3,5 +3,5 @@ Driver=smsc95xx
 Path=platform-20980000.usb-usb-0:1.1:1.0
 
 [Link]
-Name=onboard
+Name=be
 MACAddressPolicy=random

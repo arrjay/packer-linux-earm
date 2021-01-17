@@ -1,6 +1,6 @@
 # fallback - try dhcp on it!
 [Match]
-Name=onboard wl eth* em* en*
+Name=be wl eth* em* en*
 [Network]
 LinkLocalAddressing=yes
 LLMNR=true
