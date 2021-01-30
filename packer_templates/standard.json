@@ -64,8 +64,10 @@
 				"./scripts/standard/ups.sh",
 				"./scripts/standard/pdns.sh",
 				"./scripts/standard/miniupnpd.sh",
+				"./scripts/standard/tang.sh",
 				"./scripts/standard/recursor.sh",
 				"./scripts/standard/dnsfilter.sh",
+				"./scripts/standard/ucarp.sh",
 				"./scripts/standard/login-config.sh"
 			]
 		},
