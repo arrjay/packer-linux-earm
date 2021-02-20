@@ -6,9 +6,10 @@
 			"name": "pi",
 			"type": "arm-image",
 			"image_type": "raspberrypi",
-			"iso_url": "./images/standard/pi.img",
+			"iso_url": "./images/standard/pi.img.xz",
 			"iso_checksum_type": "none",
-			"output_filename": "./images/xfce/pi.img"
+			"output_filename": "./images/xfce/pi.img",
+			"target_image_size": 4831838208
 		}
 	],
 	"provisioners": [
@@ -33,5 +34,12 @@
 				"./scripts/xfce/0_init.sh"
 			]
 		}
-	]
+	],
+        "post-processors": [
+                {
+                        "type": "compress",
+                        "format": "xz",
+                        "output": "images/xfce/{{.BuildName}}.img.xz"
+                }
+        ]
 }

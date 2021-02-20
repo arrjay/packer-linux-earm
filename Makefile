@@ -39,8 +39,8 @@ images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS
 	-rm -rf images/standard/sheeva.img*
 	packer build -only=sheeva packer_templates/standard.json
 
-images/xfce/pi.img: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img
-	-rm -rf images/xfce/pi.img
+images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img.xz
+	-rm -rf images/xfce/pi.img*
 	packer build -only=pi packer_templates/xfce.json
 
 edger/image: dterm-image/image edger.json scripts/edger.sh
