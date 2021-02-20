@@ -15,7 +15,7 @@ esac
 apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
-  python-dbus python-setuptools mtools telnet incron networkd-dispatcher awscli \
+  python-dbus python-setuptools mtools telnet incron networkd-dispatcher awscli putty-tools \
   "${ADDITIONAL_PACKAGES[*]}"
 
 # disable installed services for imd management
