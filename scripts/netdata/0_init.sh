@@ -22,7 +22,7 @@ apt-get install autoconf autoconf-archive autogen automake curl cmake gcc git gz
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
-git checkout v1.28.0
+git checkout v1.29.1
 ./netdata-installer.sh --dont-start-it --dont-wait
 
 case "${PACKER_BUILD_NAME}" in
