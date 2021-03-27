@@ -26,7 +26,7 @@
                         "type": "shell-local",
                         "execute_command": ["bash", "-c", "{{ .Vars }} {{ .Script }}"],
                         "inline": [
-				"p=$(pwd) && rm -f $p/files/standard/cache/imd/install.run && pushd vendor/imd && make OUTPUTDIR=$p/files/standard/cache/imd/ && popd",
+				"bash -exc 'p=$(pwd) && rm -f $p/files/standard/cache/imd/install.run && pushd vendor/imd && make OUTPUTDIR=$p/files/standard/cache/imd/ && popd'",
 				"mkdir -p $p/files/standard/cache/etc/skel",
 				"cp vendor/dotfiles/bashrc $p/files/standard/cache/etc/skel/.bashrc",
 				"cp -R vendor/dotfiles/bash.d $p/files/standard/cache/etc/skel/.bash.d"
