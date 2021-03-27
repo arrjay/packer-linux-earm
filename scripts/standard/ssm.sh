@@ -36,3 +36,5 @@ esac
   dpkg -i /tmp/amazon-ssm-agent.deb || true
   apt-get install -f
 }
+
+true
