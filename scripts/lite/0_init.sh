@@ -141,7 +141,7 @@ apt-get install \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
  rsync sudo vim curl tmux \
- cryptsetup \
+ cryptsetup luksipc \
  ca-certificates openssh-client openssh-server openssh-sftp-server
 
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
