@@ -34,12 +34,5 @@
 				"./scripts/xfce/0_init.sh"
 			]
 		}
-	],
-        "post-processors": [
-                {
-                        "type": "compress",
-                        "format": "xz",
-                        "output": "images/xfce/{{.BuildName}}.img.xz"
-                }
         ]
 }
