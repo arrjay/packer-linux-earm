@@ -26,9 +26,6 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
   sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 }
 
-# configure fstab for luksroot
-augtool set '/files/etc/fstab/*[file = "/"]/spec' /dev/mapper/luksroot
-
 # (rpi) append initramfs loading to config.txt
 [[ -e /boot/config.txt ]] && [[ -f "${PFSRC}/${PACKER_BUILD_NAME}/config.txt" ]] && \
   cat "${PFSRC}/${PACKER_BUILD_NAME}/config.txt" >> /boot/config.txt
@@ -147,6 +144,9 @@ apt-get install \
  rsync sudo vim curl tmux \
  augeas-tools mtools \
  ca-certificates openssh-client openssh-server openssh-sftp-server
+
+# configure fstab for luksroot
+augtool set '/files/etc/fstab/*[file = "/"]/spec' /dev/mapper/luksroot
 
 # we want a newer cryptsetup that...works...
 apt-get -t buster-backports install cryptsetup
