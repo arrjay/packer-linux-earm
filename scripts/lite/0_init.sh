@@ -22,8 +22,12 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 # (rpi) drop dist hack for init, create serial-oriented command line
 [[ -f /boot/cmdline.txt ]] && {
   sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
+  sed -i -e 's@ root=@ root=/dev/mapper/luksroot luksipc=@' /boot/cmdline.txt
   sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 }
+
+# configure fstab for luksroot
+augtool set '/files/etc/fstab/*[file = "/"]/spec' /dev/mapper/luksroot
 
 # (rpi) append initramfs loading to config.txt
 [[ -e /boot/config.txt ]] && [[ -f "${PFSRC}/${PACKER_BUILD_NAME}/config.txt" ]] && \
@@ -141,8 +145,11 @@ apt-get install \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
  rsync sudo vim curl tmux \
- cryptsetup luksipc \
+ augeas-tools mtools \
  ca-certificates openssh-client openssh-server openssh-sftp-server
+
+# we want a newer cryptsetup that...works...
+apt-get -t buster-backports install cryptsetup
 
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
 for f in /etc/ssl/certs/* ; do
@@ -181,6 +188,9 @@ systemctl disable regenerate_ssh_host_keys.service
 
 # disable rpi's resize rootfs service too.
 systemctl disable resize2fs_once.service
+
+# add cryptsetup stuff to initrds
+grep -q ^CRYPTSETUP=y /etc/initramfs-tools/initramfs.conf || printf '%s\n' 'CRYPTSETUP=y' >> /etc/initramfs-tools/initramfs.conf
 
 # (rpi) create the initrds
 [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {

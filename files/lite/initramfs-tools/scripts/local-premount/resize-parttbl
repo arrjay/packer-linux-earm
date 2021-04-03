@@ -28,20 +28,30 @@ command -v blkid >/dev/null || exit 0
 command -v lsblk >/dev/null || exit 0
 command -v parted >/dev/null || exit 0
 
+for arg in $(cat /proc/cmdline) ; do
+  case "${arg}" in
+    luksipc=*)
+      checkdev=${arg#luksipc=}
+    ;;
+  esac
+done
+
+[ "${checkdev}" ] || checkdev="${ROOT}"
+
 # find partitions belonging to the root block device and extend them.
-log_begin_msg "resizing partitions underlying ${ROOT}"
-case "${ROOT}" in
+log_begin_msg "resizing partitions underlying ${checkdev}"
+case "${checkdev}" in
   /*)
-    rootdev="${ROOT}"
+    rootdev="${checkdev}"
    ;;
   *=*)
-    lsbk=$(echo "${ROOT}" | awk -F= '{ print $1 }')
-    lsbv=$(echo "${ROOT}" | awk -F= '{ gsub(/"/, "", $2) ; print $2 }')
-    rootdev=$(blkid | awk -F: '$2 ~ "'"${lsbk}"'=\"'"${lsbv}"'\"" { print $1 }')
+    lsbk=$(echo "${checkdev}" | awk -F= '{ print $1 }')
+    lsbv=$(echo "${checkdev}" | awk -F= '{ gsub(/"/, "", $2) ; print $2 }')
+    checkdev=$(blkid | awk -F: '$2 ~ "'"${lsbk}"'=\"'"${lsbv}"'\"" { print $1 }')
    ;;
 esac
 
-parts=$(lsblk -Ps "${rootdev}" | awk '$0 ~ "TYPE=\"part\"" { e=split($1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
+parts=$(lsblk -Ps "${checkdev}" | awk '$0 ~ "TYPE=\"part\"" { e=split($1, o, "=") ; gsub(/"/, "", o[e]) ; print o[e] }')
 
 for slice in ${parts} ; do
   read -r pno < "/sys/class/block/${slice}/partition"

@@ -1,0 +1,44 @@
+#!/bin/sh
+# install in initramfs-tools/hooks/luksipc
+
+set -e
+
+PREREQ=""
+
+prereqs () {
+	echo "${PREREQ}"
+}
+
+case "${1}" in
+	prereqs)
+		prereqs
+		exit 0
+		;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+copy_file config /etc/initramfs-tools/support/mtools.conf /etc
+copy_exec /sbin/cryptsetup
+copy_exec /sbin/dmsetup
+copy_exec /lib/cryptsetup/askpass
+copy_exec /usr/sbin/cryptsetup-reencrypt
+copy_exec /bin/mktemp
+# mtools dynamically loads this one, ow.
+copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so
+copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gconv-modules /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gconv-modules
+copy_exec /sbin/blkid /sbin
+copy_exec /bin/lsblk /bin
+copy_exec /usr/bin/mcopy /usr/bin
+copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/libgcc_s.so.1
+
+# FIXME: debugging
+#copy_exec /usr/bin/strace
+#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-v6l.so
+#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so
+#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-v8l.so
+#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-aarch64.so
+
+manual_add_modules aes
+manual_add_modules sha256
+manual_add_modules dm_crypt
