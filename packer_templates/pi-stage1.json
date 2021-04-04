@@ -34,8 +34,13 @@
 				"printf 'UUID=%s / ext4 defaults,noatime 0 1\n' \"${rootfs_uuid}\" >> /etc/fstab",
 				"printf 'UUID=%s /boot vfat defaults,umask=0077,uid=1,gid=0 0 2\n' \"${bootfs_id}\" >> /etc/fstab",
 				"sed -i -e 's@root=[0-9a-zA-Z/_.=\\-]\\+@root=UUID='\"${rootfs_uuid}\"'@' /boot/cmdline.txt",
+				"sed -i -e 's@init=[0-9a-zA-Z/_.=\\-]\\+@@' /boot/cmdline.txt",
+				"sed -i -e 's@console=tty1@@' /boot/cmdline.txt",
+				"sed -i -e 's@quiet@@' /boot/cmdline.txt",
+				"echo enable_uart=1 >> /boot/config.txt",
 				"cat /etc/fstab",
 				"cat /boot/cmdline.txt",
+				"cat /boot/config.txt",
 				"df -h"
 			],
 			"skip_clean": true
