@@ -142,11 +142,15 @@ apt-get install \
  mawk util-linux parted \
  iproute2 bind9utils dnsutils \
  rsync sudo vim curl tmux \
- augeas-tools mtools \
+ augeas-tools mtools dpkg-dev \
  ca-certificates openssh-client openssh-server openssh-sftp-server
 
-# configure fstab for luksroot
-augtool set '/files/etc/fstab/*[file = "/"]/spec' /dev/mapper/luksroot
+# configure fstab for luksroot (pi)
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    augtool set '/files/etc/fstab/*[file = "/"]/spec' /dev/mapper/luksroot
+  ;;
+esac
 
 # we want a newer cryptsetup that...works...
 apt-get -t buster-backports install cryptsetup
