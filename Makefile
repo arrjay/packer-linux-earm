@@ -15,9 +15,17 @@ STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
 XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -print -type f)
 
+pi-uuids.json:
+	-rm pi-uuids.json
+	./scripts/genuuid-json.sh > pi-uuids.json
+
 images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
-	-rm images/upstream/sheevaplug-s1.img.xz
+	-rm images/upstream/sheevaplug-s1.img
 	./scripts/sheevaplug-stage1.sh
+
+images/upstream/pi-s1.img: packer_templates/pi-stage1.json pi-uuids.json
+	-rm images/upstream/pi-s1.img*
+	packer build -var-file=pi-uuids.json packer_templates/pi-stage1.json
 
 images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
