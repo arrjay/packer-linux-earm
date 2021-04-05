@@ -97,6 +97,8 @@ rm "${partlist}"
 dataland="${dataland%:*}"
 
 mkdir /run/cryptsetup
+random=/dev/random
+[ -f /dev/hwrng ] && random="/dev/hwrng"
 
 log_begin_msg "luksipc: examining ${srcdev}"
 
@@ -104,10 +106,11 @@ for arg in $(blkid "${srcdev}") ; do
   case "${arg}" in
     'TYPE="ext4"')
       log_begin_msg "generating keyfile..."
-        dd if=/dev/random of=/run/luksipc.key bs=1 count=32
+        dd "if="${random}" of=/run/luksipc.key bs=1 count=32
 	mcopy /run/luksipc.key $(get_driveletter "${dataland}"):luksipc.key
       log_end_msg
       log_begin_msg "converting ${srcdev} to LUKS..."
+        resize2fs -M -p "${srcdev}"
         cryptsetup-reencrypt --reduce-device-size=16M --new "${srcdev}" --key-file /run/luksipc.key
       log_end_msg
     ;;
