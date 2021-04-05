@@ -22,7 +22,7 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 # (rpi) drop dist hack for init, create serial-oriented command line
 [[ -f /boot/cmdline.txt ]] && {
   sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
-  sed -i -e 's@ root=@ root=/dev/mapper/luksroot luksipc=@' /boot/cmdline.txt
+  sed -i -e 's@ root=[0-9a-zA-Z/_.\=-]\+@ root=UUID='"${rootfs_uuid}"'@' /boot/cmdline.txt
   sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 }
 
@@ -34,6 +34,16 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 [[ -f /etc/default/raspberrypi-kernel ]] && {
   printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
 }
+
+# (rpi) stomp on fstab
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    {
+      printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${rootfs_uuid}"
+      printf 'UUID=%s /boot vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(echo ${bootfs_id}| tr '[a-z]' '[A-Z]' | sed 's/./&-/4')"
+    } > /etc/fstab
+  ;;
+esac
 
 # recursion function for walking around in /tmp, installing to /etc
 install_ef () {
@@ -144,13 +154,6 @@ apt-get install \
  rsync sudo vim curl tmux \
  augeas-tools mtools dpkg-dev \
  ca-certificates openssh-client openssh-server openssh-sftp-server
-
-# configure fstab for luksroot (pi)
-case "${PACKER_BUILD_NAME}" in
-  pi)
-    augtool set '/files/etc/fstab/*[file = "/"]/spec' /dev/mapper/luksroot
-  ;;
-esac
 
 # we want a newer cryptsetup that...works...
 apt-get -t buster-backports install cryptsetup

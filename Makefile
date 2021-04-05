@@ -27,9 +27,9 @@ images/upstream/pi-s1.img: packer_templates/pi-stage1.json pi-uuids.json
 	-rm images/upstream/pi-s1.img*
 	packer build -var-file=pi-uuids.json packer_templates/pi-stage1.json
 
-images/lite/pi.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS)
+images/lite/pi.img: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
-	packer build -only=pi packer_templates/lite.json
+	packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
 
 images/lite/sheeva.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz
 	-rm -rf images/lite/sheeva.img*

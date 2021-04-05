@@ -61,11 +61,32 @@
 		},
 		{
 			"type": "shell",
-			"environment_vars": [ "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ],
+			"environment_vars": [
+				"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+				"rootfs_uuid={{user `rootfs_uuid`}}",
+				"bootfs_id={{user `bootfs_id`}}"
+			],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [
 				"./scripts/lite/0_init.sh",
 				"./scripts/lite/network-setup.sh"
+			]
+		}
+	],
+	"post-processors": [
+		{
+			"type": "manifest"
+		},
+		{
+			"only": [ "pi" ],
+			"type": "shell-local",
+			"environment_vars": [
+				"rootfs_uuid={{user `rootfs_uuid`}}",
+				"bootfs_id={{user `bootfs_id`}}",
+				"partition_id={{user `partition_id`}}"
+			],
+			"scripts": [
+				"./scripts/lite/HOST_mangle_partitions.sh"
 			]
 		}
 	]
