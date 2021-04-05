@@ -23,6 +23,7 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 [[ -f /boot/cmdline.txt ]] && {
   sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
   sed -i -e 's@ root=[0-9a-zA-Z/_.\=-]\+@ root=UUID='"${rootfs_uuid}"'@' /boot/cmdline.txt
+  sed -i -e 's@ root=@ luksipc=PARTUUID='"${partition_id}"'-02 root=@' /boot/cmdline.txt
   sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 }
 

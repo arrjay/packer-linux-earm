@@ -64,7 +64,8 @@
 			"environment_vars": [
 				"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 				"rootfs_uuid={{user `rootfs_uuid`}}",
-				"bootfs_id={{user `bootfs_id`}}"
+				"bootfs_id={{user `bootfs_id`}}",
+				"partition_id={{user `partition_id`}}"
 			],
 			"execute_command": "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}",
 			"scripts": [

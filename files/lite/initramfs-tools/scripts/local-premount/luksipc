@@ -61,9 +61,6 @@ command -v awk >/dev/null || exit 0
 command -v mcopy >/dev/null || exit 0
 command -v mktemp >/dev/null || exit 0
 
-# find partitions belonging to the root block device and extend them.
-[ "${ROOT}" = "/dev/mapper/luksroot" ] || exit 0
-
 for arg in $(cat /proc/cmdline) ; do
   case "${arg}" in
     luksipc=*)

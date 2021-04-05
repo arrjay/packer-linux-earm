@@ -11,7 +11,10 @@ imagefile="$(jq -r '.builds[] | select(.packer_run_uuid=="'"${PACKER_RUN_UUID}"'
 
 for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
   case "${loop}" in
-    *1) mlabel -N "${bootfs_id}"  -i "/dev/mapper/${loop}" ;;
+    *1)
+      mlabel -N "${bootfs_id}"  -i "/dev/mapper/${loop}"
+      fatlabel "/dev/mapper/${loop}" boot
+    ;;
     *2) tune2fs -U "${rootfs_uuid}"  "/dev/mapper/${loop}" ;;
   esac
 done
