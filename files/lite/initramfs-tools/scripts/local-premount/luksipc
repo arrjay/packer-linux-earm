@@ -106,7 +106,7 @@ for arg in $(blkid "${srcdev}") ; do
   case "${arg}" in
     'TYPE="ext4"')
       log_begin_msg "generating keyfile..."
-        dd "if="${random}" of=/run/luksipc.key bs=1 count=32
+        dd "if=${random}" of=/run/luksipc.key bs=1 count=32
 	mcopy /run/luksipc.key $(get_driveletter "${dataland}"):luksipc.key
       log_end_msg
       log_begin_msg "converting ${srcdev} to LUKS..."
