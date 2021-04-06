@@ -184,6 +184,7 @@ esac
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/resize-rootfs.sh" "/usr/lib/untrustedhost/scripts/resize-rootfs.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/sshd-keygen" "/usr/lib/untrustedhost/scripts/sshd-keygen"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/addswap.sh" "/usr/lib/untrustedhost/scripts/addswap.sh"
+install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/postluksipc.sh" "/usr/lib/untrustedhost/scripts/postluksipc.sh"
 
 # install our custom services
 systemctl enable resize-rootfs.service

@@ -1,0 +1,11 @@
+[Unit]
+Description=post-boot luksipc handler (regenerate initramfs)
+ConditionKernelCommandLine=luksipc
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/untrustedhost/scripts/postluksipc.sh
+
+[Install]
+WantedBy=multi-user.target
