@@ -30,6 +30,7 @@ copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gcon
 copy_exec /sbin/blkid /sbin
 copy_exec /bin/lsblk /bin
 copy_exec /usr/bin/mcopy /usr/bin
+copy_exec /usr/sbin/e2fsck /sbin
 copy_exec /usr/sbin/resize2fs
 # for cryptsetup-reencrypt
 copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/libgcc_s.so.1

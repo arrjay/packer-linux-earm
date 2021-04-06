@@ -110,6 +110,7 @@ for arg in $(blkid "${srcdev}") ; do
 	mcopy /run/luksipc.key $(get_driveletter "${dataland}"):luksipc.key
       log_end_msg
       log_begin_msg "converting ${srcdev} to LUKS..."
+        e2fsck -f "${srcdev}"
         resize2fs -M -p "${srcdev}"
         cryptsetup-reencrypt --reduce-device-size=16M --new "${srcdev}" --key-file /run/luksipc.key
       log_end_msg
