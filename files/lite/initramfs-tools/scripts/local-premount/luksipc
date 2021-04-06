@@ -127,7 +127,6 @@ for arg in $(blkid "${srcdev}") ; do
 done
 
 cryptsetup luksOpen --key-file /run/luksipc.key "${srcdev}" luksroot
-cryptsetup resize --key-file /run/luksipc.key /dev/mapper/luksroot
 resize2fs -f "/dev/disk/by-uuid/${fsuuid}"
 
 log_end_msg
