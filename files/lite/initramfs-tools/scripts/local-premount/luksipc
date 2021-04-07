@@ -126,7 +126,8 @@ for arg in $(blkid "${srcdev}") ; do
   esac
 done
 
-cryptsetup luksOpen --key-file /run/luksipc.key "${srcdev}" luksroot
+luks_uuid="$(cryptsetup luksUUID "${srcdev}")"
+cryptsetup luksOpen --key-file /run/luksipc.key "${srcdev}" "luks-${luks_uuid}"
 resize2fs -f "/dev/disk/by-uuid/${fsuuid}"
 
 log_end_msg
