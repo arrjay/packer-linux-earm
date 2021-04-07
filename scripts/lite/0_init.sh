@@ -193,6 +193,7 @@ install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/postluksipc.sh" "
 # install our custom services
 systemctl enable resize-rootfs.service
 systemctl enable resolvlink.service
+systemctl enable postluksipc.service
 
 # wipe any ssh keys
 rm -rf /etc/ssh/ssh_host_*_key*
