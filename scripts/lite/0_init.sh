@@ -58,6 +58,9 @@ install_ef () {
   done
 }
 
+# move the cryptsetup-initramfs conf-hook out of the way
+dpkg-divert --rename /etc/cryptsetup-initramfs/conf-hook
+
 # install system configs from packer file provisioner
 for source in \
   "${PFSRC}/apt" \
@@ -74,9 +77,6 @@ for directory in /tmp/apt /tmp/cryptsetup-initramfs /tmp/dpkg /tmp/systemd ; do
   install_ef "${directory}"
   rm -rf "${directory}"
 done
-
-# move the cryptsetup-initramfs conf-hook out of the way
-dpkg-divert --rename /etc/cryptsetup-initramfs/conf-hook
 
 # kernel/initrd hooks from packer file provisioner
 for source in \

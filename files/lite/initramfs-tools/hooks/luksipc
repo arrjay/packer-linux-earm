@@ -34,7 +34,7 @@ copy_exec /usr/sbin/e2fsck /sbin
 copy_exec /usr/sbin/tune2fs /sbin
 copy_exec /usr/sbin/resize2fs
 # for cryptsetup-reencrypt
-copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/libgcc_s.so.1
+copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/libgcc_s.so.1 || true
 
 # FIXME: debugging
 #copy_exec /usr/bin/strace
