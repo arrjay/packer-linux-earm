@@ -23,36 +23,40 @@ images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
 	-rm images/upstream/sheevaplug-s1.img
 	./scripts/sheevaplug-stage1.sh
 
-images/lite/pi.img: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
+images/lite/pi.img.xz: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
 	packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
+	xz -T0 images/lite/pi.img
 
-images/lite/sheeva.img: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz
+images/lite/sheeva.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz
 	-rm -rf images/lite/sheeva.img*
 	packer build -only=sheeva packer_templates/lite.json
+	xz -T0 images/lite/sheeva.img
 
-images/netdata/pi.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
+images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
 	-rm -rf images/netdata/pi.img*
 	packer build -only=pi packer_templates/netdata.json
+	xz -T0 images/netdata/pi.img
 
-images/netdata/sheeva.img: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/sheeva.img.xz
+images/netdata/sheeva.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/sheeva.img.xz
 	-rm -rf images/netdata/sheeva.img*
 	packer build -only=sheeva packer_templates/netdata.json
+	xz -T0 images/netdata/sheeva.img
 
-images/standard/pi.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/pi.img.xz
+images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/pi.img.xz
 	-rm -rf images/standard/pi.img*
 	packer build -only=pi packer_templates/standard.json
+	xz -T0 images/standard/pi.img
 
-images/standard/sheeva.img: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/sheeva.img.xz
+images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/sheeva.img.xz
 	-rm -rf images/standard/sheeva.img*
 	packer build -only=sheeva packer_templates/standard.json
+	xz -T0 images/standard/sheeva.img
 
-images/xfce/pi.img: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img.xz
+images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img.xz
 	-rm -rf images/xfce/pi.img*
 	packer build -only=pi packer_templates/xfce.json
-
-%.img.xz: %.img
-	xz -T0 $<
+	xz -T0 images/xfce/pi.img
 
 edger/image: dterm-image/image edger.json scripts/edger.sh
 	-rm -rf edger
