@@ -63,16 +63,20 @@ for source in \
   "${PFSRC}/apt" \
   "${PFSRC}/dpkg" \
   "${PFSRC}/systemd" \
+  "${PFSRC}/cryptsetup-initramfs" \
   "${PFSRC}/${PACKER_BUILD_NAME}/apt" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
 
 # install from scratch directories into filesystem, clean them back up
-for directory in /tmp/apt /tmp/dpkg /tmp/systemd ; do
+for directory in /tmp/apt /tmp/cryptsetup-initramfs /tmp/dpkg /tmp/systemd ; do
   install_ef "${directory}"
   rm -rf "${directory}"
 done
+
+# move the cryptsetup-initramfs conf-hook out of the way
+dpkg-divert --rename /etc/cryptsetup-initramfs/conf-hook
 
 # kernel/initrd hooks from packer file provisioner
 for source in \
@@ -141,7 +145,7 @@ printf '%s\n' "localepurge localepurge/use-dpkg-feature boolean false" \
  | debconf-set-selections
 apt-get install localepurge
 localepurge
-echo "localepurge localepurge/use-dpkg-deature boolean true" | debconf-set-selections
+echo "localepurge localepurge/use-dpkg-feature boolean true" | debconf-set-selections
 dpkg-reconfigure localepurge
 
 # if we don't have /bin -> /usr/bin and such, install usrmerge
@@ -157,7 +161,7 @@ apt-get install \
  ca-certificates openssh-client openssh-server openssh-sftp-server
 
 # we want a newer cryptsetup that...works...
-apt-get -t buster-backports install cryptsetup
+apt-get -t buster-backports install cryptsetup cryptsetup-initramfs
 
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
 for f in /etc/ssl/certs/* ; do
