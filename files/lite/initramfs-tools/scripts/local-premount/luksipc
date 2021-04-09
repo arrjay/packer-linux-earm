@@ -20,7 +20,7 @@ esac
 # step 1 - finding a filesystem labeled boot or IMD
 boot_or_imd_parts () {
   # list partitions labeled IMD or boot - return an error if we find more than one
-  local wktmp line bootct=0 imdct=0
+  line='' bootct=0 imdct=0
   wktmp=$(mktemp)
   blkid > "${wktmp}"
   while read -r line ; do
@@ -30,21 +30,21 @@ boot_or_imd_parts () {
     esac
   done < "${wktmp}"
   rm "${wktmp}"
-  [[ "${imdct}"  -gt 2 ]] && return 1
-  [[ "${bootct}" -gt 2 ]] && return 1
+  [ "${imdct}"  -gt 2 ] && return 1
+  [ "${bootct}" -gt 2 ] && return 1
   return 0
 }
 
 get_driveletter () {
   # return a drive letter match for mtools.conf
-  local MTOOLSRC="${MTOOLSRC:-/etc/mtools.conf}"
-  local line src=$1 res
+  MTOOLSRC="${MTOOLSRC:-/etc/mtools.conf}"
+  line='' src=$1 res=''
   while read -r line ; do
     case $line in
       *' file="'"${src}"'"') res="${line:6:1}" ;;
     esac
   done < "${MTOOLSRC}"
-  [[ "${res}" ]] || return 1
+  [ "${res}" ] || return 1
   echo "${res}"
 }
 
@@ -60,6 +60,16 @@ command -v blkid >/dev/null || exit 0
 command -v awk >/dev/null || exit 0
 command -v mcopy >/dev/null || exit 0
 command -v mktemp >/dev/null || exit 0
+command -v date >/dev/null || exit 0
+command -v od >/dev/null || exit 0
+command -v dd >/dev/null || exit 0
+command -v expr >/dev/null || exit 0
+command -v tune2fs >/dev/null || exit 0
+command -v resize2fs >/dev/null || exit 0
+command -v grep >/dev/null || exit 0
+command -v cat >/dev/null || exit 0
+command -v echo >/dev/null || exit 0
+command -v rm >/dev/null || exit 0
 
 for arg in $(cat /proc/cmdline) ; do
   case "${arg}" in
@@ -107,66 +117,34 @@ for arg in $(blkid "${srcdev}") ; do
     'TYPE="ext4"')
       log_begin_msg "generating keyfile..."
         dd "if=${random}" of=/run/luksipc.key bs=1 count=32
-	mcopy /run/luksipc.key $(get_driveletter "${dataland}"):luksipc.key
+	mcopy /run/luksipc.key "$(get_driveletter "${dataland}"):luksipc.key"
       log_end_msg
       log_begin_msg "converting ${srcdev} to LUKS..."
+        # hooo boy, direct fs block munge ;)
+        fsdate="$(od -An -j 0x42c -N4 -tu4 < "${srcdev}")"
+	cdate="$(date +%s)"
+	[ "${fsdate}" -gt "${cdate}" ] && date "--set=@${fsdate}"
         e2fsck -f "${srcdev}"
-	# FIXME: should actually advance the system clock to the last mounted partition time...
-        resize2fs -f -M -p "${srcdev}"
-	blkct="$(tune2fs -l "${srcdev}" | awk '$0 ~ "Block count:" { print $3 }')"
-	blksz="$(tune2fs -l "${srcdev}" | awk '$0 ~ "Block size:" { print $3 }')"
-	fsuuid="$(tune2fs -l "${srcdev}" | awk '$0 ~ "Filesystem UUID:" { print $3 }')"
+        resize2fs -M -p "${srcdev}"
+	tune2fs_out="$(mktemp)"
+	tune2fs -l "${srcdev}" | awk '-F: +' '$1 ~ /Block count|Block size|Filesystem UUID/ { print $2 }' > "${tune2fs_out}"
+	read -r blkct blksz fsuuid < "${tune2fs_out}"
+	rm "${tune2fs_out}"
 	blocks="$(expr "${blkct}" \* "${blksz}")"
         cryptsetup-reencrypt "--device-size=${blocks}" --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
       log_end_msg
     ;;
     'TYPE="crypto_LUKS"')
-      mcopy $(get_driveletter "${dataland}"):luksipc.key /run
+      mcopy "$(get_driveletter "${dataland}"):luksipc.key" /run
     ;;
   esac
 done
 
 luks_uuid="$(cryptsetup luksUUID "${srcdev}")"
 cryptsetup luksOpen --key-file /run/luksipc.key "${srcdev}" "luks-${luks_uuid}"
+cryp_fsdate="$(od -An -j 0x42c -N4 -tu4 < "/dev/mapper/luks-${luks_uuid}")"
+cdate="$(date +%s)"
+[ "${cryp_fsdate}" -gt "${cdate}" ] && date "--set=@${cryp_fsdate}"
 resize2fs -f "/dev/disk/by-uuid/${fsuuid}"
 
 log_end_msg
-
-check_imd_file () {
-  # walk partition list and check for MDDATA.XML - priority is IMD, BOOT
-  # or we try boot:IMD/MDDATA.XML
-  local table drive
-  table=$(boot_or_imd_parts) || return 1
-  local row bootpart imdpart imdfile=''
-  for row in ${table} ; do
-    case $row in
-      *:boot) bootpart="${row%:*}" ;;
-      *:imd)  imdpart="${row%:*}"  ;;
-    esac
-  done
-
-  [[ "${imdpart}" ]] && {
-    drive="$(get_driveletter "${imdpart}")"
-    mdir "${drive}:MDDATA.XML" > /dev/null && imdfile="${drive}:MDDATA.XML"
-  }
-
-  [[ "${imdfile}" ]] || {
-    [[ "${bootpart}" ]] && {
-      drive="$(get_driveletter "${bootpart}")"
-      mdir "${drive}:IMD/MDDATA.XML" > /dev/null && imdfile="${drive}:IMD/MDDATA.XML"
-    }
-  }
-  [[ "${imdfile}" ]] && {
-    echo "${imdfile}"
-    return 0
-  }
-  return 1
-}
-
-copy_imd_file () {
-  # copy an imd file to /run/MDDATA.XML
-  local fsrc
-  fsrc="$(check_imd_file)"
-  [[ "${fsrc}" ]] || return 1
-  mcopy "${fsrc}" /run/MDDATA.XML
-}
