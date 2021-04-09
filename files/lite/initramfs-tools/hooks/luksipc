@@ -35,13 +35,14 @@ copy_exec /usr/sbin/tune2fs /sbin
 copy_exec /usr/sbin/resize2fs
 # for cryptsetup-reencrypt
 copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/libgcc_s.so.1 || true
-
-# FIXME: debugging
-#copy_exec /usr/bin/strace
-#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-v6l.so
-#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-v7l.so
-#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-v8l.so
-#copy_file /usr/lib/arm-linux-gnueabihf/libarmmem-aarch64.so
+copy_exec /usr/bin/date
+copy_exec /usr/bin/od
+copy_exec /usr/bin/dd
+copy_exec /usr/bin/expr
+copy_exec /usr/bin/echo
+copy_exec /usr/bin/grep
+copy_exec /usr/bin/cat
+copy_exec /usr/bin/rm
 
 manual_add_modules aes
 manual_add_modules sha256
