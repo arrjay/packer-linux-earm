@@ -70,6 +70,7 @@ command -v grep >/dev/null || exit 0
 command -v cat >/dev/null || exit 0
 command -v echo >/dev/null || exit 0
 command -v rm >/dev/null || exit 0
+command -v xargs >/dev/null || exit 0
 
 for arg in $(cat /proc/cmdline) ; do
   case "${arg}" in
@@ -121,16 +122,22 @@ for arg in $(blkid "${srcdev}") ; do
       log_end_msg
       log_begin_msg "converting ${srcdev} to LUKS..."
         # hooo boy, direct fs block munge ;)
-        fsdate="$(od -An -j 0x42c -N4 -tu4 < "${srcdev}")"
-	cdate="$(date +%s)"
-	[ "${fsdate}" -gt "${cdate}" ] && date "--set=@${fsdate}"
+        fsdate="$(od -An -j 0x42c -N4 -tu4 < "${srcdev}" | xargs)"
+        cdate="$(date +%s)"
+        [ "${fsdate}" -gt "${cdate}" ] && date "--set=@${fsdate}"
         e2fsck -f "${srcdev}"
         resize2fs -M -p "${srcdev}"
-	tune2fs_out="$(mktemp)"
-	tune2fs -l "${srcdev}" | awk '-F: +' '$1 ~ /Block count|Block size|Filesystem UUID/ { print $2 }' > "${tune2fs_out}"
-	read -r blkct blksz fsuuid < "${tune2fs_out}"
-	rm "${tune2fs_out}"
-	blocks="$(expr "${blkct}" \* "${blksz}")"
+        tune2fs_out="$(mktemp)"
+        tune2fs -l "${srcdev}" | awk '-F: +' '$1 ~ /Block count|Block size|Filesystem UUID/ { split($1,v," ") ;print $2,v[2] }' > "${tune2fs_out}"
+        while read -r line ; do
+          case "${line}" in
+            *UUID) fsuuid="$(echo "${line}" | awk '{ print $1 }')" ;;
+	    *count) blkct="$(echo "${line}" | awk '{ print $1 }')" ;;
+	    *size) blksz="$(echo "${line}" | awk '{ print $1 }')" ;;
+          esac
+        done < "${tune2fs_out}"
+        rm "${tune2fs_out}"
+        blocks="$(expr "${blkct}" \* "${blksz}")"
         cryptsetup-reencrypt "--device-size=${blocks}" --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
       log_end_msg
     ;;

@@ -43,6 +43,7 @@ copy_exec /usr/bin/echo
 copy_exec /usr/bin/grep
 copy_exec /usr/bin/cat
 copy_exec /usr/bin/rm
+copy_exec /usr/bin/xargs
 
 manual_add_modules aes
 manual_add_modules sha256
