@@ -149,7 +149,7 @@ done
 
 luks_uuid="$(cryptsetup luksUUID "${srcdev}")"
 cryptsetup luksOpen --key-file /run/luksipc.key "${srcdev}" "luks-${luks_uuid}"
-cryp_fsdate="$(od -An -j 0x42c -N4 -tu4 < "/dev/mapper/luks-${luks_uuid}")"
+cryp_fsdate="$(od -An -j 0x42c -N4 -tu4 < "/dev/mapper/luks-${luks_uuid}" | xargs)"
 cdate="$(date +%s)"
 [ "${cryp_fsdate}" -gt "${cdate}" ] && date "--set=@${cryp_fsdate}"
 resize2fs -f "/dev/disk/by-uuid/${fsuuid}"
