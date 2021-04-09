@@ -14,6 +14,7 @@ STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
 STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -o -print -type f)
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
 XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -print -type f)
+IMD_FILES = $(shell find vendor/imd -type f)
 
 pi-uuids.json:
 	-rm pi-uuids.json
@@ -43,12 +44,12 @@ images/netdata/sheeva.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) i
 	packer build -only=sheeva packer_templates/netdata.json
 	xz -T0 images/netdata/sheeva.img
 
-images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/pi.img.xz
+images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/pi.img.xz
 	-rm -rf images/standard/pi.img*
 	packer build -only=pi packer_templates/standard.json
 	xz -T0 images/standard/pi.img
 
-images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(STANDARD_FILES) images/netdata/sheeva.img.xz
+images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/sheeva.img.xz
 	-rm -rf images/standard/sheeva.img*
 	packer build -only=sheeva packer_templates/standard.json
 	xz -T0 images/standard/sheeva.img
