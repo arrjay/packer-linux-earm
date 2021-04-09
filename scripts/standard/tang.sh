@@ -13,3 +13,5 @@ cd build
 meson .. --prefix=/usr
 ninja
 ninja install
+
+install --mode=0750 --owner=0 --group=0 --directory /var/db/tang
