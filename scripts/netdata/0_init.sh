@@ -22,8 +22,8 @@ apt-get install autoconf autoconf-archive autogen automake curl cmake gcc git gz
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
-git checkout v1.30.0
-./netdata-installer.sh --dont-start-it --dont-wait
+git checkout v1.31.0
+./netdata-installer.sh --dont-start-it --dont-wait --disable-telemetry
 
 case "${PACKER_BUILD_NAME}" in
   pi)
