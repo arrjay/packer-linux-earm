@@ -16,11 +16,13 @@ apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
   python-dbus python-setuptools mtools telnet incron networkd-dispatcher awscli putty-tools \
+  modemmanager hostapd \
   "${ADDITIONAL_PACKAGES[*]}"
 
 # disable installed services for imd management
 systemctl disable chrony
 systemctl disable isc-dhcp-server
+systemctl disable hostapd
 
 # allow dhcp, dns through the trusted zone in firewalld
 firewall-offline-cmd --zone=trusted --add-service=dhcp
