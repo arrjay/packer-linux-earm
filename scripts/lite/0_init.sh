@@ -158,10 +158,8 @@ apt-get install \
  iproute2 bind9utils dnsutils \
  rsync sudo vim curl tmux \
  augeas-tools mtools dpkg-dev \
- ca-certificates openssh-client openssh-server openssh-sftp-server
-
-# we want a newer cryptsetup that...works...
-apt-get -t buster-backports install cryptsetup cryptsetup-initramfs
+ ca-certificates openssh-client openssh-server openssh-sftp-server \
+ cryptsetup cryptsetup-initramfs
 
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
 for f in /etc/ssl/certs/* ; do

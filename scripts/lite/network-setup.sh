@@ -25,10 +25,6 @@ systemctl enable systemd-resolved.service
 systemctl mask systemd-networkd-wait-online.service
 systemctl enable ssh.service
 
-# disable ipv6
-apt-get install augeas-tools
+# disable ipv6, install firewall bits
+apt-get install augeas-tools iptables firewalld
 augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1
-
-# install iptables from buster-backports, firewalld
-apt-get -t buster-backports install iptables
-apt-get install firewalld
