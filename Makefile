@@ -3,6 +3,9 @@
 DISPLAY := ''
 export DISPLAY
 
+CURRENT_USER = $(shell id -u)
+CURRENT_GROUP = $(shell id -g)
+
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
@@ -26,7 +29,8 @@ images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
 
 images/lite/pi.img.xz: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
-	packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
+	sudo env PACKER_LOG=1 packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/pi.img
 	xz -T0 images/lite/pi.img
 
 images/lite/sheeva.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz

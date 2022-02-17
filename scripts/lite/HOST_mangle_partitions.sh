@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 for item in jq mlabel tune2fs kpartx ; do
   type "${item}" 2>/dev/null 1>&2
