@@ -25,7 +25,7 @@ debootstrap () {
    bash "${PWD}/vendor/debootstrap/sbin/debootstrap" \
     --verbose --variant=minbase --arch=armel \
     --foreign --merged-usr \
-    --keyring="${PWD}/keyrings/debian-archive-buster-stable.gpg" \
+    --keyring="${PWD}/keyrings/debian-archive-bullseye-stable.gpg" \
     ${release} \
     ${rootdir} \
     ${DEBIAN_URI} 1>&2
@@ -45,7 +45,7 @@ echo "building ${CODEREV} at ${BUILD_TIMESTAMP}"
 rfs_uuid="$(uuidgen)"
 bfs_uuid="$(uuidgen)"
 
-temp_chroot="$(debootstrap buster)"
+temp_chroot="$(debootstrap bullseye)"
 
 # create disk image, partition it
 temp_image="$(mktemp)"
@@ -53,7 +53,7 @@ temp_image="$(mktemp)"
 truncate -s 2G "${temp_image}"
 parted "${temp_image}" mklabel msdos
 parted "${temp_image}" mkpart pri ext2 1m 230m
-parted "${temp_image}" mkpart pri fat16 230m 238m
+parted "${temp_image}" mkpart pri fat16 230m 246m
 # MIND THE GAP (for a swap partition)
 parted "${temp_image}" mkpart pri ext4 768m 100%
 parted "${temp_image}" toggle 1 boot
