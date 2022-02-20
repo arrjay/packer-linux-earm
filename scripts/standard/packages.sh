@@ -15,7 +15,7 @@ esac
 apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
-  python-dbus python-setuptools mtools telnet incron networkd-dispatcher awscli putty-tools \
+  python3-dbus python3-setuptools mtools telnet incron networkd-dispatcher awscli putty-tools \
   modemmanager hostapd \
   "${ADDITIONAL_PACKAGES[*]}"
 

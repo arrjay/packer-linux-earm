@@ -12,7 +12,7 @@ python setup.py install
 popd
 
 # install nut for ups fun...
-apt-get install nut nut-monitor apg
+apt-get install nut nut-client apg
 systemctl disable nut-monitor
 # nut-driver is masked due to alias startup issues. we use the nut-driver@ template instead.
 systemctl mask nut-driver
