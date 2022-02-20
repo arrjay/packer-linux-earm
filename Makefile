@@ -29,38 +29,44 @@ images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
 
 images/lite/pi.img.xz: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
-	sudo env PACKER_LOG=1 packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
+	sudo packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/pi.img
 	xz -T0 images/lite/pi.img
 
 images/lite/sheeva.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz
 	-rm -rf images/lite/sheeva.img*
-	packer build -only=sheeva packer_templates/lite.json
+	sudo packer build -only=sheeva packer_templates/lite.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/sheeva.img
 	xz -T0 images/lite/sheeva.img
 
 images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
 	-rm -rf images/netdata/pi.img*
-	packer build -only=pi packer_templates/netdata.json
+	sudo packer build -only=pi packer_templates/netdata.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/netdata/pi.img
 	xz -T0 images/netdata/pi.img
 
 images/netdata/sheeva.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/sheeva.img.xz
 	-rm -rf images/netdata/sheeva.img*
-	packer build -only=sheeva packer_templates/netdata.json
+	sudo packer build -only=sheeva packer_templates/netdata.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/netdata/sheeva.img
 	xz -T0 images/netdata/sheeva.img
 
 images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/pi.img.xz
 	-rm -rf images/standard/pi.img*
-	packer build -only=pi packer_templates/standard.json
+	sudo packer build -only=pi packer_templates/standard.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/standard/pi.img
 	xz -T0 images/standard/pi.img
 
 images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/sheeva.img.xz
 	-rm -rf images/standard/sheeva.img*
-	packer build -only=sheeva packer_templates/standard.json
+	sudo packer build -only=sheeva packer_templates/standard.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/standard/sheeva.img
 	xz -T0 images/standard/sheeva.img
 
 images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img.xz
 	-rm -rf images/xfce/pi.img*
-	packer build -only=pi packer_templates/xfce.json
+	sudo packer build -only=pi packer_templates/xfce.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/xfce/pi.img
 	xz -T0 images/xfce/pi.img
 
 edger/image: dterm-image/image edger.json scripts/edger.sh
