@@ -83,8 +83,10 @@ install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/attach-hidups.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/start-upsd-aliases.sh" "/usr/lib/untrustedhost/scripts/start-upsd-aliases.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/write-upsd-config.sh" "/usr/lib/untrustedhost/scripts/write-upsd-config.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/dns-update.sh" "/usr/lib/untrustedhost/scripts/dns-update.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/fitstat" "/usr/lib/untrustedhost/scripts/fitstat"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/ucarp-down-dhcpd.sh" "/usr/lib/untrustedhost/scripts/ucarp-down-dhcpd.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/ucarp-up-dhcpd.sh" "/usr/lib/untrustedhost/scripts/ucarp-up-dhcpd.sh"
 
-systemctl enable untrustedhost-fitstat
+[[ -e "${PFSRC}/fitstat" ]] && {
+  install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/fitstat" "/usr/lib/untrustedhost/scripts/fitstat"
+  systemctl enable untrustedhost-fitstat
+}
