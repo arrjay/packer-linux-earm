@@ -50,6 +50,8 @@ done
 # if we have a platform directory, arrange for that too
 for source in \
   "${PFSRC}/${PACKER_BUILD_NAME}/untrustedhost" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/systemd" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/incron.d" \
  ; do
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
