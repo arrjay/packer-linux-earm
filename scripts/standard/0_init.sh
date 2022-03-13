@@ -86,7 +86,7 @@ install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/dns-update.sh" "/
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/ucarp-down-dhcpd.sh" "/usr/lib/untrustedhost/scripts/ucarp-down-dhcpd.sh"
 install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/ucarp-up-dhcpd.sh" "/usr/lib/untrustedhost/scripts/ucarp-up-dhcpd.sh"
 
-[[ -e "${PFSRC}/fitstat" ]] && {
-  install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/fitstat" "/usr/lib/untrustedhost/scripts/fitstat"
+[[ -e "${PFSRC}/${PACKER_BUILD_NAME}/fitstat" ]] && {
+  install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/${PACKER_BUILD_NAME}/fitstat" "/usr/lib/untrustedhost/scripts/fitstat"
   systemctl enable untrustedhost-fitstat
 }
