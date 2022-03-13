@@ -18,8 +18,6 @@ install_ef () {
   done
 }
 
-apt-get install ucarp
-
 rm -f /etc/systemd/system/networking.service
 
 for source in \

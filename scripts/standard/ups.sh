@@ -7,8 +7,8 @@ PFSRC=/tmp/packer-files
 pushd /usr/src
 git clone --depth 1 --branch 0.9.2 https://github.com/carlosefr/mdns-publisher
 cd mdns-publisher
-python setup.py build
-python setup.py install
+python3 setup.py build
+python3 setup.py install
 popd
 
 # install nut for ups fun...
