@@ -4,7 +4,7 @@ set -e
 
 case "${PACKER_BUILD_NAME}" in
   pi) ADDITIONAL_PACKAGES=(
-        'pi-bluetooth incron ucarp'
+        'pi-bluetooth' 'incron' 'ucarp'
       )
    ;;
   *)  ADDITIONAL_PACKAGES=(
