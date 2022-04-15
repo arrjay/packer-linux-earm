@@ -33,6 +33,14 @@ install --verbose -o 0 -g 0 -d /etc/bird
 chmod +x "${PFSRC}/cache/imd/install.run"
 "${PFSRC}/cache/imd/install.run"
 
+# disable pi's userconfig
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    systemctl disable userconfig
+  ;;
+esac
+
+
 # install system configs from packer file provisioner
 for source in \
   "${PFSRC}/cache/etc/skel" \

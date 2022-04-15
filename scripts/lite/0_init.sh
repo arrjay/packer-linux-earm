@@ -9,6 +9,9 @@ PFSRC=/tmp/packer-files
 # just for comparison...
 df -m
 
+# stomp on gai.conf, we're in ipv4 here. no regrets.
+printf '%s\n' 'precedence ::ffff:0:0/96  100' > /etc/gai.conf
+
 # install environment files by concatenating them
 cat "${PFSRC}/environment" >> /etc/environment
 [[ -f "${PFSRC}/environment-${PACKER_BUILD_NAME}" ]] && cat "${PFSRC}/environment-${PACKER_BUILD_NAME}" >> /etc/environment

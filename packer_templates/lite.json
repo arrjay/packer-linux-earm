@@ -6,8 +6,8 @@
 			"name": "pi",
 			"type": "arm-image",
 			"image_type": "raspberrypi",
-			"iso_url": "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-01-28/2022-01-28-raspios-bullseye-armhf-lite.zip",
-			"iso_checksum": "sha256:f6e2a3e907789ac25b61f7acfcbf5708a6d224cf28ae12535a2dc1d76a62efbc",
+			"iso_url": "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-04-07/2022-04-04-raspios-bullseye-armhf-lite.img.xz",
+			"iso_checksum": "sha256:34987327503fac1076e53f3584f95ca5f41a6a790943f1979262d58d62b04175",
 			"output_filename": "images/lite/pi.img"
 		},
 		{
