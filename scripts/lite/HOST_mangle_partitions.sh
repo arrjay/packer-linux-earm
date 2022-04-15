@@ -19,6 +19,8 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
   esac
 done
 
-kpartx -d "${imagefile}"
+while : ; do
+  kpartx -d "${imagefile}" && break
+done
 
 printf 'x\ni\n0x%s\nr\nw\n' "${partition_id}" | fdisk "${imagefile}"
