@@ -18,6 +18,9 @@ STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
 XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -print -type f)
 IMD_FILES = $(shell find vendor/imd -type f)
+YKMAN_SCRIPTS = $(shell find files/ykman -type f)
+YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print -type f)
+MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 
 pi-uuids.json:
 	-rm pi-uuids.json
@@ -68,6 +71,12 @@ images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) 
 	sudo packer build -only=pi packer_templates/xfce.json
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/xfce/pi.img
 	xz -T0 images/xfce/pi.img
+
+images/ykman/pi.img.xz: packer_templates/ykman.json $(YKMAN_SCRIPTS) $(MISCSCRIPT_FILES) $(YKMAN_FILES) images/xfce/pi.img.xz    
+	-rm -rf images/ykman/pi.img*
+	sudo packer build -only=pi packer_templates/ykman.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/ykman/pi.img
+	xz -T0 images/ykman/pi.img
 
 edger/image: dterm-image/image edger.json scripts/edger.sh
 	-rm -rf edger
