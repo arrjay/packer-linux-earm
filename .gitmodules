@@ -4,3 +4,6 @@
 [submodule "vendor/imd"]
 	path = vendor/imd
 	url = https://gitlab.com/untrustedhost/imd.git
+[submodule "vendor/misc-scripts"]
+	path = vendor/misc-scripts
+	url = https://github.com/arrjay/misc-scripts.git
