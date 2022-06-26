@@ -12,7 +12,7 @@ apt-get -qq -y install yubikey-personalization \
                        yubikey-personalization-gui \
                        yubikey-manager \
                        gawk fdupes \
-                       imagemagick paperkey fonts-freefont-otf zbar-tools
+                       imagemagick paperkey fonts-freefont-otf zbar-tools ghostscript qrencode
 apt-get -qq clean
 
 # fix the imagemagick policy... first with awk to get it validating, then xmlstarlet.
@@ -24,7 +24,6 @@ mv /tmp/policy.xml /etc/ImageMagick-6/policy.xml
 u=gfx
 # NOTE: position-dependent arguments...
 tar xvf "${PFSRC}/cache/misc-scripts.tar" -C "/home/${u}" --strip-components=1 noarch/cardykey.sh
-mkdir -p "/home/${u}/keymat"
-tar xvf "${PFSRC}/cache/keymat.tar" -C "/home/${u}/keymat"
+tar xvf "${PFSRC}/cache/keymat.tar" -C "/home/${u}"
 chmod +x "/home/${u}/cardykey.sh" "/home/${u}/keymat"/*.sh
 chown -R "${u}:${u}" "/home/${u}"
