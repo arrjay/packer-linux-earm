@@ -7,3 +7,6 @@
 [submodule "vendor/misc-scripts"]
 	path = vendor/misc-scripts
 	url = https://github.com/arrjay/misc-scripts.git
+[submodule "vendor/keymat"]
+	path = vendor/keymat
+	url = https://github.com/arrjay/keymat.git

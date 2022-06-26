@@ -22,7 +22,8 @@
             "inline": [
                 "p=\"$(pwd)\"",
                 "mkdir -p \"${p}/files/ykman/cache\"",
-                "(cd \"${p}/vendor/misc-scripts\" && git archive HEAD -o \"${p}/files/ykman/cache/misc-scripts.tar\")"
+                "(cd \"${p}/vendor/misc-scripts\" && git archive HEAD -o \"${p}/files/ykman/cache/misc-scripts.tar\")",
+                "(cd \"${p}/vendor/keymat\" && git archive HEAD -o \"${p}/files/ykman/cache/keymat.tar\")"
             ]
         },
 		{

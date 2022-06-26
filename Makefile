@@ -21,6 +21,7 @@ IMD_FILES = $(shell find vendor/imd -type f)
 YKMAN_SCRIPTS = $(shell find files/ykman -type f)
 YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print -type f)
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
+KEYMAT_FILES = $(shell find vendor/keymat -type f)
 
 pi-uuids.json:
 	-rm pi-uuids.json
@@ -72,7 +73,7 @@ images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) 
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/xfce/pi.img
 	xz -T0 images/xfce/pi.img
 
-images/ykman/pi.img.xz: packer_templates/ykman.json $(YKMAN_SCRIPTS) $(MISCSCRIPT_FILES) $(YKMAN_FILES) images/xfce/pi.img.xz    
+images/ykman/pi.img.xz: packer_templates/ykman.json $(YKMAN_SCRIPTS) $(MISCSCRIPT_FILES) $(KEYMAT_FILES) $(YKMAN_FILES) images/xfce/pi.img.xz
 	-rm -rf images/ykman/pi.img*
 	sudo packer build -only=pi packer_templates/ykman.json
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/ykman/pi.img
