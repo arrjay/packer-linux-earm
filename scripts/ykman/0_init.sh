@@ -10,7 +10,8 @@ PFSRC=/tmp/packer-files
 apt-get -qq clean
 apt-get -qq -y install yubikey-personalization \
                        yubikey-personalization-gui \
-                       yubikey-manager
+                       yubikey-manager \
+                       gawk fdupes
 apt-get -qq clean
 
 u=gfx
