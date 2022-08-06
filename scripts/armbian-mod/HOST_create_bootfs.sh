@@ -2,7 +2,7 @@
 
 set -ex
 
-for item in expr parted sfdisk truncate jq mlabel mke2fs mkfs.vfat e2fsck kpartx ; do
+for item in expr parted fdisk sfdisk truncate jq mlabel mke2fs mkfs.vfat e2fsck kpartx wipefs ; do
   type "${item}" 2>/dev/null 1>&2
 done
 
@@ -43,6 +43,7 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
       mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super "/dev/mapper/${loop}"
     ;;
     *2)
+      # IMD metadata partition
       mkfs.vfat -n "IMD" "/dev/mapper/${loop}"
     ;;
     *3)
@@ -56,3 +57,27 @@ done
 while : ; do
   kpartx -d "${imagefile}" && break
 done
+
+# now, do something *really* dumb. we're gonna write down the partition table,
+# wipe the image and recreate it. there's something odd about armbian images here.
+parted -s "${imagefile}" 'unit s' print
+parted -s "${imagefile}" print
+bounds=()
+for line in $(parted -s "${imagefile}" 'unit s' print | awk '$1 ~ /[0-9]/ { printf "%s:%s\n", $2, $3 }') ; do
+  bounds=("${bounds[@]}" "${line}")
+done
+
+wipefs -a --force "${imagefile}"
+parted -s "${imagefile}" mklabel msdos
+
+for series in "${bounds[@]}" ; do
+  pstart="${series%:*}"
+  pend="${series#*:}"
+  parted -s "${imagefile}" mkpart pri ext2 "${pstart}" "${pend}"
+  parted -s "${imagefile}" print
+done
+
+# staple in a new disk-id.
+#partition_id="$(uuidgen)"
+#partition_id="${partition_id%%-*}"
+#printf 'x\ni\n0x%s\nr\nw\n' "${partition_id}" | fdisk "${imagefile}"
