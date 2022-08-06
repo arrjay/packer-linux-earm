@@ -42,7 +42,7 @@ apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-
 apt-get -qq clean
 
 # disable the newer vc4 graphics stack. reasons.
-[[ -e /boot/config.txt ]] && sed -ie 's/^dtoverlay=vc4-/#dtoverlay=vc4-/g' /boot/config.txt
+[[ -e /boot/config.txt ]] && sed -i -e 's/^dtoverlay=vc4-/#dtoverlay=vc4-/g' /boot/config.txt
 
 # the multihead setup is only test on pi. anything else is hopefully not this silly.
 case "${PACKER_BUILD_NAME}" in

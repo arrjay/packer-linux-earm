@@ -9,7 +9,7 @@
 			"iso_url": "./images/standard/pi.img.xz",
 			"iso_checksum": "none",
 			"output_filename": "./images/xfce/pi.img",
-			"target_image_size": 4831838208
+			"target_image_size": 5368709120
 		}
 	],
 	"provisioners": [
