@@ -136,7 +136,7 @@ dpkg -l rpi-eeprom        > /dev/null && apt-get reinstall rpi-eeprom
 ln -sf /usr/share/zoneinfo/UCT /etc/localtime
 
 # configure localepurge, make ssl shut _up_
-libssl=$(dpkg -l | grep libssl | awk '{print $2}') 
+libssl=$(dpkg -l | grep libssl | awk '{print $2}' |grep -v dev)
 printf '%s\n' "localepurge localepurge/use-dpkg-feature boolean false" \
               "localepurge localepurge/mandelete boolean true" \
               "localepurge localepurge/dontbothernew boolean true" \
