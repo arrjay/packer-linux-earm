@@ -12,7 +12,9 @@ apt-get -qq -y install yubikey-personalization \
                        yubikey-personalization-gui \
                        yubikey-manager \
                        gawk fdupes \
-                       imagemagick paperkey fonts-freefont-otf zbar-tools ghostscript qrencode
+                       imagemagick paperkey fonts-freefont-otf zbar-tools ghostscript qrencode \
+                       system-config-printer system-config-printer-udev cups cups-daemon \
+                       hplip printer-driver-hpijs hpijs-ppds
 apt-get -qq clean
 
 # fix the imagemagick policy... first with awk to get it validating, then xmlstarlet.
