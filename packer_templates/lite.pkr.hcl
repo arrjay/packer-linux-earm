@@ -74,7 +74,7 @@ build {
       "chmod 0755 /",
       "chown 0:0 /",
       "/debootstrap/debootstrap --second-stage --merged-usr",
-      "# set root password to nosoup4u (sheevaplug image default)",
+      // set root password to nosoup4u (sheevaplug image default)
       "usermod -p '$6$fFo1kfYxV7aTJbir$LpccRu/YSjF/7Ih2NOBhmlcZumM3lhQsbvUXIdkwyuzTVJdTgf5rlOKRRUwUwyqwFxCHQV1Tsio1El0jWNbea.' root",
     ]
     skip_clean       = true
