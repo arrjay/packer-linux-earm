@@ -88,4 +88,4 @@ case "${temp_chroot}" in
 esac
 
 mkdir -p images/upstream
-mv "${temp_image}" images/upstream/sheevaplug-s1.img
+mv "${temp_image}" images/upstream/sheeva.img

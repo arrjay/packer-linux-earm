@@ -42,7 +42,7 @@ pi-uuids.json: scripts/genuuid-json.sh
 %.img.xz : %.img
 	xz -T0 $<
 
-images/upstream/sheevaplug-s1.img: scripts/sheevaplug-stage1.sh
+images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
 	-rm images/upstream/sheevaplug-s1.img*
 	./scripts/sheevaplug-stage1.sh
 
