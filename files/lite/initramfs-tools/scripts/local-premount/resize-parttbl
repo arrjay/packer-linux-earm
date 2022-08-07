@@ -17,11 +17,6 @@ esac
 
 . /scripts/functions
 
-# bail if we're resuming, ok?
-if [ -n "${resume?}" ] || [ -e /sys/power/resume ]; then
-        exit 0
-fi
-
 # deps
 command -v awk >/dev/null || exit 0
 command -v blkid >/dev/null || exit 0
