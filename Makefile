@@ -4,7 +4,9 @@
 
 .NOTPARALLEL:
 
-.INTERMEDIATE: %.img images/upstream/sheevaplug-s1.img
+.INTERMEDIATE: %.img images/upstream/sheevaplug-s1.img images/upstream/rock64.img
+
+.PRECIOUS: %.img.xz
 
 DISPLAY := ''
 export DISPLAY
@@ -46,7 +48,7 @@ images/upstream/sheevaplug-s1.img: scripts/sheevaplug-stage1.sh
 
 images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl $(ARMBIAN_MOD_SCRIPTS)
 	-rm images/upstream/rock64.img*
-	sudo packer build -only=rock64 packer_templates/armbian_mod.pkr.hcl
+	sudo packer build -only=arm-image.rock64 packer_templates/armbian_mod.pkr.hcl
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/upstream/rock64.img
 
 images/upstream/pi.img:
