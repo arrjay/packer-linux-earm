@@ -30,6 +30,9 @@ pi-uuids.json:
 	-rm pi-uuids.json
 	./scripts/genuuid-json.sh > pi-uuids.json
 
+%.img.xz.json : %.img.xz
+	md5sum $< | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > $@
+
 images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
 	-rm images/upstream/sheevaplug-s1.img
 	./scripts/sheevaplug-stage1.sh
@@ -45,9 +48,6 @@ images/lite/pi.img.xz: packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES)
 	sudo packer build -var-file=pi-uuids.json -only=arm-image.pi packer_templates/lite.pkr.hcl
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/pi.img
 	xz -T0 images/lite/pi.img
-
-images/upstream/sheevaplug-s1.img.xz.json: Makefile images/upstream/sheevaplug-s1.img.xz
-	md5sum images/upstream/sheevaplug-s1.img.xz | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > images/upstream/sheevaplug-s1.img.xz.json
 
 images/lite/sheeva.img.xz: packer_templates/lite.pkr.hcl $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz images/upstream/sheevaplug-s1.img.xz.json
 	-rm -rf images/lite/sheeva.img*
