@@ -1,4 +1,4 @@
-.DELETE_ON_ERROR:
+.DELETE_ON_ERROR: %.img
 
 .ONESHELL:
 
@@ -60,7 +60,7 @@ images/lite/%.img.xz : images/lite/%.img
 
 images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm images/lite/$(@F)*
-	sudo packer build -var-file=pi-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl
+	sudo packer build -var-file=pi-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
