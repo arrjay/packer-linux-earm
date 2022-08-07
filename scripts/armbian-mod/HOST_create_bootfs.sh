@@ -57,27 +57,3 @@ done
 while : ; do
   kpartx -d "${imagefile}" && break
 done
-
-# now, do something *really* dumb. we're gonna write down the partition table,
-# wipe the image and recreate it. there's something odd about armbian images here.
-parted -s "${imagefile}" 'unit s' print
-parted -s "${imagefile}" print
-bounds=()
-for line in $(parted -s "${imagefile}" 'unit s' print | awk '$1 ~ /[0-9]/ { printf "%s:%s\n", $2, $3 }') ; do
-  bounds=("${bounds[@]}" "${line}")
-done
-
-wipefs -a --force "${imagefile}"
-parted -s "${imagefile}" mklabel msdos
-
-for series in "${bounds[@]}" ; do
-  pstart="${series%:*}"
-  pend="${series#*:}"
-  parted -s "${imagefile}" mkpart pri ext2 "${pstart}" "${pend}"
-  parted -s "${imagefile}" print
-done
-
-# staple in a new disk-id.
-#partition_id="$(uuidgen)"
-#partition_id="${partition_id%%-*}"
-#printf 'x\ni\n0x%s\nr\nw\n' "${partition_id}" | fdisk "${imagefile}"

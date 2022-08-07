@@ -22,7 +22,7 @@
 			"name": "rock64",
 			"type":"arm-image",
 			"image_mounts": [ "/newboot", "/newboot/IMD", "/" ],
-			"iso_url": "./images/armbian-mod/rock64.img",
+			"iso_url": "./images/armbian-mod/rock64.img.xz",
 			"iso_checksum": "none",
 			"output_filename": "images/lite/rock64.img"
 		}

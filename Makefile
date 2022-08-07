@@ -9,6 +9,7 @@ CURRENT_GROUP = $(shell id -g)
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
+ARMBIAN_MOD_SCRIPTS = $(shell find scripts/armbian-mod -type f)
 LITE_FILES = $(shell find files/lite -path files/lite/cache -prune -o -print -type f)
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
@@ -31,6 +32,12 @@ images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
 	-rm images/upstream/sheevaplug-s1.img
 	./scripts/sheevaplug-stage1.sh
 
+images/armbian-mod/rock64.img.xz: packer_templates/armbian.json $(ARMBIAN_MOD_SCRIPTS)
+	-rm -rf images/armbian-mod/rock64.img*
+	sudo packer build -only=rock64 packer_templates/armbian.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/armbian-mod/rock64.img
+	xz -T0 images/armbian-mod/rock64.img
+
 images/lite/pi.img.xz: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
 	sudo packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
@@ -42,6 +49,12 @@ images/lite/sheeva.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIP
 	sudo packer build -only=sheeva packer_templates/lite.json
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/sheeva.img
 	xz -T0 images/lite/sheeva.img
+
+images/lite/rock64.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/armbian-mod/rock64.img.xz
+	-rm -rf images/lite/rock64.img*
+	sudo packer build -only=rock64 packer_templates/lite.json
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/rock64.img
+	xz -T0 images/lite/rock64.img
 
 images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
 	-rm -rf images/netdata/pi.img*
