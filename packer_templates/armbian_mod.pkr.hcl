@@ -12,7 +12,6 @@ build {
     environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"]
     execute_command  = "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"
     inline           = ["mkdir /newboot", "mkdir /IMD"]
-    skip_clean       = true
   }
 
   post-processor "manifest" {}
