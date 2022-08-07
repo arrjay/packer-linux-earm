@@ -48,11 +48,6 @@ get_driveletter () {
   echo "${res}"
 }
 
-# bail if we're resuming, ok?
-if [ -n "${resume?}" ] || [ -e /sys/power/resume ]; then
-        exit 0
-fi
-
 # deps
 command -v cryptsetup >/dev/null || exit 0
 command -v cryptsetup-reencrypt >/dev/null || exit 0
