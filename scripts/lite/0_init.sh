@@ -183,10 +183,11 @@ done
 # (armbian) configure maximal verbosity
 [[ -f /boot/armbianEnv.txt ]] && {
   printf '%s\n' \
-    'set /augeas/load/Shellvars/lens Shellvars.lns' \
-    'set /augeas/load/Shellvars/incl /boot/armbianEnv.txt' \
+    'set /augeas/load/Simplevars/lens Simplevars.lns' \
+    'set /augeas/load/Simplevars/incl /boot/armbianEnv.txt' \
     'load' \
     'set /files/boot/armbianEnv.txt/verbosity 7' \
+    'set /files/boot/armbianEnv.txt/console serial' \
     'save' \
   | augtool -A
 }
