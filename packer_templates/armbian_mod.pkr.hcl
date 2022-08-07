@@ -8,6 +8,13 @@ source "arm-image" "rock64" {
 build {
   sources = ["source.arm-image.rock64"]
 
+  provisioner "shell" {
+    environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"]
+    execute_command  = "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"
+    inline           = ["mkdir /newboot", "mkdir /IMD"]
+    skip_clean       = true
+  }
+
   post-processor "manifest" {}
 
   post-processor "shell-local" {

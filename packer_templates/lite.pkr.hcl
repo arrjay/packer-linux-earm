@@ -24,7 +24,7 @@ source "arm-image" "pi" {
 }
 
 source "arm-image" "rock64" {
-  image_mounts    = ["/newboot", "/newboot/IMD", "/"]
+  image_mounts    = ["/newboot", "/IMD", "/"]
   iso_checksum    = var.dynamic_checksum
   iso_url         = "./images/upstream/rock64.img.xz"
   output_filename = "images/lite/rock64.img"
