@@ -4,7 +4,7 @@
 
 .NOTPARALLEL:
 
-.INTERMEDIATE: %.img images/upstream/sheevaplug-s1.img images/upstream/rock64.img
+.INTERMEDIATE: %.img images/upstream/sheeva.img images/upstream/rock64.img
 
 .PRECIOUS: %.img.xz
 
@@ -43,7 +43,7 @@ pi-uuids.json: scripts/genuuid-json.sh
 	xz -T0 $<
 
 images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
-	-rm images/upstream/sheevaplug-s1.img*
+	-rm images/upstream/sheeva.img*
 	./scripts/sheevaplug-stage1.sh
 
 images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl $(ARMBIAN_MOD_SCRIPTS)

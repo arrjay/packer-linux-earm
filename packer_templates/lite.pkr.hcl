@@ -33,7 +33,7 @@ source "arm-image" "rock64" {
 source "arm-image" "sheeva" {
   image_mounts    = ["/boot", "/boot/IMD", "/"]
   iso_checksum    = var.dynamic_checksum
-  iso_url         = "./images/upstream/sheevaplug-s1.img.xz"
+  iso_url         = "./images/upstream/sheeva.img.xz"
   output_filename = "images/lite/sheeva.img"
 }
 
