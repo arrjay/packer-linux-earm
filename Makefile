@@ -55,23 +55,13 @@ images/upstream/pi.img:
 	echo "packer will directly handle downloading/caching the pi image, creating empty file"
 	touch images/upstream/pi.img
 
-images/lite/pi.img.xz: packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
-	-rm images/lite/pi.img*
-	sudo packer build -var-file=pi-uuids.json -only=arm-image.pi packer_templates/lite.pkr.hcl
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/pi.img
-	xz -T0 images/lite/pi.img
+images/lite/%.img.xz : images/lite/%.img
+	xz -T0 $<
 
-images/lite/sheeva.img.xz: packer_templates/lite.pkr.hcl $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz images/upstream/sheevaplug-s1.img.xz.json
-	-rm -rf images/lite/sheeva.img*
-	sudo packer build -var-file=pi-uuids.json -var-file=images/upstream/sheevaplug-s1.img.xz.json -only=arm-image.sheeva packer_templates/lite.pkr.hcl
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/sheeva.img
-	xz -T0 images/lite/sheeva.img
-
-images/lite/rock64.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/armbian-mod/rock64.img.xz
-	-rm -rf images/lite/rock64.img*
-	sudo packer build -only=rock64 packer_templates/lite.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/rock64.img
-	xz -T0 images/lite/rock64.img
+images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
+	-rm images/lite/$(@F)*
+	sudo packer build -var-file=pi-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
 	-rm -rf images/netdata/pi.img*
