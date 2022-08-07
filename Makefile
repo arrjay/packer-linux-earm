@@ -8,15 +8,18 @@
 
 .PRECIOUS: %.img.xz
 
+# turn off DISPLAY as a matter of course (forces packer to always be headless)
 DISPLAY := ''
 export DISPLAY
 
+# arm-image builder actually runs as root, so this will let us chown files back.
 CURRENT_USER = $(shell id -u)
 CURRENT_GROUP = $(shell id -g)
 
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
+# dependencies to the packer templates
 ARMBIAN_MOD_SCRIPTS = $(shell find scripts/armbian-mod -type f)
 LITE_FILES = $(shell find files/lite -path files/lite/cache -prune -o -print -type f)
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
@@ -32,32 +35,43 @@ YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print 
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 KEYMAT_FILES = $(shell find vendor/keymat -type f)
 
+# filesystem/disk UUIDs for when we scramble the pi image
 pi-uuids.json: scripts/genuuid-json.sh
 	-rm pi-uuids.json
 	./scripts/genuuid-json.sh > pi-uuids.json
 
+# for any given compressed image, make a dynamic_checksum varfile
+# so that we can reference it in a packer template
+# this works around arm-image not understanding "none" as a checksum
 %.img.xz.json : %.img.xz
 	md5sum $< | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > $@
 
+# compress images
 %.img.xz : %.img
+	-rm $@
 	xz -T0 $<
 
+#  upstream images are the weird ones - they've all got their own recipes
 images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
-	-rm images/upstream/sheeva.img*
+	-rm $@*
 	./scripts/sheevaplug-stage1.sh
 
 images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl $(ARMBIAN_MOD_SCRIPTS)
-	-rm images/upstream/rock64.img*
-	sudo packer build -only=arm-image.rock64 packer_templates/armbian_mod.pkr.hcl
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/upstream/rock64.img
+	-rm $@*
+	sudo packer build -only=arm-image.rock64 packer_templates/armbian_mod.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/upstream/pi.img:
+	-rm $@*
 	echo "packer will directly handle downloading/caching the pi image, creating empty file"
-	touch images/upstream/pi.img
+	touch $@
 
+# compress lite images
 images/lite/%.img.xz : images/lite/%.img
+	-rm $@
 	xz -T0 $<
 
+# create lite images
 images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm images/lite/$(@F)*
 	sudo packer build -var-file=pi-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
