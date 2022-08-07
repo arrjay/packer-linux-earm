@@ -2,6 +2,10 @@
 
 .ONESHELL:
 
+.NOTPARALLEL:
+
+.INTERMEDIATE: %.img images/upstream/sheevaplug-s1.img
+
 DISPLAY := ''
 export DISPLAY
 
@@ -26,25 +30,31 @@ YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print 
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 KEYMAT_FILES = $(shell find vendor/keymat -type f)
 
-pi-uuids.json:
+pi-uuids.json: scripts/genuuid-json.sh
 	-rm pi-uuids.json
 	./scripts/genuuid-json.sh > pi-uuids.json
 
 %.img.xz.json : %.img.xz
 	md5sum $< | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > $@
 
-images/upstream/sheevaplug-s1.img.xz: scripts/sheevaplug-stage1.sh
-	-rm images/upstream/sheevaplug-s1.img
+%.img.xz : %.img
+	xz -T0 $<
+
+images/upstream/sheevaplug-s1.img: scripts/sheevaplug-stage1.sh
+	-rm images/upstream/sheevaplug-s1.img*
 	./scripts/sheevaplug-stage1.sh
 
-images/armbian-mod/rock64.img.xz: packer_templates/armbian.json $(ARMBIAN_MOD_SCRIPTS)
-	-rm -rf images/armbian-mod/rock64.img*
-	sudo packer build -only=rock64 packer_templates/armbian.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/armbian-mod/rock64.img
-	xz -T0 images/armbian-mod/rock64.img
+images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl $(ARMBIAN_MOD_SCRIPTS)
+	-rm images/upstream/rock64.img*
+	sudo packer build -only=rock64 packer_templates/armbian_mod.pkr.hcl
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/upstream/rock64.img
+
+images/upstream/pi.img:
+	echo "packer will directly handle downloading/caching the pi image, creating empty file"
+	touch images/upstream/pi.img
 
 images/lite/pi.img.xz: packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
-	-rm -rf images/lite/pi.img*
+	-rm images/lite/pi.img*
 	sudo packer build -var-file=pi-uuids.json -only=arm-image.pi packer_templates/lite.pkr.hcl
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/pi.img
 	xz -T0 images/lite/pi.img
