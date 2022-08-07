@@ -1,3 +1,9 @@
+// external variables
+variable "rk64_bootfs_uuid" {
+  type      = string
+  sensitive = false
+}
+
 source "arm-image" "rock64" {
   image_mounts    = ["/"]
   iso_checksum    = "sha256:f5edb2c031774e081ab408e632cece3f48c19c80b96bb619f0da0206230be609"
@@ -17,6 +23,7 @@ build {
   post-processor "manifest" {}
 
   post-processor "shell-local" {
-    scripts = ["./scripts/armbian-mod/HOST_create_bootfs.sh"]
+    environment_vars = ["RK64_BOOTFS_UUID=${var.rk64_bootfs_uuid}"]
+    scripts          = ["./scripts/armbian-mod/HOST_create_bootfs.sh"]
   }
 }

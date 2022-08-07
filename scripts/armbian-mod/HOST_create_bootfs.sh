@@ -40,7 +40,7 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
   case "${loop}" in
     *1)
       # the new /boot partition
-      mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super "/dev/mapper/${loop}"
+      mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super -U "${RK64_BOOTFS_UUID}" "/dev/mapper/${loop}"
     ;;
     *2)
       # IMD metadata partition

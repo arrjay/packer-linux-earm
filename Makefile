@@ -35,10 +35,10 @@ YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print 
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 KEYMAT_FILES = $(shell find vendor/keymat -type f)
 
-# filesystem/disk UUIDs for when we scramble the pi image
-pi-uuids.json: scripts/genuuid-json.sh
+# filesystem/disk UUIDs for when we scramble the pi/rock64 image
+fs-uuids.json: scripts/genuuid-json.sh
 	-rm pi-uuids.json
-	./scripts/genuuid-json.sh > pi-uuids.json
+	./scripts/genuuid-json.sh > fs-uuids.json
 
 # for any given compressed image, make a dynamic_checksum varfile
 # so that we can reference it in a packer template
@@ -56,9 +56,9 @@ images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
 	-rm $@*
 	./scripts/sheevaplug-stage1.sh
 
-images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl $(ARMBIAN_MOD_SCRIPTS)
+images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS)
 	-rm $@*
-	sudo packer build -only=arm-image.rock64 packer_templates/armbian_mod.pkr.hcl || rm $@
+	sudo packer build -only=arm-image.rock64 -var-file=fs-uuids.json packer_templates/armbian_mod.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/upstream/pi.img:
@@ -72,9 +72,9 @@ images/lite/%.img.xz : images/lite/%.img
 	xz -T0 $<
 
 # create lite images
-images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
+images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm images/lite/$(@F)*
-	sudo packer build -var-file=pi-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
+	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz

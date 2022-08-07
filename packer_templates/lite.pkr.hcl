@@ -11,6 +11,10 @@ variable "partition_id" {
   type      = string
   sensitive = false
 }
+variable "rk64_bootfs_uuid" {
+  type      = string
+  sensitive = false
+}
 variable "dynamic_checksum" {
   type      = string
   sensitive = false
@@ -47,6 +51,7 @@ locals {
     "rootfs_uuid=${var.rootfs_uuid}",
     "bootfs_id=${var.bootfs_id}",
     "partition_id=${var.partition_id}",
+    "rk64_bootfs_uuid=${var.rk64_bootfs_uuid}",
   ]
   cmdexec = "/bin/chmod +x {{ .Path }} ; {{ .Vars }} {{ .Path }}"
 }
@@ -106,8 +111,7 @@ build {
     environment_vars = local.envblock
     execute_command = local.cmdexec
     inline = [
-      "rsync -av /boot/ /newboot/",
-      "ln -s . /newboot/boot",
+      "rsync -a /boot/ /newboot/",
       "rm -rf /boot/*",
     ]
   }

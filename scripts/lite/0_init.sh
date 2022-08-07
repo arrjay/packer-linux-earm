@@ -39,13 +39,18 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
   printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
 }
 
-# (rpi) stomp on fstab
+# (rpi/rock64) stomp on fstab
 case "${PACKER_BUILD_NAME}" in
   pi)
     {
       printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${rootfs_uuid}"
       printf 'UUID=%s /boot vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(echo ${bootfs_id}| tr '[a-z]' '[A-Z]' | sed 's/./&-/4')"
     } > /etc/fstab
+  ;;
+  rock64)
+    {
+      printf 'UUID=%s /boot ext2 defaults,noatime,errors=remount-ro 0 2\n' "${rk64_bootfs_uuid}"
+    } >> /etc/fstab
   ;;
 esac
 
@@ -174,6 +179,17 @@ for f in /etc/ssl/certs/* ; do
     ln -s ".${f#/etc/ssl/certs}" "/etc/ssl/certs/${hf}"
   }
 done
+
+# (armbian) configure maximal verbosity
+[[ -f /boot/armbianEnv.txt ]] && {
+  printf '%s\n' \
+    'set /augeas/load/Shellvars/lens Shellvars.lns' \
+    'set /augeas/load/Shellvars/incl /boot/armbianEnv.txt' \
+    'load' \
+    'set /files/boot/armbianEnv.txt/verbosity 7' \
+    'save' \
+  | augtool -A
+}
 
 # (sheeva) install a kernel, flash-tools
 case "${PACKER_BUILD_NAME}" in
