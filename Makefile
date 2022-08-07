@@ -1,5 +1,7 @@
 .DELETE_ON_ERROR:
 
+.ONESHELL:
+
 DISPLAY := ''
 export DISPLAY
 
@@ -38,15 +40,18 @@ images/armbian-mod/rock64.img.xz: packer_templates/armbian.json $(ARMBIAN_MOD_SC
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/armbian-mod/rock64.img
 	xz -T0 images/armbian-mod/rock64.img
 
-images/lite/pi.img.xz: packer_templates/lite.json pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
+images/lite/pi.img.xz: packer_templates/lite.pkr.hcl pi-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
 	-rm -rf images/lite/pi.img*
-	sudo packer build -var-file=pi-uuids.json -only=pi packer_templates/lite.json
+	sudo packer build -var-file=pi-uuids.json -only=arm-image.pi packer_templates/lite.pkr.hcl
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/pi.img
 	xz -T0 images/lite/pi.img
 
-images/lite/sheeva.img.xz: packer_templates/lite.json $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz
+images/upstream/sheevaplug-s1.img.xz.json: Makefile images/upstream/sheevaplug-s1.img.xz
+	md5sum images/upstream/sheevaplug-s1.img.xz | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > images/upstream/sheevaplug-s1.img.xz.json
+
+images/lite/sheeva.img.xz: packer_templates/lite.pkr.hcl $(LITE_FILES) $(LITE_SCRIPTS) images/upstream/sheevaplug-s1.img.xz images/upstream/sheevaplug-s1.img.xz.json
 	-rm -rf images/lite/sheeva.img*
-	sudo packer build -only=sheeva packer_templates/lite.json
+	sudo packer build -var-file=pi-uuids.json -var-file=images/upstream/sheevaplug-s1.img.xz.json -only=arm-image.sheeva packer_templates/lite.pkr.hcl
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/lite/sheeva.img
 	xz -T0 images/lite/sheeva.img
 
