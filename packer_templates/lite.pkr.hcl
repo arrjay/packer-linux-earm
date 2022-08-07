@@ -100,6 +100,18 @@ build {
     ]
   }
 
+  // rock64 has a special step to shuffle /boot over to the new boot partition.
+  provisioner "shell" {
+    only = ["arm-image.rock64"]
+    environment_vars = local.envblock
+    execute_command = local.cmdexec
+    inline = [
+      "rsync -av /boot/ /newboot/",
+      "ln -s . /newboot/boot",
+      "rm -rf /boot/*",
+    ]
+  }
+
   // call the manifest post-processor so that we can...
   post-processor "manifest" {}
 
