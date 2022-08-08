@@ -38,12 +38,8 @@ boot_or_imd_parts () {
 get_driveletter () {
   # return a drive letter match for mtools.conf
   MTOOLSRC="${MTOOLSRC:-/etc/mtools.conf}"
-  line='' src=$1 res=''
-  while read -r line ; do
-    case $line in
-      *' file="'"${src}"'"') res="${line:6:1}" ;;
-    esac
-  done < "${MTOOLSRC}"
+  src=$1 res=''
+  res="$(awk -F= '$2 == "\"'"${src}"'\"" { split($1,d," ");print substr(d[2],1,1); }' "${MTOOLSRC}")"
   [ "${res}" ] || return 1
   echo "${res}"
 }
@@ -102,6 +98,9 @@ rm "${partlist}"
 [ "${dataland}" ] || exit 0
 dataland="${dataland%:*}"
 
+drvletter="$(get_driveletter "${dataland}")"
+[ "${drvletter}" ] || exit 0
+
 mkdir /run/cryptsetup
 random=/dev/random
 [ -f /dev/hwrng ] && random="/dev/hwrng"
@@ -113,7 +112,7 @@ for arg in $(blkid "${srcdev}") ; do
     'TYPE="ext4"')
       log_begin_msg "generating keyfile..."
         dd "if=${random}" of=/run/luksipc.key bs=1 count=32
-	mcopy /run/luksipc.key "$(get_driveletter "${dataland}"):luksipc.key"
+        mcopy /run/luksipc.key "${drvletter}:luksipc.key"
       log_end_msg
       log_begin_msg "converting ${srcdev} to LUKS..."
         # hooo boy, direct fs block munge ;)
@@ -127,8 +126,8 @@ for arg in $(blkid "${srcdev}") ; do
         while read -r line ; do
           case "${line}" in
             *UUID) fsuuid="$(echo "${line}" | awk '{ print $1 }')" ;;
-	    *count) blkct="$(echo "${line}" | awk '{ print $1 }')" ;;
-	    *size) blksz="$(echo "${line}" | awk '{ print $1 }')" ;;
+            *count) blkct="$(echo "${line}" | awk '{ print $1 }')" ;;
+            *size)  blksz="$(echo "${line}" | awk '{ print $1 }')" ;;
           esac
         done < "${tune2fs_out}"
         rm "${tune2fs_out}"
@@ -137,7 +136,7 @@ for arg in $(blkid "${srcdev}") ; do
       log_end_msg
     ;;
     'TYPE="crypto_LUKS"')
-      mcopy "$(get_driveletter "${dataland}"):luksipc.key" /run
+      mcopy "${drvletter}:luksipc.key" /run
     ;;
   esac
 done
