@@ -190,6 +190,7 @@ done
     'set /files/boot/armbianEnv.txt/console serial' \
     'save' \
   | augtool -A
+  sed -i -e 's/ = /=/' /boot/armbianEnv.txt
 }
 
 # (sheeva) install a kernel, flash-tools
