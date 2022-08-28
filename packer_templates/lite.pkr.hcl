@@ -34,6 +34,7 @@ source "arm-image" "rock64" {
   iso_checksum    = var.dynamic_checksum
   iso_url         = "./images/upstream/rock64.img.xz"
   output_filename = "images/lite/rock64.img"
+  qemu_binary     = "qemu-aarch64-static"
 }
 source "arm-image" "sheeva" {
   image_mounts    = ["/boot", "/boot/IMD", "/"]

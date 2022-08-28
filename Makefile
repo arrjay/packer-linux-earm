@@ -4,7 +4,7 @@
 
 .NOTPARALLEL:
 
-.INTERMEDIATE: %.img images/upstream/sheeva.img images/upstream/rock64.img
+.INTERMEDIATE: %.img images/upstream/sheeva.img images/upstream/rock64.img images/lite/cache/resolv.conf
 
 .PRECIOUS: %.img.xz
 
@@ -44,6 +44,7 @@ fs-uuids.json: scripts/genuuid-json.sh
 # so that we can reference it in a packer template
 # this works around arm-image not understanding "none" as a checksum
 %.img.xz.json : %.img.xz
+	mkdir -p $(@D)
 	md5sum $< | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > $@
 
 # compress images
@@ -66,13 +67,17 @@ images/upstream/pi.img:
 	echo "packer will directly handle downloading/caching the pi image, creating empty file"
 	touch $@
 
+# we stuff a copy of resolv.conf in lite's cache
+files/lite/cache/resolv.conf:
+	cat /etc/resolv.conf > files/lite/cache/resolv.conf
+
 # compress lite images
 images/lite/%.img.xz : images/lite/%.img
 	-rm $@
 	xz -T0 $<
 
 # create lite images
-images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS)
+images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS) files/lite/cache/resolv.conf
 	-rm images/lite/$(@F)*
 	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@

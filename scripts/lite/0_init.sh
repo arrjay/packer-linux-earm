@@ -9,6 +9,10 @@ PFSRC=/tmp/packer-files
 # just for comparison...
 df -m
 
+# stomp on resolv.conf
+rm /etc/resolv.conf
+cp "${PFSRC}/cache/resolv.conf" /etc/resolv.conf
+
 # stomp on gai.conf, we're in ipv4 here. no regrets.
 printf '%s\n' 'precedence ::ffff:0:0/96  100' > /etc/gai.conf
 
