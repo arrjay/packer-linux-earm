@@ -5,19 +5,23 @@ variable "dynamic_checksum" {
   default   = "none"
 }
 
+locals {
+  image_size = 3221225472
+}
+
 source "arm-image" "pi" {
   image_type        = "raspberrypi"
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/lite/pi.img.xz"
   output_filename   = "images/netdata/pi.img"
-  target_image_size = 3221225472
+  target_image_size = local.image_size
 }
 source "arm-image" "sheeva" {
   image_mounts      = ["/boot", "/boot/IMD", "/"]
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/lite/sheeva.img.xz"
   output_filename   = "images/netdata/sheeva.img"
-  target_image_size = 3221225472
+  target_image_size = local.image_size
 }
 
 build {

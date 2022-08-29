@@ -4,9 +4,11 @@
 
 .NOTPARALLEL:
 
-# this lets us dynamically treat *any* img.xz as a replacement for .img
-EXISTING_IMAGES=$(shell find images -type f -name '*.img.xz')
-.INTERMEDIATE: %.img $(patsubst %.img.xz,%.img,$(EXISTING_IMAGES)) images/lite/cache/resolv.conf
+.INTERMEDIATE: images/upstream/sheeva.img images/upstream/pi.img images/upstream/rock64.img \
+	       images/lite/cache/resolv.conf \
+	       images/lite/sheeva.img images/lite/pi.img images/lite/rock64.img images/lite/cache/resolv.conf \
+               images/netdata/sheeva.img images/netdata/pi.img images/netdata/rock64.img \
+	       images/standard/sheeva.img images/standard/pi.img images/standard/rock64.img
 
 .PRECIOUS: %.img.xz
 
