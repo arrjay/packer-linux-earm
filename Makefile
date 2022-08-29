@@ -4,7 +4,9 @@
 
 .NOTPARALLEL:
 
-.INTERMEDIATE: %.img images/upstream/sheeva.img images/upstream/rock64.img images/lite/cache/resolv.conf
+# this lets us dynamically treat *any* img.xz as a replacement for .img
+EXISTING_IMAGES=$(shell find images -type f -name '*.img.xz')
+.INTERMEDIATE: %.img $(patsubst %.img.xz,%.img,$(EXISTING_IMAGES)) images/lite/cache/resolv.conf
 
 .PRECIOUS: %.img.xz
 
@@ -82,17 +84,15 @@ images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl f
 	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-images/netdata/pi.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/pi.img.xz
-	-rm -rf images/netdata/pi.img*
-	sudo packer build -only=pi packer_templates/netdata.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/netdata/pi.img
-	xz -T0 images/netdata/pi.img
+# compress netdata images
+images/netdata/%.img.xz : images/netdata/%.img
+	-rm $@
+	xz -T0 $<
 
-images/netdata/sheeva.img.xz: packer_templates/netdata.json $(NETDATA_SCRIPTS) images/lite/sheeva.img.xz
-	-rm -rf images/netdata/sheeva.img*
-	sudo packer build -only=sheeva packer_templates/netdata.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/netdata/sheeva.img
-	xz -T0 images/netdata/sheeva.img
+images/netdata/%.img: images/lite/%.img.xz.json packer_templates/netdata.pkr.hcl $(NETDATA_SCRIPTS)
+	-rm images/netdata/$(@F)*
+	sudo packer build -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/pi.img.xz
 	-rm -rf images/standard/pi.img*
