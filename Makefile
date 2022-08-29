@@ -91,20 +91,18 @@ images/netdata/%.img.xz : images/netdata/%.img
 
 images/netdata/%.img: images/lite/%.img.xz.json packer_templates/netdata.pkr.hcl $(NETDATA_SCRIPTS)
 	-rm images/netdata/$(@F)*
-	sudo packer build -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
+	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-images/standard/pi.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/pi.img.xz
-	-rm -rf images/standard/pi.img*
-	sudo packer build -only=pi packer_templates/standard.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/standard/pi.img
-	xz -T0 images/standard/pi.img
+# standard images
+images/standard/%.img.xz : images/standard/%.img
+	-rm $@
+	xz -T0 $<
 
-images/standard/sheeva.img.xz: packer_templates/standard.json $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) images/netdata/sheeva.img.xz
-	-rm -rf images/standard/sheeva.img*
-	sudo packer build -only=sheeva packer_templates/standard.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/standard/sheeva.img
-	xz -T0 images/standard/sheeva.img
+images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES)
+	-rm -rf images/standard/$(@F)*
+	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img.xz
 	-rm -rf images/xfce/pi.img*
