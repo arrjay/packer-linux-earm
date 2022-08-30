@@ -114,6 +114,7 @@ build {
     inline = [
       "rsync -a /boot/ /newboot/",
       "rm -rf /boot/*",
+      "mkdir /newboot/IMD",
     ]
   }
 
