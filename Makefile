@@ -2,15 +2,17 @@
 
 .ONESHELL:
 
+# used to coerce INTERMEDIATE to ignore .img files not existing, and .PRECIOUS to keep compressed versions
+TARGETS := rock64 pi sheeva
+TYPES := upstream lite netdata standard
+IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
+COMPRESSED_IMAGES := $(addsuffix .xz, $(IMAGES))
+
 .NOTPARALLEL:
 
-.INTERMEDIATE: images/upstream/sheeva.img images/upstream/pi.img images/upstream/rock64.img \
-	       images/lite/cache/resolv.conf \
-	       images/lite/sheeva.img images/lite/pi.img images/lite/rock64.img images/lite/cache/resolv.conf \
-               images/netdata/sheeva.img images/netdata/pi.img images/netdata/rock64.img \
-	       images/standard/sheeva.img images/standard/pi.img images/standard/rock64.img
+.INTERMEDIATE: $(IMAGES) images/lite/cache/resolv.conf
 
-.PRECIOUS: %.img.xz
+.PRECIOUS: $(COMPRESSED_IMAGES)
 
 # turn off DISPLAY as a matter of course (forces packer to always be headless)
 DISPLAY := ''
