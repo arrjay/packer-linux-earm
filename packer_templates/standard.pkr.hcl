@@ -13,6 +13,14 @@ source "arm-image" "pi" {
   target_image_size = 4831838208
 }
 
+source "arm-image" "rock64" {
+  image_mounts    = ["/boot", "/boot/IMD", "/"]
+  iso_checksum    = var.dynamic_checksum
+  iso_url         = "./images/netdata/rock64.img.xz"
+  output_filename = "images/standard/rock64.img"
+  qemu_binary     = "qemu-aarch64-static"
+}
+
 source "arm-image" "sheeva" {
   image_mounts      = ["/boot", "/boot/IMD", "/"]
   iso_checksum      = var.dynamic_checksum
@@ -34,7 +42,7 @@ locals {
 }
 
 build {
-  sources = ["source.arm-image.pi", "source.arm-image.sheeva"]
+  sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64"]
 
   provisioner "shell-local" {
     inline          = [
