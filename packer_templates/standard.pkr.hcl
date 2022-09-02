@@ -19,6 +19,7 @@ source "arm-image" "rock64" {
   iso_url         = "./images/netdata/rock64.img.xz"
   output_filename = "images/standard/rock64.img"
   qemu_binary     = "qemu-aarch64-static"
+  target_image_size = 4831838208
 }
 
 source "arm-image" "sheeva" {
