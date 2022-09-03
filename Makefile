@@ -108,11 +108,14 @@ images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pk
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-images/xfce/pi.img.xz: packer_templates/xfce.json $(XFCE_SCRIPTS) $(XFCE_FILES) images/standard/pi.img.xz
-	-rm -rf images/xfce/pi.img*
-	sudo packer build -only=pi packer_templates/xfce.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/xfce/pi.img
-	xz -T0 images/xfce/pi.img
+images/xfce/%.img.xz : images/xfce/%.img
+	-rm $@
+	xz -T0 $<
+
+images/xfce/%.img: images/standard/%.img.xz.json packer_templates/xfce.pkr.hcl $(XFCE_SCRIPTS) $(XFCE_FILES)
+	-rm -rf images/xfce/$(@F)*
+	sudo packer build -var-file $< -only=arm-image.$(@F:.img=) packer_templates/xfce.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/ykman/pi.img.xz: packer_templates/ykman.json $(YKMAN_SCRIPTS) $(MISCSCRIPT_FILES) $(KEYMAT_FILES) $(YKMAN_FILES) images/xfce/pi.img.xz
 	-rm -rf images/ykman/pi.img*
