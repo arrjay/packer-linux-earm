@@ -4,7 +4,7 @@
 
 # used to coerce INTERMEDIATE to ignore .img files not existing, and .PRECIOUS to keep compressed versions
 TARGETS := rock64 pi sheeva
-TYPES := upstream lite netdata standard
+TYPES := upstream lite netdata standard xfce ykman
 IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
 COMPRESSED_IMAGES := $(addsuffix .xz, $(IMAGES))
 
@@ -108,6 +108,7 @@ images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pk
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
+# now with X!
 images/xfce/%.img.xz : images/xfce/%.img
 	-rm $@
 	xz -T0 $<
@@ -117,28 +118,12 @@ images/xfce/%.img: images/standard/%.img.xz.json packer_templates/xfce.pkr.hcl $
 	sudo packer build -var-file $< -only=arm-image.$(@F:.img=) packer_templates/xfce.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-images/ykman/pi.img.xz: packer_templates/ykman.json $(YKMAN_SCRIPTS) $(MISCSCRIPT_FILES) $(KEYMAT_FILES) $(YKMAN_FILES) images/xfce/pi.img.xz
-	-rm -rf images/ykman/pi.img*
-	sudo packer build -only=pi packer_templates/ykman.json
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/ykman/pi.img
-	xz -T0 images/ykman/pi.img
+# set up for yubikey/gpg mangling
+images/ykman/%.img.xz : images/ykman/%.img
+	-rm $@
+	xz -T0 $<
 
-edger/image: dterm-image/image edger.json scripts/edger.sh
-	-rm -rf edger
-	packer build edger.json
-
-hose/image: dterm-image/image hose.json scripts/hose.sh
-	-rm -rf hose
-	packer build hose.json
-
-aerator/image: hose/image aerator.json
-	-rm -rf aerator
-	packer build aerator.json
-
-gloves/image: xfce-image/image gloves.json scripts/gloves.sh $(GLOVES_SECRETS)
-	-rm -rf gloves
-	packer build gloves.json
-
-trowel/image: xfce-image/image trowel.json scripts/trowel.sh $(TROWEL_SECRETS)
-	-rm -rf trowel
-	packer build trowel.json
+images/ykman/%.img: images/xfce/%.img.xz.json packer_templates/ykman.pkr.hcl $(YKMAN_SCRIPTS) $(MISCSCRIPT_FILES) $(KEYMAT_FILES) $(YKMAN_FILES)
+	-rm -rf images/ykman/$(@F)*
+	sudo packer build -var-file $< -only=arm-image.$(@F:.img=) packer_templates/ykman.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
