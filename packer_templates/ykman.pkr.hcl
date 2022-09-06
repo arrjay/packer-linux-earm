@@ -12,8 +12,16 @@ source "arm-image" "pi" {
   output_filename   = "./images/ykman/pi.img"
 }
 
+source "arm-image" "rock64" {
+  image_mounts    = ["/boot", "/boot/IMD", "/"]
+  iso_checksum    = var.dynamic_checksum
+  iso_url         = "./images/xfce/rock64.img.xz"
+  output_filename = "./images/ykman/rock64.img"
+  qemu_binary     = "qemu-aarch64-static"
+}
+
 build {
-  sources = ["source.arm-image.pi"]
+  sources = ["source.arm-image.pi", "source.arm-image.rock64"]
 
   provisioner "shell-local" {
     inline          = ["p=\"$(pwd)\"", "mkdir -p \"$${p}/files/ykman/cache\"", "(cd \"$${p}/vendor/misc-scripts\" && git archive HEAD -o \"$${p}/files/ykman/cache/misc-scripts.tar\")", "(cd \"$${p}/vendor\" && tar cf \"$${p}/files/ykman/cache/keymat.tar\" keymat)"]
