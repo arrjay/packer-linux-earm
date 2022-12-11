@@ -25,8 +25,8 @@ variable "dynamic_checksum" {
 // from Makefile targets, hence the "dynamic_checksum" use.
 source "arm-image" "pi" {
   image_type      = "raspberrypi"
-  iso_checksum    = "sha256:34987327503fac1076e53f3584f95ca5f41a6a790943f1979262d58d62b04175"
-  iso_url         = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-04-07/2022-04-04-raspios-bullseye-armhf-lite.img.xz"
+  iso_checksum    = "sha256:9bf5234efbadd2d39769486e0a20923d8526a45eba57f74cda45ef78e2b628da"
+  iso_url         = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-09-26/2022-09-22-raspios-bullseye-armhf-lite.img.xz"
   output_filename = "images/lite/pi.img"
 }
 source "arm-image" "rock64" {

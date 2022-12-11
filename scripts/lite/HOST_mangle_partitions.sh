@@ -15,7 +15,10 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
       mlabel -N "${bootfs_id}"  -i "/dev/mapper/${loop}"
       fatlabel "/dev/mapper/${loop}" boot
     ;;
-    *2) tune2fs -U "${rootfs_uuid}"  "/dev/mapper/${loop}" ;;
+    *2)
+      e2fsck -fy "/dev/mapper/${loop}"
+      tune2fs -U "${rootfs_uuid}"  "/dev/mapper/${loop}"
+    ;;
   esac
 done
 
