@@ -22,6 +22,11 @@ chown -R $u:$u /home/$u/
 # force key-only login over ssh
 augtool set /files/etc/ssh/sshd_config/PasswordAuthentication no
 
+# remove rpi banner if exists
+[ -e /etc/ssh/sshd_config.d/rename_user.conf ] && {
+  rm /etc/ssh/sshd_config.d/rename_user.conf
+}
+
 # reconfigure sudoers
 rm -f /etc/sudoers.d/010_pi-nopasswd
 printf '%s ALL=(ALL) NOPASSWD: ALL\n' $u > /etc/sudoers.d/010_$u-nopasswd
