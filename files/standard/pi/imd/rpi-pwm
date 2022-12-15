@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#set -x
+
+## generate the config file for pwm scripts
+
+# source:
+# <metadata>
+#  <pwm>
+#   <control chip=CHIP_ID id=ID period=NUMBER duty_cycle=NUMBER pulse=FLOAT>
+#    <position label=STRING duty_cycle=NUMBER/>
+#   </control>
+#  </pwm>
+# </metadata>
+
+# chip_id, id, period are all required.
+# at least one position is required, and all position entries must have a label and duty_cycle.
+
+# target:
+# PWMCHIP0_PWM1_DEFAULT_PERIOD=number
+# PWMCHIP0_PWM1_DEFAULT_CYCLE=number
+# PWMCHIP0_PWM1_DEFAULT_PULSE=float
+# PWMCHIP0_PWM1_POSITION_string_CYCLE=number
+
+output_conf="/var/run/untrustedhost/pwm.conf"
+
+control_ct="$(xmlstarlet sel -t -v 'count(/metadata/pwm/control)' "${IMD_PATH}")"
+
+# silently go away if we have no controls
+[[ "${control_ct}" -gt 0 ]] || exit 0
+: > "${output_conf}"
+
+pwms=()
+
+while [[ "${control_ct}" -gt 0 ]] ; do
+  err=0
+  csel="${control_ct}"
+  ((control_ct--))
+  xmladdr="/metadata/pwm/control[${csel}]/"
+  chipid="$(xmlstarlet sel -t -v "${xmladdr}@chip" "${IMD_PATH}")"
+  pwmid="$(xmlstarlet sel -t -v "${xmladdr}@id" "${IMD_PATH}")"
+  period="$(xmlstarlet sel -t -v "${xmladdr}@period" "${IMD_PATH}")"
+  defduty="$(xmlstarlet sel -t -v "${xmladdr}@duty_cycle" "${IMD_PATH}")"
+  defpulse="$(xmlstarlet sel -t -v "${xmladdr}@pulse" "${IMD_PATH}")"
+  for reqd in chipid pwmid period ; do
+    [[ "${!reqd}" ]] || { printf 'missing %s for control entry %s\n' "${reqd}" "${csel}" 1>&2 ; err=1 ; }
+  done
+  # needed to skip the control_ct loop, not the reqd one.
+  [[ "${err}" -eq 0 ]] || continue
+  preamble="PWMCHIP${chipid}_PWM${pwmid}_"
+  case " ${pwms[*]} " in
+    *" ${preamble} "*) printf '%s was already defined, skipping control entry %s\n' "${preamble%_}" "${csel}" 1>&2 ; continue ;;
+  esac
+  pwms=("${pwms[@]}" "${preamble}")
+  {
+    printf '%sDEFAULT_PERIOD=%s\n' "${preamble}" "${period}"
+    [[ "${defduty}"  ]] && printf '%sDEFAULT_CYCLE=%s\n' "${preamble}" "${defduty}"
+    [[ "${defpulse}" ]] && printf '%sDEFAULT_PULSE=%s\n' "${preamble}" "${defpulse}"
+  } >> "${output_conf}"
+  positions=()
+  pos_ct="$(xmlstarlet sel -t -v "count(/metadata/pwm/control[${csel}]/position)" "${IMD_PATH}")"
+  while [[ "${pos_ct}" -gt 0 ]] ; do
+    err=0
+    pos_sel="${pos_ct}"
+    ((pos_ct--))
+    posaddr="${xmladdr}position[${pos_sel}]/"
+    label="$(xmlstarlet sel -t -v "${posaddr}@label" "${IMD_PATH}")"
+    duty="$(xmlstarlet sel -t -v "${posaddr}@duty_cycle" "${IMD_PATH}")"
+    for reqd in label duty ; do
+      [[ "${!reqd}" ]] || { printf 'missing %s for position entry %s on %s\n' "${reqd}" "${pos_sel}" "${preamble%_}" 1>&2 ; err=1 ; }
+    done
+    [[ "${err}" -eq 0 ]] || continue
+    case " ${positions[*]} " in
+      *" ${label} "*) printf '%s was already defined, skipping position entry %s in %s\n' "${label}" "${pos_sel}" "${preamble%_}" 1>&2 ; continue ;;
+    esac
+    positions=("${positions[@]}" "${label}")
+    {
+        printf '%sPOSITION_%s_CYCLE=%s\n' "${preamble}" "${label}" "${duty}"
+    } >> "${output_conf}"
+  done
+done

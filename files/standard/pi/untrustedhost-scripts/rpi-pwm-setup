@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# enable pwm control if available for rpi systems.
+
+# first, do I have any npwm files?
+npwmfiles=(/sys/class/pwm/*/npwm)
+
+[[ -f "${npwmfiles[0]}" ]] || { printf '%s\n' 'no pwm endpoints are available to export' 1>&2 ; exit 255 ; }
+
+# then, source our config. we only support k/vs written by the imd hook...
+config="/var/run/untrustedhost/pwm.conf"
+[[ -f "${config}" ]] && . "${config}"
+
+# set up all the PWMs on in sysfs (export them)
+# and set their duty cycle, if we have it.
+# they're not *on* yet, though
+for file in "${npwmfiles[@]}" ; do
+  read -r npmct < "${file}"
+  base="${file%/*}"
+  chip="${base##*/}"
+  active=0
+  while [[ "${active}" -lt "${npmct}" ]] ; do
+    # skip export if we're already...there
+    [[ -d "${base}/pwm${active}" ]] || echo "${active}" > "${base}/export"
+    # if we have a definition of a pwm period, apply it now
+    pwm_period="${chip}_pwm${active}_default_period" ; pwm_period="${pwm_period^^}"
+    declare -p "${pwm_period}" 2>/dev/null 1>&2 && {
+        echo "${!pwm_period}" > "${base}/pwm${active}/period"
+    }
+    # if we have a base duty cycle, we can set that too (as we're not _enabled_...)
+    default_duty_cycle="${chip}_pwm${active}_default_cycle" ; default_duty_cycle="${default_duty_cycle^^}"
+    declare -p "${default_duty_cycle}" 2>/dev/null 1>&2 && {
+        echo "${!default_duty_cycle}" > "${base}/pwm${active}/duty_cycle"
+    }
+    ((active++))
+  done
+done
