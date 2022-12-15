@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+config="/run/untrustedhost/pwm.conf"
+
+[[ -e "${config}" ]] || { printf 'missing config %s, quitting!\n' "${config}" 1>&2 ; exit 255 ; }
+
+_pwmchip=0
+_pwm=0
+_pulse=0.5
+noreset=0
+
+. "${config}"
+
+while getopts "c:p:P:t:T:N" _opt ; do
+  case "${_opt}" in
+    c) _pwmchip="${OPTARG}"  ;;
+    p) position="${OPTARG}"  ;;
+    P) _pwm="${OPTARG}"      ;;
+    t) _pulse="${OPTARG}"    ;;
+    T) _defpulse="${OPTARG}" ;;
+    N) noreset=1             ;;
+  esac
+done
+
+[[ -z "${position}" ]] && { printf 'you need to provide a position\n' 1>&2 ; exit 1 ; }
+
+preamble="PWMCHIP${_pwmchip}_PWM${_pwm}_"
+active_cycle="${preamble}POSITION_${position}_CYCLE"
+declare -p "${active_cycle}" 2>/dev/null 1>&2 || { printf 'position cycle not defined\n' 1>&2 ; exit 1 ; }
+
+reset_cycle="${preamble}DEFAULT_CYCLE"
+declare -p "${reset_cycle}" 2>/dev/null 1>&2 || { printf 'reset cycle not defined\n' 1>&2 ; exit 1 ; }
+
+pre_sleep="${preamble}DEFAULT_PULSE"
+declare -p "${pre_sleep}" 2>/dev/null 1>&2 || { pre_sleep="_defpulse" ; }
+
+sleep="${preamble}POSITION_${position}_PULSE"
+declare -p "${sleep}" 2>/dev/null 1>&2 || { 
+  case "${pre_sleep}" in
+    _defpulse) sleep="_pulse"       ;;
+    *)         sleep="${pre_sleep}" ;;
+  esac
+}
+
+# turn the pwm on and wait for the pulse to settle. warn if it's not the default cycle.
+sysfs_pwm="/sys/class/pwm/pwmchip${_pwmchip}/pwm${_pwm}"
+
+read -r current_cycle < "${sysfs_pwm}/duty_cycle"
+[[ "${current_cycle}" -ne "${!reset_cycle}" ]] && {
+    printf 'WARNING: pwm was not configured for %s cycle initially\n' "${!reset_cycle}"
+}
+
+# turn the pwm on
+echo 1 > "${sysfs_pwm}/enable"
+
+# start delay
+sleep "${!pre_sleep}"
+
+# change the cycle
+echo "${!active_cycle}" > "${sysfs_pwm}/duty_cycle"
+
+# hold delay
+sleep "${!sleep}"
+
+# reset the cycle
+echo "${!reset_cycle}" > "${sysfs_pwm}/duty_cycle"
+
+# end delay
+sleep "${!pre_sleep}"
+
+# turn the pwm off
+echo 0 > "${sysfs_pwm}/enable"
