@@ -40,28 +40,30 @@ case "${PACKER_BUILD_NAME}" in
   ;;
 esac
 
-
 # install system configs from packer file provisioner
 for source in \
   "${PFSRC}/cache/etc/skel" \
   "${PFSRC}/systemd" \
   "${PFSRC}/untrustedhost" \
+  "${PFSRC}/untrustedhost-scripts" \
   "${PFSRC}/imd" \
   "${PFSRC}/logrotate.d" \
   "${PFSRC}/udev" \
   "${PFSRC}/incron.d" \
   "${PFSRC}/networkd-dispatcher" \
  ; do
-  [[ -d "${source}" ]] && cp -R "${source}" /tmp
+  [[ -d "${source}" ]] && rsync -a "${source}/" "/tmp/${source##*/}/"
 done
 
 # if we have a platform directory, arrange for that too
 for source in \
   "${PFSRC}/${PACKER_BUILD_NAME}/untrustedhost" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/untrustedhost-scripts" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/imd" \
   "${PFSRC}/${PACKER_BUILD_NAME}/systemd" \
   "${PFSRC}/${PACKER_BUILD_NAME}/incron.d" \
  ; do
-  [[ -d "${source}" ]] && cp -R "${source}" /tmp
+  [[ -d "${source}" ]] && rsync -a "${source}/" "/tmp/${source##*/}/"
 done
 
 # install from scratch directories into filesystem, clean them back up
@@ -87,14 +89,18 @@ firewall-offline-cmd --add-service=mdns --zone=public
 firewall-offline-cmd --zone=external --remove-service-from-zone=ssh
 
 # install additional scripts
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/attach-hidups.sh" "/usr/lib/untrustedhost/scripts/attach-hidups.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/start-upsd-aliases.sh" "/usr/lib/untrustedhost/scripts/start-upsd-aliases.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/write-upsd-config.sh" "/usr/lib/untrustedhost/scripts/write-upsd-config.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/dns-update.sh" "/usr/lib/untrustedhost/scripts/dns-update.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/ucarp-down-dhcpd.sh" "/usr/lib/untrustedhost/scripts/ucarp-down-dhcpd.sh"
-install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/ucarp-up-dhcpd.sh" "/usr/lib/untrustedhost/scripts/ucarp-up-dhcpd.sh"
+rm -rf /tmp/scripts
+mv /tmp/untrustedhost-scripts /tmp/scripts
+for file in /tmp/scripts/* ; do
+  INSTALL_MODE=0755 TARGET_DIR=/usr/lib/untrustedhost install_ef "${file}"
+  rm -rf "${file}"
+done
 
 if [[ -e "${PFSRC}/${PACKER_BUILD_NAME}/fitstat" ]] ; then
   install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/${PACKER_BUILD_NAME}/fitstat" "/usr/lib/untrustedhost/scripts/fitstat"
   systemctl enable untrustedhost-fitstat
+fi
+
+if [[ -e /etc/systemd/system/untrustedhost-pwm.service ]] ; then
+  systemctl enable untrustedhost-pwm
 fi
