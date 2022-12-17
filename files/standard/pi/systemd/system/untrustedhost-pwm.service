@@ -1,11 +1,11 @@
 [Unit]
 Description=enable pwm controls on rpi (requires overlay be enabled)
+ConditionPathExistsGlob=/sys/class/pwm/*/npwm
 After=imd.service
 
 [Service]
 Type=oneshot
 ExecStart=/usr/lib/untrustedhost/scripts/rpi-pwm-setup
-ConditionPathExistsGlob=/sys/class/pwm/*/npwm
 
 [Install]
 WantedBy=multi-user.target
