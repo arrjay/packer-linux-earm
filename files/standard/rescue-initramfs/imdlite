@@ -82,10 +82,10 @@ copy_imd_file () {
 find_onboard_if () {
   # first, spin on /sys/class/net to get a device :/
   local iflist
-  iflist=(/sys/class/net/*)
+  iflist="$(ls -1 /sys/class/net)"
   while [[ "${#iflist[@]}" -lt 2 ]] ; do
     sleep 1
-    iflist=(/sys/class/net/*)
+    iflist="$(ls -1 /sys/class/net)"
   done
   # find 'onboard' interface for renaming
   # currently just a collection of hacks to match sysfs things (model specific)
@@ -146,7 +146,7 @@ create_onboard_vlans () {
 create_onboard_ip () {
   [[ -f /run/MDDATA.XML ]] || return 1
   local v4addrs ipadd
-  v4addrs="$(xmlstarlet sel -t -v 'count(metadata/domain/devices/interface[@type="bridge"][source/@bridge="be"]/ipv4/@address)' /run/MDDATA.XML)"
+  v4addrs="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface[@type="bridge"][source/@bridge="be"]/ipv4/@address' /run/MDDATA.XML)"
   for ipadd in ${v4addrs} ; do
     case "${ipadd}" in */*) : ;; *) continue ;; esac
     ip addr add "${ipadd}" dev "be"
