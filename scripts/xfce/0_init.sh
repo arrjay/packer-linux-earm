@@ -44,16 +44,14 @@ esac
 apt-get -qq clean
 apt-get -qq -y install xserver-xorg xserver-xorg-video-fbdev xserver-xorg-input-all \
                lightdm xfce4 xfce4-screenshooter xfce4-terminal xfce4-power-manager \
-               xfonts-terminus fonts-terminus \
+               xfonts-terminus fonts-terminus python3-xcffib \
                solaar blueman scdaemon virt-manager "${additional_packages[@]}"
 apt-get -qq clean
-
-# disable the newer vc4 graphics stack. reasons.
-[[ -e /boot/config.txt ]] && sed -i -e 's/^dtoverlay=vc4-/#dtoverlay=vc4-/g' /boot/config.txt
 
 # the multihead setup is only test on pi. anything else is hopefully not this silly.
 case "${PACKER_BUILD_NAME}" in
   pi)
+    rm -rf /etc/X11/xorg.conf.d
     ln -sf /run/untrustedhost/xorg.conf.d /etc/X11/xorg.conf.d
     mkdir -p /usr/lib/untrustedhost/xorg.conf.d
     for f in "${PFSRC}/xorg.conf.d"/* ; do
@@ -72,7 +70,11 @@ apt-get -qq clean
 printf 'XFCE_PANEL_MIGRATE_DEFAULT=1\n' >> /etc/environment
 
 mkdir -p /etc/systemd/system/lightdm.service.d
-printf '[Unit]\nConditionPathExists=/sys/class/backlight/rpi_backlight\n' > /etc/systemd/system/lightdm.service.d/req-backlight.conf
+printf '%s\n' \
+  '[Unit]' \
+  'ConditionPathExists=|/sys/class/backlight/rpi_backlight' \
+  'ConditionPathExists=|/sys/class/backlight/10-0045' \
+ > /etc/systemd/system/lightdm.service.d/req-backlight.conf
 ln -s /lib/systemd/system/lightdm.service /etc/systemd/system/multi-user.target.wants/lightdm.service
 ln -s /dev/null /etc/systemd/system/plymouth-quit-wait.service
 
