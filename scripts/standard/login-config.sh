@@ -11,7 +11,7 @@ getent passwd pi && passwd -l pi
 # add ejusdem user
 groupadd $u
 useradd -g $u $u
-for g in dialout i2c systemd-journal netdev ; do
+for g in dialout i2c systemd-journal netdev pijuice ; do
   getent group $g && usermod -a -G $g $u
 done
 
