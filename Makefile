@@ -4,7 +4,7 @@
 
 # used to coerce INTERMEDIATE to ignore .img files not existing, and .PRECIOUS to keep compressed versions
 TARGETS := rock64 pi sheeva
-TYPES := upstream lite netdata standard xfce ykman
+TYPES := upstream lite netdata standard xfce ykman pijuice
 IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
 COMPRESSED_IMAGES := $(addsuffix .xz, $(IMAGES))
 
@@ -31,6 +31,7 @@ LITE_FILES = $(shell find files/lite -path files/lite/cache -prune -o -print -ty
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
 NETDATA_FILES = $(shell find files/netdata -path files/netdata/cache -prune -o -print -type f)
+PIJUICE_SCRIPTS = $(shell find scripts/pijuice -type f)
 STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
 STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -o -print -type f)
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
@@ -98,10 +99,26 @@ images/netdata/%.img: images/lite/%.img.xz.json packer_templates/netdata.pkr.hcl
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
+# a specific image for pijuice support *on pi*
+images/pijuice/%.img.xz : images/pijuice/%.img
+	-rm $@
+	xz -T0 $<
+
+images/pijuice/pi.img: images/netdata/pi.img.xz.json packer_templates/pijuice.pkr.hcl $(PIJUICE_SCRIPTS)
+	-rm images/pijuice/$(@F)*
+	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/pijuice.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
+
 # standard images
 images/standard/%.img.xz : images/standard/%.img
 	-rm $@
 	xz -T0 $<
+
+# the pi target here gets an override because we stuffed the pijuice build in too
+images/standard/pi.img: images/pijuice/pi.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES)
+	-rm -rf images/standard/$(@F)*
+	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES)
 	-rm -rf images/standard/$(@F)*
