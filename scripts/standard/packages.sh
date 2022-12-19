@@ -16,7 +16,7 @@ apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
   python3-dbus python3-setuptools mtools telnet networkd-dispatcher awscli putty-tools \
-  modemmanager hostapd etherwake \
+  modemmanager hostapd etherwake gpiod \
   "${ADDITIONAL_PACKAGES[@]}"
 
 # disable installed services for imd management
