@@ -5,11 +5,16 @@ variable "dynamic_checksum" {
   default   = "none"
 }
 
+locals {
+  image_size = 4294967296
+}
+
 source "arm-image" "pi" {
   image_type        = "raspberrypi"
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/netdata/pi.img.xz"
   output_filename   = "images/pijuice/pi.img"
+  target_image_size = local.image_size
 }
 
 build {

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 PFSRC=/tmp/packer-files
 
 # prereq - install mdns-publisher
@@ -12,24 +12,29 @@ python3 setup.py install
 popd
 
 # install nut for ups fun...
-apt-get install nut nut-client apg
+type upsd >/dev/null 2>&1 || apt-get install nut
+type upsc >/dev/null 2>&1 || apt-get install nut-client
+apt-get install apg
 systemctl disable nut-monitor
 # nut-driver is masked due to alias startup issues. we use the nut-driver@ template instead.
 systemctl mask nut-driver
 systemctl disable nut-server
 
-# clone the nut sources for reference
-nut_ver=$(upsd -V)
+# configure that entire stack so that `upsd -V` works... :x
+printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
+
+# clone the nut sources for reference. or don't, if we have one.
+nut_ver="$(upsd -V)"
 nut_ver="${nut_ver##* }"
 pushd /usr/src
-git clone --depth 1 --branch v2.7.4 https://github.com/networkupstools/nut
-cd nut
-TOP_SRCDIR=. TOP_BUILDDIR=. perl "${PFSRC}/nut-usbinfo.pl"
+nutdir=(nut*)
+[[ -d "${nutdir[0]}" ]] || { git clone --depth 1 --branch "v${nut_ver}" https://github.com/networkupstools/nut ; nutdir=("nut") ; }
+cd "${nutdir[0]}"
+usbinfo="${PFSRC}/nut-usbinfo.pl"
+[[ -e tools/nut-usbinfo.pl ]] && usbinfo="./tools/nut-usbinfo.pl"
+TOP_SRCDIR=. TOP_BUILDDIR=. perl "${usbinfo}"
 install -o 0 -g 0 -m 0644 scripts/udev/nut-usbups.rules.in /etc/udev/rules.d/attach-hidups.rules
 popd
-
-# configure that entire stack
-printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
 
 # ups.conf is the ups service drivers - dynamically generated
 ln -sf /run/untrustedhost/nut/ups.conf /etc/nut/ups.conf
