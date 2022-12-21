@@ -19,6 +19,9 @@ systemctl disable nut-monitor
 # nut-driver is masked due to alias startup issues. we use the nut-driver@ template instead.
 systemctl mask nut-driver
 systemctl disable nut-server
+# the next bits are for nut 2.8.0, which did a target trick...
+systemctl disable nut.target || true
+systemctl disable nut-driver-enumerator || true
 
 # configure that entire stack so that `upsd -V` works... :x
 printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
