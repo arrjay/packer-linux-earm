@@ -30,8 +30,8 @@ pushd /usr/src
 nutdir=(nut*)
 [[ -d "${nutdir[0]}" ]] || { git clone --depth 1 --branch "v${nut_ver}" https://github.com/networkupstools/nut ; nutdir=("nut") ; }
 cd "${nutdir[0]}"
+# the below script is an _additional udev hook_ to trip our own attach-hidups services
 usbinfo="${PFSRC}/nut-usbinfo.pl"
-[[ -e tools/nut-usbinfo.pl ]] && usbinfo="./tools/nut-usbinfo.pl"
 TOP_SRCDIR=. TOP_BUILDDIR=. perl "${usbinfo}"
 install -o 0 -g 0 -m 0644 scripts/udev/nut-usbups.rules.in /etc/udev/rules.d/attach-hidups.rules
 popd
