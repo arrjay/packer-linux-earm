@@ -1,4 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
+# shellcheck disable=SC3010,SC3043
+# I don't know what shell the initramfs uses other than *it sucks*
+
+# set -x
 
 # configure network and ssh using imd metadata
 
@@ -17,8 +21,8 @@ boot_or_imd_parts () {
   blkid > "${blkout}"
   while read -r line ; do
     case $line in
-      *'LABEL="IMD"'*)  echo "${line%: *}:imd"  ; ((imdct++))  ;;
-      *'LABEL="boot"'*) echo "${line%: *}:boot" ; ((bootct++)) ;;
+      *'LABEL="IMD"'*)  echo "${line%: *}:imd"  ; imdct=$((imdct+1))  ;;
+      *'LABEL="boot"'*) echo "${line%: *}:boot" ; bootct=$((bootct+1)) ;;
     esac
   done < "${blkout}"
   rm "${blkout}"
@@ -30,10 +34,10 @@ boot_or_imd_parts () {
 get_driveletter () {
   # return a drive letter match for mtools.conf
   local MTOOLSRC="${MTOOLSRC:-/etc/mtools.conf}"
-  local line src=$1 res
+  local line src="$1" res
   while read -r line ; do
     case $line in
-      *' file="'"${src}"'"') res="${line:6:1}" ;;
+      *' file="'"${src}"'"') res="$(awk -F'"' '{print $2}')" ;;
     esac
   done < "${MTOOLSRC}"
   [[ "${res}" ]] || return 1
@@ -131,7 +135,7 @@ create_onboard_vlans () {
   while [[ "${vlcount}" -gt 0 ]] ; do
     v4addrs="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface[@type="bridge"][source/@bridge="be"]/vlan['"${vlcount}"']/ipv4/@address' /run/MDDATA.XML)"
     vlname="$(xmlstarlet sel -t -v 'metadata/domain/devices/interface[@type="bridge"][source/@bridge="be"]/vlan['"${vlcount}"']/@name' /run/MDDATA.XML)"
-    ((vlcount--))
+    vlcount=$((vlcount-1))
     case "${v4addrs}" in */*) : ;; *) continue ;; esac
     vlid="$(xmlstarlet sel -t -v 'metadata/vlan/map[@name="'"${vlname}"'"]/@id' /run/MDDATA.XML)"
     ip link add link be name "vl-${vlname}" type vlan id "${vlid}"
