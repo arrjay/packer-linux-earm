@@ -46,7 +46,7 @@ luksuuid="$(cryptsetup luksUUID "${srcdev}")"
 
 [[ -f /boot/luksipc.key ]] && [[ -s /boot/luksipc.key ]] && {
   # fix crypttab
-  printf 'luks-%s UUID=%s %s\n' "${luksuuid}" "${luksuuid}" /boot/luksipc.key >> /etc/crypttab
+  printf 'luks-%s UUID=%s %s\n' "${luksuuid}" "${luksuuid}" none >> /etc/crypttab.luksipc
 
   # regenerate initramfs
   [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
@@ -62,7 +62,7 @@ luksuuid="$(cryptsetup luksUUID "${srcdev}")"
   }
 
   # remove commandlines
-  for file in /boot/cmdline.txt /boot/serial.txt ; do
-    [[ -f "${file}" ]] && sed -i -e 's@luksipc=[0-9A-Za-z/_.\=-]\+@@' "${file}"
-  done
+  #for file in /boot/cmdline.txt /boot/serial.txt ; do
+  #  [[ -f "${file}" ]] && sed -i -e 's@luksipc=[0-9A-Za-z/_.\=-]\+@@' "${file}"
+  #done
 }

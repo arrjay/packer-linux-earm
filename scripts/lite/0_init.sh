@@ -99,9 +99,15 @@ for source in \
   [[ -d "${source}" ]] && cp -R "${source}" /tmp
 done
 
+find /etc/initramfs-tools -type f
+
 for directory in /tmp/initramfs-tools /tmp/kernel ; do
   INSTALL_MODE=0755 install_ef "${directory}"
   rm -rf "${directory}"
+  find /etc/initramfs-tools -type f
+  # ???
+  rm -f /etc/initramfs-tools/scripts/local-premount/luksipc
+  ln /etc/initramfs-tools/scripts/local-block/luksipc /etc/initramfs-tools/scripts/local-premount/luksipc
 done
 
 # reset hostnames for these to the builder name
