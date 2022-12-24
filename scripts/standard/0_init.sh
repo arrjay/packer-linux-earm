@@ -33,10 +33,11 @@ install --verbose -o 0 -g 0 -d /etc/bird
 chmod +x "${PFSRC}/cache/imd/install.run"
 "${PFSRC}/cache/imd/install.run"
 
-# disable pi's userconfig
+# disable pi's userconfig, install rtc modules in pi initrds
 case "${PACKER_BUILD_NAME}" in
   pi)
     systemctl disable userconfig
+    printf '%s\n' 'rtc-ds1307' 'i2c_bcm2835' 'i2c-dev' >> /etc/initramfs-tools/modules
   ;;
 esac
 
@@ -62,6 +63,7 @@ for source in \
   "${PFSRC}/${PACKER_BUILD_NAME}/imd" \
   "${PFSRC}/${PACKER_BUILD_NAME}/systemd" \
   "${PFSRC}/${PACKER_BUILD_NAME}/incron.d" \
+  "${PFSRC}/${PACKER_BUILD_NAME}/initramfs-tools" \
  ; do
   [[ -d "${source}" ]] && rsync -a "${source}/" "/tmp/${source##*/}/"
 done
@@ -72,7 +74,7 @@ for directory in /tmp/systemd /tmp/untrustedhost /tmp/logrotate.d /tmp/udev /tmp
   rm -rf "${directory}"
 done
 
-for directory in /tmp/skel /tmp/networkd-dispatcher ; do
+for directory in /tmp/skel /tmp/networkd-dispatcher /tmp/initramfs-tools ; do
   INSTALL_MODE=0755 install_ef "${directory}"
   rm -rf "${directory}"
 done
@@ -81,6 +83,23 @@ for directory in /tmp/imd ; do
   INSTALL_MODE=0755 TARGET_DIR=/usr/lib/untrustedhost install_ef "${directory}"
   rm -rf "${directory}"
 done
+
+# build the pi initrds (because we installed kick_rtc in this image - it's not essential)
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
+      for kv in /lib/modules/* ; do
+        case "${kv}" in
+          *-v7+)   kimage=kernel7.img  ;;
+          *-v7l+)  kimage=kernel7l.img ;;
+          *-v8+)   kimage=kernel8.img  ;;
+          *[0-9]+) kimage=kernel.img   ;;
+        esac
+        RPI_INITRD=yes /etc/kernel/postinst.d/rpi-initramfs "${kv##*/}" "/boot/${kimage}"
+      done
+    }
+  ;;
+esac
 
 # enable mdns to pass through firewalld
 firewall-offline-cmd --add-service=mdns --zone=public
