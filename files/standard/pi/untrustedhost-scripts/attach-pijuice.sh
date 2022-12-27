@@ -37,6 +37,7 @@ pval="$(xmlstarlet sel -t -v "${xmlpath}/@powervalue" /run/untrustedhost/nut/con
   [[ "${upsnode}" ]] || xmled_args=("${xmled_args[@]}" '--subnode' '/nut' '--type' 'elem' '-n' "ups-$$"
                                                        '--subnode' "/nut/ups-$$" '--type' 'attr' '-n' 'vendor' '-v' "${vendorid}"
                                                        '--subnode' "/nut/ups-$$" '--type' 'attr' '-n' 'serial' '-v' "${serialno}"
+                                                       '--subnode' "/nut/ups-$$" '--type' 'attr' '-n' 'advertise' '-v' 'false'
                                                        '--rename'  "/nut/ups-$$" '-v' 'ups')
   xmled_args=("${xmled_args[@]}" '--subnode' "${xmlpath}" '--type' 'attr' '-n' 'powervalue' '-v' '1')
   tfile="$(mktemp)"
