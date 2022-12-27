@@ -22,3 +22,24 @@ cat <<EOF>"/run/untrustedhost/nut/ups.conf.d/${vendorid}-${serialno}.conf"
   port         = /dev/i2c-1
   pollinterval = 2
 EOF
+
+# modify nut's conf.xml so that pijuice is *always* your builtin ups...
+# deal with no xml config existing first.
+[ -s /run/untrustedhost/nut/conf.xml ] || { printf '%s\n' '<nut/>' > /run/untrustedhost/nut/conf.xml ; }
+
+# do I already have the builtin pijuice as an explicit ups in the config? if so, don't touch it.
+xmlpath="nut/ups[@vendor=\"${vendorid}\"][@serial=\"${serialno}\"]"
+pval="$(xmlstarlet sel -t -v "${xmlpath}/@powervalue" /run/untrustedhost/nut/conf.xml)"
+[[ "${pval}" ]] || {
+  # do I already have the pijuice defined at all?
+  xmled_args=()
+  upsnode="$(xmlstarlet sel -t -c "${xmlpath}" /run/untrustedhost/nut/conf.xml)"
+  [[ "${upsnode}" ]] || xmled_args=("${xmled_args[@]}" '--subnode' '/nut' '--type' 'elem' '-n' "ups-$$"
+                                                       '--subnode' "/nut/ups-$$" '--type' 'attr' '-n' 'vendor' '-v' "${vendorid}"
+                                                       '--subnode' "/nut/ups-$$" '--type' 'attr' '-n' 'serial' '-v' "${serialno}"
+                                                       '--rename'  "/nut/ups-$$" '-v' 'ups')
+  xmled_args=("${xmled_args[@]}" '--subnode' "${xmlpath}" '--type' 'attr' '-n' 'powervalue' '-v' '1')
+  tfile="$(mktemp)"
+  xmlstarlet ed "${xmled_args[@]}" < /run/untrustedhost/nut/conf.xml > "${tfile}"
+  mv "${tfile}" /run/untrustedhost/nut/conf.xml
+}
