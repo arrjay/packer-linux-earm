@@ -1,0 +1,8 @@
+[Unit]
+Description=attach-pijuice UPS
+Wants=write-upsd-config.service
+Before=write-upsd-config.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/untrustedhost/scripts/attach-pijuice.sh

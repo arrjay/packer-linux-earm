@@ -48,6 +48,13 @@ ln -sf /run/untrustedhost/nut/upsd.users /etc/nut/upsd.users
 # ditto upsmon.conf
 ln -sf /run/untrustedhost/nut/upsmon.conf /etc/nut/upsmon.conf
 
+# pi builds get nut added to the i2c group
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    usermod -a -G i2c nut
+  ;;
+esac
+
 # HACK: currently we hardwire firewalld and interface interop to this.
 firewall-offline-cmd --new-zone=hv
 firewall-offline-cmd --zone=hv --add-interface=be-vl-hv
