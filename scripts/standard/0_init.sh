@@ -52,6 +52,7 @@ for source in \
   "${PFSRC}/udev" \
   "${PFSRC}/incron.d" \
   "${PFSRC}/networkd-dispatcher" \
+  "${PFSRC}/sudoers.d" \
  ; do
   [[ -d "${source}" ]] && rsync -a "${source}/" "/tmp/${source##*/}/"
 done
@@ -78,6 +79,13 @@ for directory in /tmp/skel /tmp/networkd-dispatcher /tmp/initramfs-tools ; do
   INSTALL_MODE=0755 install_ef "${directory}"
   rm -rf "${directory}"
 done
+
+for directory in /tmp/sudoers.d ; do
+  INSTALL_MODE=0440 install_ef "${directory}"
+  rm -rf "${directory}"
+done
+# if sudo fails to work, all hell will eventually break loose. die fast.
+visudo -c || exit 1
 
 for directory in /tmp/imd ; do
   INSTALL_MODE=0755 TARGET_DIR=/usr/lib/untrustedhost install_ef "${directory}"
