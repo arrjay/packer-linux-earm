@@ -10,7 +10,7 @@ source "arm-image" "pi" {
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/pijuice/pi.img.xz"
   output_filename   = "images/standard/pi.img"
-  target_image_size = 4831838208
+  target_image_size = 5368709120
 }
 
 source "arm-image" "rock64" {
@@ -74,6 +74,7 @@ build {
       "./scripts/standard/xt_cgroup.sh",
       "./scripts/standard/rescue-initrd.sh",
       "./scripts/standard/install-dterm.sh",
+#      "./scripts/standard/oxidized.sh",
       "./scripts/standard/ssm.sh",
       "./scripts/standard/ups.sh",
       "./scripts/standard/pdns.sh",
@@ -82,7 +83,7 @@ build {
       "./scripts/standard/recursor.sh",
       "./scripts/standard/dnsfilter.sh",
       "./scripts/standard/ucarp.sh",
-      "./scripts/standard/login-config.sh"
+      "./scripts/standard/login-config.sh",
     ]
   }
 
