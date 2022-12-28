@@ -98,9 +98,10 @@ for f in /run/untrustedhost/nut/discovered-ups.xml.d/*.xml ; do
   upsname="$(xmlstarlet sel -t -v 'ups/@name' "${f}")"
   upsvend="$(xmlstarlet sel -t -v 'ups/@vendor' "${f}")"
   upsser="$(xmlstarlet sel -t -v 'ups/@serial' "${f}")"
-  upsadvert="$(xmlstarlet sel -t -v 'ups/@advertise' "${f}")"
+  qstring="nut/ups[@vendor=\"${upsvend}\"][@serial=\"${upsser}\"]"
+  upsadvert="$(xmlstarlet sel -t -v "${qstring}/@advertise" /run/untrustedhost/nut/conf.xml)"
   # determine if this UPS powers us - assume not
-  myups="$(xmlstarlet sel -t -v 'nut/ups[@vendor="'"${upsvend}"'"][@serial="'"${upsser}"'"]/@powervalue' /run/untrustedhost/nut/conf.xml)"
+  myups="$(xmlstarlet sel -t -v "${qstring}/@powervalue" /run/untrustedhost/nut/conf.xml)"
   [[ "${myups}" ]] || myups=0
   [[ "${myups}" -ne 0 ]] && ((MINSUPPLIES++))
   printf 'MONITOR %s@localhost %s upsctrl %s master\n' "${upsname}" "${myups}" "${upsctrl_pw}" \
