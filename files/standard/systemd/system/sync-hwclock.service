@@ -1,0 +1,13 @@
+[Unit]
+Description=sync hwardware clock on shutdown
+DefaultDependencies=no
+ConditionPathExists=/dev/rtc
+ConditionPathExists=/usr/sbin/hwclock
+Before=final.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/hwclock --systohc
+
+[Install]
+WantedBy=shutdown.target
