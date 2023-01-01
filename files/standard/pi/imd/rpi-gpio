@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+#set -x
+
+## generate the config file for gpio scripts
+
+# source:
+# <metadata>
+#  <gpio>
+#    <line id="24" chip="0" default_state="HIGH" pulse="0.75"/>
+#    <line id="23" alias="gs105" chip="0" default_state="HIGH" pulse="0.75"/>
+#  </gpio>
+# </metadata>
+
+# chip_id, id are all required. default state is *really* recommended.
+
+# target:
+# GPIOCHIP0_GPIO24_DEFAULT_STATE=(H|h)||(L|l)||(0|1)
+# GPIOCHIP0_GPIO24_DEFAULT_PULSE=float
+# ALIAS_string=GPIOCHIP0_GPIO1
+
+output_conf="/var/run/untrustedhost/gpio.conf"
+
+line_ct="$(xmlstarlet sel -t -v 'count(/metadata/gpio/line)' "${IMD_PATH}")"
+
+# silently go away if we have no controls
+[[ "${line_ct}" -gt 0 ]] || exit 0
+: > "${output_conf}"
+
+gpio_lines=()
+
+while [[ "${line_ct}" -gt 0 ]] ; do
+  err=0
+  csel="${line_ct}"
+  ((line_ct--))
+  xmladdr="/metadata/gpio/line[${csel}]/"
+  chipid="$(xmlstarlet sel -t -v "${xmladdr}@chip" "${IMD_PATH}")"
+  gpioid="$(xmlstarlet sel -t -v "${xmladdr}@id" "${IMD_PATH}")"
+  defstate="$(xmlstarlet sel -t -v "${xmladdr}@default_state" "${IMD_PATH}")"
+  defpulse="$(xmlstarlet sel -t -v "${xmladdr}@pulse" "${IMD_PATH}")"
+  alias="$(xmlstarlet sel -t -v "${xmladdr}@alias" "${IMD_PATH}")"
+  for reqd in chipid gpioid ; do
+    [[ "${!reqd}" ]] || { printf 'missing %s for control entry %s\n' "${reqd}" "${csel}" 1>&2 ; err=1 ; }
+  done
+  # needed to skip the line_ct loop, not the reqd one.
+  [[ "${err}" -eq 0 ]] || continue
+  preamble="GPIOCHIP${chipid}_GPIO${gpioid}_"
+  case " ${gpio_lines[*]} " in
+    *" ${preamble} "*) printf '%s was already defined, skipping control entry %s\n' "${preamble%_}" "${csel}" 1>&2 ; continue ;;
+  esac
+  gpio_lines=("${gpio_lines[@]}" "${preamble}")
+  {
+    [[ "${alias}" ]] && printf 'ALIAS_%s=%s\n' "${alias}" "${preamble%_}"
+    [[ "${defstate}"  ]] && printf '%sDEFAULT_STATE=%s\n' "${preamble}" "${defstate}"
+    [[ "${defpulse}" ]] && printf '%sDEFAULT_PULSE=%s\n' "${preamble}" "${defpulse}"
+  } >> "${output_conf}"
+done

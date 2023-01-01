@@ -1,0 +1,11 @@
+[Unit]
+Description=manage gpio controls on rpi
+ConditionPathExistsGlob=/dev/gpiochip*
+After=imd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/untrustedhost/scripts/rpi-gpio-startup
+
+[Install]
+WantedBy=multi-user.target

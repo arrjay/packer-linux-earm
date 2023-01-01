@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# do I have gpioset?
+type gpioset 2>/dev/null 1>&2 || exit 240
+
+# do I have a config from imd?
+[[ -f /run/untrustedhost/gpio.conf ]] || exit 128
+. /run/untrustedhost/gpio.conf
+
+# okay, so this is some horrible introspection because we *only* have
+# the gpio.conf to tell us what gpio settings are possible.
+for evvar in $(compgen -A variable) ; do
+  lineval='' ; chip='' ; pin=''
+  case "${evvar}" in
+    GPIOCHIP*_GPIO*_DEFAULT_STATE)
+      chip="${evvar%%_*}" ; pin="${evvar#"${chip}"_GPIO}" ; chip="${chip,,}" ; pin="${pin%%_*}"
+      [[ -e "/dev/${chip}" ]] || { printf 'chip %s not found in /dev' "${chip}" 1>&2 ; continue ; }
+      case "${!evvar}" in
+        H*|h*|1) lineval=1 ;;
+        L*|l*|0) lineval=0 ;;
+        *) printf '%s does not specify a valid gpio default state' "${evvar}" 1>&2 ; continue ;;
+      esac
+      gpioset "${chip}" "${pin}=${lineval}"
+    ;;
+  esac
+done

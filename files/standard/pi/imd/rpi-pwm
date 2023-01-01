@@ -6,7 +6,7 @@
 # source:
 # <metadata>
 #  <pwm>
-#   <control chip=CHIP_ID id=ID period=NUMBER duty_cycle=NUMBER pulse=FLOAT>
+#   <control chip=CHIP_ID id=ID period=NUMBER duty_cycle=NUMBER pulse=FLOAT alias=STRING>
 #    <position label=STRING duty_cycle=NUMBER/>
 #   </control>
 #  </pwm>
@@ -20,6 +20,7 @@
 # PWMCHIP0_PWM1_DEFAULT_CYCLE=number
 # PWMCHIP0_PWM1_DEFAULT_PULSE=float
 # PWMCHIP0_PWM1_POSITION_string_CYCLE=number
+# ALIAS_string=PWMCHIP0_PWM1
 
 output_conf="/var/run/untrustedhost/pwm.conf"
 
@@ -41,6 +42,7 @@ while [[ "${control_ct}" -gt 0 ]] ; do
   period="$(xmlstarlet sel -t -v "${xmladdr}@period" "${IMD_PATH}")"
   defduty="$(xmlstarlet sel -t -v "${xmladdr}@duty_cycle" "${IMD_PATH}")"
   defpulse="$(xmlstarlet sel -t -v "${xmladdr}@pulse" "${IMD_PATH}")"
+  alias="$(xmlstarlet sel -t -v "${xmladdr}@alias" "${IMD_PATH}")"
   for reqd in chipid pwmid period ; do
     [[ "${!reqd}" ]] || { printf 'missing %s for control entry %s\n' "${reqd}" "${csel}" 1>&2 ; err=1 ; }
   done
@@ -52,6 +54,7 @@ while [[ "${control_ct}" -gt 0 ]] ; do
   esac
   pwms=("${pwms[@]}" "${preamble}")
   {
+    [[ "${alias}" ]] && printf 'ALIAS_%s=%s\n' "${alias}" "${preamble%_}"
     printf '%sDEFAULT_PERIOD=%s\n' "${preamble}" "${period}"
     [[ "${defduty}"  ]] && printf '%sDEFAULT_CYCLE=%s\n' "${preamble}" "${defduty}"
     [[ "${defpulse}" ]] && printf '%sDEFAULT_PULSE=%s\n' "${preamble}" "${defpulse}"

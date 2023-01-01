@@ -132,4 +132,8 @@ if [[ -e /etc/systemd/system/untrustedhost-pwm.service ]] ; then
   systemctl enable untrustedhost-pwm
 fi
 
+if [[ -e /etc/systemd/system/untrustedhost-gpio.service ]] ; then
+  systemctl enable untrustedhost-gpio
+fi
+
 systemctl enable sync-hwclock.service
