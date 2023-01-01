@@ -16,7 +16,7 @@ apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dhcp-server \
   python3-dbus python3-setuptools mtools telnet networkd-dispatcher awscli putty-tools \
-  modemmanager hostapd etherwake gpiod uptimed uhubctl \
+  modemmanager hostapd etherwake gpiod uptimed uhubctl tftpd-hpa \
   gawk bison libffi-dev libgdbm-dev libncurses5-dev libsqlite3-dev libtool libyaml-dev sqlite3 libgmp-dev \
   "${ADDITIONAL_PACKAGES[@]}"
 
@@ -24,7 +24,9 @@ apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc chrony isc-dh
 systemctl disable chrony
 systemctl disable isc-dhcp-server
 systemctl disable hostapd
+systemctl disable tftpd-hpa
 
 # allow dhcp, dns through the trusted zone in firewalld
 firewall-offline-cmd --zone=trusted --add-service=dhcp
 firewall-offline-cmd --zone=trusted --add-service=dns
+firewall-offline-cmd --zone=trusted --add-service=tftp
