@@ -55,20 +55,7 @@ case "${PACKER_BUILD_NAME}" in
   ;;
 esac
 
-# HACK: currently we hardwire firewalld and interface interop to this.
-firewall-offline-cmd --new-zone=hv
-firewall-offline-cmd --zone=hv --add-interface=be-vl-hv
-firewall-offline-cmd --zone=hv --add-service=nut
-firewall-offline-cmd --new-zone=ninf
-firewall-offline-cmd --zone=ninf --add-interface=be-vl-ninf
-firewall-offline-cmd --zone=ninf --add-service=nut
-firewall-offline-cmd --zone=trusted --add-service=nut
-
-# copy the services from public to here as well.
-for service in $(firewall-offline-cmd --list-services --zone=public) ; do
-  firewall-offline-cmd --zone=hv   --add-service="${service}"
-  firewall-offline-cmd --zone=ninf --add-service="${service}"
-done
+firewall-offline-cmd --zone=internal --add-service=nut
 
 # upsd.conf is the network ups control plane
 cat <<_EOF_> /etc/nut/upsd.conf
