@@ -22,6 +22,7 @@ copy_file config /etc/rescue-initramfs/mtools.conf /etc
 copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so
 copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gconv-modules /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/gconv-modules
 copy_exec /etc/rescue-initramfs/imdlite /scripts/local-premount/imdlite
+copy_exec /etc/rescue-initramfs/getwrites_gb /usr/bin
 copy_exec /usr/bin/xmlstarlet /usr/bin
 copy_exec /usr/bin/bash /bin
 copy_exec /sbin/blkid /sbin
