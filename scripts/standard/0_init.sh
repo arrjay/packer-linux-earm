@@ -115,6 +115,9 @@ firewall-offline-cmd --add-service=mdns --zone=public
 # disable ssh in external zone
 firewall-offline-cmd --zone=external --remove-service-from-zone=ssh
 
+# enable ntp in internal zone
+firewall-offline-cmd --zone=internal --add-service=ntp
+
 # install additional scripts
 rm -rf /tmp/scripts
 mv /tmp/untrustedhost-scripts /tmp/scripts
