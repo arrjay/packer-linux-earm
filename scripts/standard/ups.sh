@@ -12,9 +12,13 @@ python3 setup.py install
 popd
 
 # install nut for ups fun...
-type upsd >/dev/null 2>&1 || apt-get install nut
-type upsc >/dev/null 2>&1 || apt-get install nut-client
-apt-get install apg
+[[ -e "${PFSRC}/cache/${PACKER_BUILD_NAME}/nut_debs.tar.xz" ]] || exit 1
+cd /tmp
+tar xf "${PFSRC}/cache/${PACKER_BUILD_NAME}/nut_debs.tar.xz"
+dpkg -i ./debs/nut-server_* ./debs/nut-i2c_* ./debs/nut-client_* ./debs/nut-monitor_* \
+        ./debs/libnutscan2_* ./debs/libupsclient6_* ./debs/python3-nut_* || true # this will be annoyed about deps!
+apt-get -f install
+type apg >/dev/null 2>&1 || apt-get install apg
 systemctl disable nut-monitor
 # nut-driver is masked due to alias startup issues. we use the nut-driver@ template instead.
 systemctl mask nut-driver
