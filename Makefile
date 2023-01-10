@@ -4,7 +4,7 @@
 
 # used to coerce INTERMEDIATE to ignore .img files not existing, and .PRECIOUS to keep compressed versions
 TARGETS := rock64 pi sheeva
-TYPES := upstream lite netdata standard xfce ykman pijuice
+TYPES := upstream lite netdata standard xfce ykman
 IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
 COMPRESSED_IMAGES := $(addsuffix .xz, $(IMAGES))
 
@@ -89,36 +89,37 @@ images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl f
 	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
+files/standard/cache/%/nut_debs.tar.xz: files/standard/cache/%/nut_debs.tar
+	-rm $@
+	xz -T0 $<
+
+# we build pijuice out of *lite* so we have a consistent place to stand. we won't use this image directly.
+# but we *will* refer to the artifact we download out of it...
+files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json
+	-rm $@
+	-rm -rf files/pijuice/cache
+	mkdir -p files/pijuice/cache
+	mkdir -p $(@D)
+	-rm images/pijuice/$*.img
+	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/pijuice.pkr.hcl || rm $@
+	-rm images/pijuice/$*.img
+	mv files/pijuice/cache/nut_debs.tar $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
+
 # compress netdata images
 images/netdata/%.img.xz : images/netdata/%.img
 	-rm $@
 	xz -T0 $<
 
 images/netdata/%.img: images/lite/%.img.xz.json packer_templates/netdata.pkr.hcl $(NETDATA_SCRIPTS)
-	-rm images/netdata/$(@F)*
+	-rm $(@D)/$(@F)*
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
-
-# a specific image for pijuice support *on pi*
-images/pijuice/%.img.xz : images/pijuice/%.img
-	-rm $@
-	xz -T0 $<
-
-images/pijuice/pi.img: images/netdata/pi.img.xz.json packer_templates/pijuice.pkr.hcl $(PIJUICE_SCRIPTS)
-	-rm images/pijuice/$(@F)*
-	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/pijuice.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 # standard images
 images/standard/%.img.xz : images/standard/%.img
 	-rm $@
 	xz -T0 $<
-
-# the pi target here gets an override because we stuffed the pijuice build in too
-images/standard/pi.img: images/pijuice/pi.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES)
-	-rm -rf images/standard/$(@F)*
-	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES)
 	-rm -rf images/standard/$(@F)*

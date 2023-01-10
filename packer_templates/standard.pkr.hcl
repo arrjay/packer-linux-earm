@@ -8,7 +8,7 @@ variable "dynamic_checksum" {
 source "arm-image" "pi" {
   image_type        = "raspberrypi"
   iso_checksum      = var.dynamic_checksum
-  iso_url           = "./images/pijuice/pi.img.xz"
+  iso_url           = "./images/netdata/pi.img.xz"
   output_filename   = "images/standard/pi.img"
   target_image_size = 5368709120
 }

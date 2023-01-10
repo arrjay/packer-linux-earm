@@ -17,8 +17,8 @@ BUILD_PACKAGES=(
     libfontenc1 libfreeipmi-dev libfreeipmi17 libgd-dev libgmp-dev libgmpxx4ldbl
     libgnutls-dane0 libgnutls-openssl27 libgnutls28-dev libgnutlsxx28
     libgraphite2-3 libgssrpc4 libharfbuzz0b libice-dev libice6 libicu-dev
-    libidn11 libidn2-dev libipmimonitoring-dev libipmimonitoring6 libjbig-dev
-    libjpeg-dev libjpeg62-turbo-dev libjs-jquery libkadm5clnt-mit12
+    libidn2-dev libipmimonitoring-dev libipmimonitoring6 libjbig-dev
+    libjpeg-dev libjs-jquery libkadm5clnt-mit12
     libkadm5srv-mit12 libkdb5-10 libkpathsea6 libltdl-dev liblzma-dev
     libmime-charset-perl libneon27-gnutls libneon27-gnutls-dev libnetsnmptrapd40
     libnspr4-dev libnss3-dev libosp5 libostyle1c2 libp11-kit-dev libpaper-utils
@@ -28,7 +28,7 @@ BUILD_PACKAGES=(
     libsub-override-perl libsynctex2 libtasn1-6-dev libteckit0 libtexlua53
     libtexluajit2 libthai-data libthai0 libtiff-dev libtiffxx5 libtool
     libudev-dev libunbound8 libunicode-linebreak-perl libusb-0.1-4 libusb-dev
-    libvpx-dev libvpx6 libwrap0-dev libx11-dev libxau-dev libxaw7 libxcb-render0
+    libvpx-dev libwrap0-dev libx11-dev libxau-dev libxaw7 libxcb-render0
     libxcb-shm0 libxcb1-dev libxdmcp-dev libxi6 libxml2-dev libxml2-utils
     libxmu6 libxpm-dev libxrender1 libxslt1.1 libxt-dev libxt6 libzzip-0-13
     lmodern lynx lynx-common nettle-dev openjade opensp po-debconf
@@ -41,6 +41,15 @@ BUILD_PACKAGES=(
     x11-common x11proto-dev xdg-utils xfonts-encodings xfonts-utils xml-core
     xorg-sgml-doctools xsltproc xtrans-dev
 )
+
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    BUILD_PACKAGES=("${BUILD_PACKAGES[@]}" libidn11 libjpeg62-turbo-dev libvpx6)
+  ;;
+  rock64)
+    BUILD_PACKAGES=("${BUILD_PACKAGES[@]}" libidn12 libvpx7)
+  ;;
+esac
 
 # build the latest nut debs on rpi for pijuice support.
 apt-get -o APT::Sandbox::User=root update
@@ -58,14 +67,7 @@ tar xf /tmp/nut_debian.txz
 debuild -b -uc -us
 cd ..
 
-# remove all the build packages, then install our binaries.
-apt-get remove "${BUILD_PACKAGES[@]}"
-
-# there's a dep for _this package_ we're removing somewhere. oops.
-apt-get install python3-pyqt5
-
-dpkg -i nut-i2c_* nut-server_* nut-client_* nut-monitor_* libnutscan2_* libupsclient6_* python3-nut_*
-
-# clean up the rest of the system.
-apt autoremove
-apt-get clean
+# grab the tarball for the file provisioner to download
+mkdir debs
+mv ./*.deb debs
+tar cvf nut_debs.tar ./debs
