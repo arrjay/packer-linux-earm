@@ -26,6 +26,7 @@ systemctl disable nut-server
 # the next bits are for nut 2.8.0, which did a target trick...
 systemctl disable nut.target || true
 systemctl disable nut-driver-enumerator || true
+# since this nut is just a direct upstream build, we don't need to lock it against updates.
 
 # configure that entire stack so that `upsd -V` works... :x
 printf 'MODE=%s\n' 'netserver' > /etc/nut/nut.conf
