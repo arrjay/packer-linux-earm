@@ -106,6 +106,18 @@ files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json
 	mv files/pijuice/cache/nut_debs.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
+# we also build a patched avahi!
+files/standard/cache/%/avahi_debs.tar: images/lite/%.img.xz.json
+	-rm $@
+	-rm -rf files/avahi-build/cache
+	mkdir -p files/avahi-build/cache
+	mkdir -p $(@D)
+	-rm images/avahi-build/$*.img
+	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/avahi-build.pkr.hcl || rm $@
+	-rm images/avahi-build/$*.img
+	mv files/avahi-build/cache/avahi_debs.tar $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
+
 # compress netdata images
 images/netdata/%.img.xz : images/netdata/%.img
 	-rm $@
