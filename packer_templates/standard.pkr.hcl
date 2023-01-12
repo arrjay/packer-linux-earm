@@ -71,6 +71,7 @@ build {
     scripts          = [
       "./scripts/standard/0_init.sh",
       "./scripts/standard/packages.sh",
+      "./scripts/standard/upgrade_avahi.sh",
       "./scripts/standard/xt_cgroup.sh",
       "./scripts/standard/rescue-initrd.sh",
       "./scripts/standard/install-dterm.sh",

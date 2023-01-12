@@ -106,6 +106,10 @@ files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json
 	mv files/pijuice/cache/nut_debs.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
+files/standard/cache/%/avahi_debs.tar.xz: files/standard/cache/%/avahi_debs.tar
+	-rm $@
+	xz -T0 $<
+
 # we also build a patched avahi!
 files/standard/cache/%/avahi_debs.tar: images/lite/%.img.xz.json
 	-rm $@
