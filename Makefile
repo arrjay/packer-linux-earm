@@ -107,7 +107,7 @@ files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json $(PIJUICE_SCRIPTS
 	mkdir -p files/pijuice/cache
 	mkdir -p $(@D)
 	-rm images/pijuice/$*.img
-	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/pijuice.pkr.hcl || rm $@
+	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/pijuice.pkr.hcl
 	-rm images/pijuice/$*.img
 	mv files/pijuice/cache/nut_debs.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
@@ -123,7 +123,7 @@ files/standard/cache/%/avahi_debs.tar: images/lite/%.img.xz.json $(AVAHI_FILES) 
 	mkdir -p files/avahi-build/cache
 	mkdir -p $(@D)
 	-rm images/avahi-build/$*.img
-	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/avahi-build.pkr.hcl || rm $@
+	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/avahi-build.pkr.hcl
 	-rm images/avahi-build/$*.img
 	mv files/avahi-build/cache/avahi_debs.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
