@@ -2,6 +2,8 @@
 
 set -ex
 
+PFSRC=/tmp/packer-files
+
 # we're gonna install these, build,. then remove 'em
 BUILD_PACKAGES=(
     build-essential devscripts debhelper-compat dh-python
@@ -23,8 +25,12 @@ curl -L -o /tmp/avahi_debian.txz http://archive.ubuntu.com/ubuntu/pool/main/a/av
 cd /usr/src
 tar xf /tmp/avahi.tgz
 cd avahi-*
-dch -i "local build with ip address allow/deny patch"
 tar xf /tmp/avahi_debian.txz
+# patch it though!
+patch -p1 < "${PFSRC}/ip-allow-deny.patch"
+
+# debian build
+DEBFULLNAME='Your Administrator' DEBEMAIL='git@untrusted.host' dch -i "local build with ip address allow/deny patch"
 debuild -b -uc -us
 cd ..
 

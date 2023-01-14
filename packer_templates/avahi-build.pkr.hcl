@@ -37,6 +37,11 @@ source "arm-image" "sheeva" {
 build {
   sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64"]
 
+  provisioner "file" {
+    destination = "/tmp/packer-files"
+    source      = "files/avahi-build/"
+  }
+
   provisioner "shell" {
     environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT"]
     execute_command  = "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"

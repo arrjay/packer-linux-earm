@@ -46,7 +46,7 @@ YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print 
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 KEYMAT_FILES = $(shell find vendor/keymat -type f)
 AVAHI_SCRIPTS = $(shell find scripts/avahi-build -type f)
-AVAHI_FILES = $(shell find files/avahi-build -path files/avahi-build/cache -prune -o print -type f)
+AVAHI_FILES = $(shell find files/avahi-build -path files/avahi-build/cache -prune -o -print -type f)
 
 # filesystem/disk UUIDs for when we scramble the pi/rock64 image
 fs-uuids.json: scripts/genuuid-json.sh
