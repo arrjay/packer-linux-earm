@@ -23,6 +23,7 @@ curl -L -o /tmp/avahi_debian.txz http://archive.ubuntu.com/ubuntu/pool/main/a/av
 cd /usr/src
 tar xf /tmp/avahi.tgz
 cd avahi-*
+dch -i "local build with ip address allow/deny patch"
 tar xf /tmp/avahi_debian.txz
 debuild -b -uc -us
 cd ..
