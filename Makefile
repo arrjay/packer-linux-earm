@@ -31,22 +31,22 @@ GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
 # dependencies to the packer templates
 ARMBIAN_MOD_SCRIPTS = $(shell find scripts/armbian-mod -type f)
-LITE_FILES = $(shell find files/lite -path files/lite/cache -prune -o -print -type f)
+LITE_FILES = $(shell find files/lite -path files/lite/cache -prune -o -type f -print)
 LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
-NETDATA_FILES = $(shell find files/netdata -path files/netdata/cache -prune -o -print -type f)
+NETDATA_FILES = $(shell find files/netdata -path files/netdata/cache -prune -o -type f -print)
 PIJUICE_SCRIPTS = $(shell find scripts/pijuice -type f)
 STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
-STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -o -print -type f)
+STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -o -type f -print)
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
-XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -print -type f)
+XFCE_FILES = $(shell find files/xfce -path files/xfce/cache -prune -o -type f -print)
 IMD_FILES = $(shell find vendor/imd -type f)
 YKMAN_SCRIPTS = $(shell find files/ykman -type f)
-YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -print -type f)
+YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -type f -print)
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 KEYMAT_FILES = $(shell find vendor/keymat -type f)
 AVAHI_SCRIPTS = $(shell find scripts/avahi-build -type f)
-AVAHI_FILES = $(shell find files/avahi-build -path files/avahi-build/cache -prune -o -print -type f)
+AVAHI_FILES = $(shell find files/avahi-build -path files/avahi-build/cache -prune -o -type f -print)
 
 # filesystem/disk UUIDs for when we scramble the pi/rock64 image
 fs-uuids.json: scripts/genuuid-json.sh
