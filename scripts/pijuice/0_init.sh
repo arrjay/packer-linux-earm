@@ -58,8 +58,8 @@ apt-get install "${BUILD_PACKAGES[@]}"
 # build it out of backports...
 curl -L -o /tmp/nut.tgz http://deb.debian.org/debian/pool/main/n/nut/nut_2.8.0.orig.tar.gz
 [[ "$(sha512sum /tmp/nut.tgz | awk '{print $1}')" == '3c413ae54088045a713eb80cf1bdda474f41bb3b67c7c0248aa7a0c4d441dce1ff42627a2735273d7e36892d1f2eeb895220cf28af63fec2fa0c7a267f82d577' ]]
-curl -L -o /tmp/nut_debian.txz http://deb.debian.org/debian/pool/main/n/nut/nut_2.8.0-5.debian.tar.xz
-[[ "$(sha512sum /tmp/nut_debian.txz | awk '{print $1}')" == '9ac46c0fa1b927ab3e9760057658950b9eabbc5e8603d9406addca77ec1f6704caae46e60eb7fb243ec96cfed63f94fa2c3a4bc1eabfe035a97e73ec6137084e' ]]
+curl -L -o /tmp/nut_debian.txz http://deb.debian.org/debian/pool/main/n/nut/nut_2.8.0-6.debian.tar.xz
+[[ "$(sha512sum /tmp/nut_debian.txz | awk '{print $1}')" == '72e1dc2babb892ee2b4589b4cc7af0e982f02072f8d709b29fe387e39c5298b9a9a15eede2572b5c21055cf0037e01db765aa6faf82b1c7973521fe230704146' ]]
 cd /usr/src
 tar xf /tmp/nut.tgz
 cd nut-*
