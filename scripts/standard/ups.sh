@@ -12,6 +12,7 @@ python3 setup.py install
 popd
 
 # install nut for ups fun...
+apt-get install python3-pyqt5
 [[ -e "${PFSRC}/cache/${PACKER_BUILD_NAME}/nut_debs.tar.xz" ]] || exit 1
 cd /tmp
 tar xf "${PFSRC}/cache/${PACKER_BUILD_NAME}/nut_debs.tar.xz"
