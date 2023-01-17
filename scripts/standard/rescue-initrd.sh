@@ -15,6 +15,7 @@ cp -R "${PFSRC}/rescue-initramfs" /etc/rescue-initramfs
 find /etc/rescue-initramfs/hooks -type f -exec chmod 0755 {} \;
 find /etc/rescue-initramfs/scripts -type f -exec chmod 0755 {} \;
 chmod 0755 /etc/rescue-initramfs/imdlite
+chmod 0755 /etc/rescue-initramfs/getwrites_gb
 
 # link the modules file from initramfs-tools
 ln -sf /etc/initramfs-tools/modules /etc/rescue-initramfs/modules
