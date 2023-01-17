@@ -8,7 +8,7 @@ TYPES := upstream lite netdata standard xfce ykman
 IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
 COMPRESSED_IMAGES := $(addsuffix .xz, $(IMAGES))
 
-DEB_TARS := avahi_debs.tar nut_debs.tar
+DEB_TARS := nut_debs.tar
 DEB_DISTS := $(foreach file, $(DEB_TARS), $(addsuffix /$(file), $(addprefix files/standard/cache/, $(TARGETS))))
 DEB_CDISTS := $(addsuffix .xz, $(DEB_DISTS))
 
@@ -45,8 +45,6 @@ YKMAN_SCRIPTS = $(shell find files/ykman -type f)
 YKMAN_FILES = $(shell find files/ykman -path files/ykman/cache -prune -o -type f -print)
 MISCSCRIPT_FILES = $(shell find vendor/misc-scripts -type f)
 KEYMAT_FILES = $(shell find vendor/keymat -type f)
-AVAHI_SCRIPTS = $(shell find scripts/avahi-build -type f)
-AVAHI_FILES = $(shell find files/avahi-build -path files/avahi-build/cache -prune -o -type f -print)
 
 # filesystem/disk UUIDs for when we scramble the pi/rock64 image
 fs-uuids.json: scripts/genuuid-json.sh
@@ -112,22 +110,6 @@ files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json $(PIJUICE_SCRIPTS
 	mv files/pijuice/cache/nut_debs.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-files/standard/cache/%/avahi_debs.tar.xz: files/standard/cache/%/avahi_debs.tar
-	-rm $@
-	xz -T0 $<
-
-# we also build a patched avahi!
-files/standard/cache/%/avahi_debs.tar: images/lite/%.img.xz.json $(AVAHI_FILES) $(AVAHI_SCRIPTS)
-	-rm $@
-	-rm -rf files/avahi-build/cache
-	mkdir -p files/avahi-build/cache
-	mkdir -p $(@D)
-	-rm images/avahi-build/$*.img
-	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/avahi-build.pkr.hcl
-	-rm images/avahi-build/$*.img
-	mv files/avahi-build/cache/avahi_debs.tar $@
-	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
-
 # compress netdata images
 images/netdata/%.img.xz : images/netdata/%.img
 	-rm $@
@@ -143,7 +125,7 @@ images/standard/%.img.xz : images/standard/%.img
 	-rm $@
 	xz -T0 $<
 
-images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) files/standard/cache/%/avahi_debs.tar.xz files/standard/cache/%/nut_debs.tar.xz
+images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) files/standard/cache/%/nut_debs.tar.xz
 	-rm -rf images/standard/$(@F)*
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@

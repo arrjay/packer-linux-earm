@@ -84,7 +84,6 @@ build {
       "./scripts/standard/dnsfilter.sh",
       "./scripts/standard/ucarp.sh",
       "./scripts/standard/login-config.sh",
-      "./scripts/standard/upgrade_avahi.sh",
     ]
   }
 
