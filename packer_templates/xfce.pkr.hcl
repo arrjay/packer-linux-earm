@@ -10,7 +10,7 @@ source "arm-image" "pi" {
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/standard/pi.img.xz"
   output_filename   = "./images/xfce/pi.img"
-  target_image_size = 5368709120
+  target_image_size = 6442450944
 }
 
 source "arm-image" "rock64" {
@@ -19,7 +19,7 @@ source "arm-image" "rock64" {
   iso_url         = "./images/standard/rock64.img.xz"
   output_filename = "images/xfce/rock64.img"
   qemu_binary     = "qemu-aarch64-static"
-  target_image_size = 5368709120
+  target_image_size = 6442450944
 }
 
 build {
