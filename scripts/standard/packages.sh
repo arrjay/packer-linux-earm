@@ -16,8 +16,9 @@ apt-get -o APT::Sandbox::User=root update
 
 apt-get install tmux augeas-tools lockfile-progs xmlstarlet ipcalc ntp ntpdate isc-dhcp-server \
   python3-dbus python3-setuptools mtools telnet networkd-dispatcher awscli putty-tools \
-  modemmanager hostapd etherwake gpiod uptimed uhubctl tftpd-hpa \
+  modemmanager hostapd etherwake gpiod uptimed uhubctl tftpd-hpa ipxe tshark \
   gawk bison libffi-dev libgdbm-dev libncurses5-dev libsqlite3-dev libtool libyaml-dev sqlite3 libgmp-dev \
+  libvirt-clients \
   "${ADDITIONAL_PACKAGES[@]}"
 
 # disable installed services for imd management
