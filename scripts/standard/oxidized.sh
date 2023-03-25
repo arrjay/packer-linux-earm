@@ -20,6 +20,10 @@ sudo -Hi -u oxidized ~oxidized/.rvm/bin/rvm install 2.7
 sudo -Hi -u oxidized ~oxidized/.rvm/bin/rvm 2.7 do rvm gemset create oxi-upstream
 sudo -Hi -u oxidized mkdir ~oxidized/src
 sudo -Hi -u oxidized --chdir ~oxidized/src git clone https://github.com/arrjay/oxidized
+sudo -Hi -u oxidized --chdir ~oxidized/src/oxidized git checkout mainline
 sudo -Hi -u oxidized --chdir ~oxidized/src/oxidized ~oxidized/.rvm/bin/rvm 2.7@oxi-upstream do gem build
 gemfile=(~oxidized/src/oxidized/oxidized*gem)
 sudo -Hi -u oxidized --chdir ~oxidized/src/oxidized ~oxidized/.rvm/bin/rvm 2.7@oxi-upstream do gem install "${gemfile[0]}"
+
+# cleanup
+pkill -9 -u oxidized
