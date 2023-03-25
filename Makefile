@@ -36,6 +36,7 @@ LITE_SCRIPTS = $(shell find scripts/lite -type f)
 NETDATA_SCRIPTS = $(shell find scripts/netdata -type f)
 NETDATA_FILES = $(shell find files/netdata -path files/netdata/cache -prune -o -type f -print)
 PIJUICE_SCRIPTS = $(shell find scripts/pijuice -type f)
+RVM_SCRIPTS = $(shell find scripts/rvm -type f)
 STANDARD_SCRIPTS = $(shell find scripts/standard -type f)
 STANDARD_FILES = $(shell find files/standard -path files/standard/cache -prune -o -type f -print)
 XFCE_SCRIPTS = $(shell find scripts/xfce -type f)
@@ -99,7 +100,7 @@ files/standard/cache/%/nut_debs.tar.xz: files/standard/cache/%/nut_debs.tar
 
 # we build pijuice out of *lite* so we have a consistent place to stand. we won't use this image directly.
 # but we *will* refer to the artifact we download out of it...
-files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json $(PIJUICE_SCRIPTS)
+files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json packer_templates/pijuice.pkr.hcl $(PIJUICE_SCRIPTS)
 	-rm $@
 	-rm -rf files/pijuice/cache
 	mkdir -p files/pijuice/cache
@@ -108,6 +109,22 @@ files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json $(PIJUICE_SCRIPTS
 	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/pijuice.pkr.hcl
 	-rm images/pijuice/$*.img
 	mv files/pijuice/cache/nut_debs.tar $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
+
+# ditto rvm
+files/standard/cache/%/rvm.tar.xz: files/standard/cache/%/rvm.tar
+	-rm $@
+	xz -T0 $<
+
+files/standard/cache/%/rvm.tar: images/lite/%.img.xz.json packer_templates/rvm.pkr.hcl $(RVM_SCRIPTS)
+	-rm $@
+	-rm -rf files/rvm/cache
+	mkdir -p files/rvm/cache
+	mkdir -p $(@D)
+	-rm images/rvm/$*.img
+	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/rvm.pkr.hcl
+	-rm images/rvm/$*.img
+	mv files/rvm/cache/rvm.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 # compress netdata images

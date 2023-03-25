@@ -74,7 +74,6 @@ build {
       "./scripts/standard/xt_cgroup.sh",
       "./scripts/standard/rescue-initrd.sh",
       "./scripts/standard/install-dterm.sh",
-      "./scripts/standard/oxidized.sh",
       "./scripts/standard/ssm.sh",
       "./scripts/standard/ups.sh",
       "./scripts/standard/pdns.sh",
