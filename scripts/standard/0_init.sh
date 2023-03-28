@@ -37,7 +37,7 @@ chmod +x "${PFSRC}/cache/imd/install.run"
 case "${PACKER_BUILD_NAME}" in
   pi)
     systemctl disable userconfig
-    printf '%s\n' 'rtc-ds1307' 'i2c_bcm2835' 'i2c-dev' >> /etc/initramfs-tools/modules
+    printf '%s\n' 'rtc-ds1307' 'rtc-pcf8523' 'i2c_bcm2835' 'i2c-dev' >> /etc/initramfs-tools/modules
   ;;
 esac
 

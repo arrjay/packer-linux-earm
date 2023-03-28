@@ -1,8 +1,8 @@
 #!/bin/sh
-                                        
+
 PREREQ=""
 prereqs()
-{                                                                               
+{
      echo "$PREREQ"
 }
 
@@ -19,34 +19,44 @@ log_begin_msg "waiting for RTC/bringing up RTC"
 
 # load modules
 modprobe i2c_bcm2835
-modprobe rtc_ds1307
+#modprobe rtc_ds1307
+#modprobe rtc_pcf8523
 modprobe i2c-dev
 
 kick_rtc () {
   # do I have i2c bus 1?
-  [ -e /dev/i2c-1 ] || return 0 
-  # clock driver sysfs path
-  drvpath=/sys/bus/i2c/drivers/rtc-ds1307
+  [ -e /dev/i2c-1 ] || return 0
+  # check rtc type by looking in devicetree
+  ls -d /sys/firmware/devicetree/base/soc/i2c*/pcf8523@* 2> /dev/null && {
+    module=rtc_pcf8523
+    drvpath=/sys/bus/i2c/drivers/rtc-pcf8523
+  }
+  ls -d /sys/firmware/devicetree/base/soc/i2c*/ds1339@* 2> /dev/null && {
+    module=rtc_ds1307
+    drvpath=/sys/bus/i2c/drivers/rtc-ds1307
+  }
+  [ "${module}" ] || return 0
+  modprobe "${module}"
   # do I have the driver control files?
   [ -e "${drvpath}/unbind" ] || return 0
   [ -e "${drvpath}/bind" ] || return 0
-  # iterations to loop on kicking the driver       
-  deathcount=5                                                                  
+  # iterations to loop on kicking the driver
+  deathcount=5
   # i2c bus-device
-  i2cdev=1-0068                                                                 
+  i2cdev=1-0068
   while [ "${deathcount}" -gt 0 ] ; do
-    # do I have an rtc? then why kick anything?                                 
+    # do I have an rtc? then why kick anything?
     hwclock -r && return 0
     deathcount=$((deathcount - 1))
-    # unbind/rebind the ds1306 driver to the device                             
-    echo "${i2cdev}" > "${drvpath}/unbind"  
-    sleep 1                                                                     
-    echo "${i2cdev}" > "${drvpath}/bind"                                        
-  done                                                                          
-}                                                                               
-                                                                                
-kick_rtc                                                                        
-                                        
-log_end_msg                             
-                                        
-exit 0   
+    # unbind/rebind the ds1306 driver to the device
+    echo "${i2cdev}" > "${drvpath}/unbind"
+    sleep 1
+    echo "${i2cdev}" > "${drvpath}/bind"
+  done
+}
+
+kick_rtc
+
+log_end_msg
+
+exit 0
