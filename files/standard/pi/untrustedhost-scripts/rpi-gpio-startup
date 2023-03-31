@@ -4,7 +4,7 @@
 type gpioset 2>/dev/null 1>&2 || exit 240
 
 # do I have a config from imd?
-[[ -f /run/untrustedhost/gpio.conf ]] || exit 128
+[[ -f /run/untrustedhost/gpio.conf ]] || exit 0
 . /run/untrustedhost/gpio.conf
 
 # okay, so this is some horrible introspection because we *only* have
