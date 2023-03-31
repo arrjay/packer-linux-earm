@@ -48,7 +48,6 @@ for source in \
   "${PFSRC}/untrustedhost" \
   "${PFSRC}/untrustedhost-scripts" \
   "${PFSRC}/imd" \
-  "${PFSRC}/logrotate.d" \
   "${PFSRC}/udev" \
   "${PFSRC}/incron.d" \
   "${PFSRC}/networkd-dispatcher" \
@@ -70,7 +69,7 @@ for source in \
 done
 
 # install from scratch directories into filesystem, clean them back up
-for directory in /tmp/systemd /tmp/untrustedhost /tmp/logrotate.d /tmp/udev /tmp/incron.d ; do
+for directory in /tmp/systemd /tmp/untrustedhost /tmp/udev /tmp/incron.d ; do
   install_ef "${directory}"
   rm -rf "${directory}"
 done

@@ -2,14 +2,14 @@
 
 set -e
 
-apt-get install unbound
+apt-get install pdns-recursor
 
-usermod -a -G unbound netdata
+#usermod -a -G unbound netdata
 
-systemctl disable unbound
+systemctl disable pdns-recursor
 
 # this thing exits nonzero if it updates the anchor. I hate it.
-unbound-anchor -vv || true
+#unbound-anchor -vv || true
 
 #cd /usr/src
 #git clone https://github.com/arrjay/unbound-hosts-blocklists/
