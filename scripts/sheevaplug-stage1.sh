@@ -87,5 +87,4 @@ case "${temp_chroot}" in
  *tmp*) sudo rm -rf "${temp_chroot}" ;;
 esac
 
-mkdir -p images/upstream
 mv "${temp_image}" images/upstream/sheeva.img

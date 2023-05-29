@@ -1,0 +1,12 @@
+[Unit]
+Description=enable apt sandboxing
+ConditionPathIsReadWrite=/
+ConditionPathExists=/etc/apt/apt.conf.d/00forceroot
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/rm /etc/apt/apt.conf.d/00forceroot
+
+[Install]
+WantedBy=multi-user.target

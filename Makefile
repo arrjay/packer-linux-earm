@@ -56,7 +56,7 @@ fs-uuids.json: scripts/genuuid-json.sh
 # so that we can reference it in a packer template
 # this works around arm-image not understanding "none" as a checksum
 %.img.xz.json : %.img.xz
-	mkdir -p $(@D)
+	mkdir -p $(@D)	# hm, do I need this here...
 	md5sum $< | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > $@
 
 # compress images
@@ -64,32 +64,45 @@ fs-uuids.json: scripts/genuuid-json.sh
 	-rm $@
 	xz -T0 $<
 
+images:
+	mkdir images
+
+images/upstream: images
+	mkdir images/upstream
+
 #  upstream images are the weird ones - they've all got their own recipes
-images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
+images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh images/upstream
 	-rm $@*
 	./scripts/sheevaplug-stage1.sh
 
-images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS)
+images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS) images/upstream
 	-rm $@*
 	sudo packer build -only=arm-image.rock64 -var-file=fs-uuids.json packer_templates/armbian_mod.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-images/upstream/pi.img:
+images/upstream/pi.img: images/upstream
 	-rm $@*
 	echo "packer will directly handle downloading/caching the pi image, creating empty file"
 	touch $@
 
+files/lite/cache:
+	mkdir files/lite/cache
+
 # we stuff a copy of resolv.conf in lite's cache
-files/lite/cache/resolv.conf:
-	cat /etc/resolv.conf > files/lite/cache/resolv.conf
+files/lite/cache/resolv.conf: files/lite/cache Makefile scripts/cache-resolveconf.sh
+# hack around resolvectl not telling us
+	./scripts/cache-resolveconf.sh > files/lite/cache/resolv.conf
 
 # compress lite images
 images/lite/%.img.xz : images/lite/%.img
 	-rm $@
 	xz -T0 $<
 
+images/lite:
+	mkdir images/lite
+
 # create lite images
-images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS) files/lite/cache/resolv.conf
+images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS) files/lite/cache/resolv.conf images/lite
 	-rm images/lite/$(@F)*
 	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@

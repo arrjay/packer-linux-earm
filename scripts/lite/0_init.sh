@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 export DEBIAN_FRONTEND=noninteractive
 export LANG=C
@@ -117,14 +117,14 @@ echo "${PACKER_BUILD_NAME}" > /etc/hostname
 }
 
 # force the update as root, otherwise this fails in some packer-chroots
-apt-get -o APT::Sandbox::User=root update
+apt-get update
 
 # install backports key, move backports back, update again
 [[ -f /etc/apt/sources.list.d/backports.list.disabled ]] && {
   apt-get install gnupg2
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
   mv /etc/apt/sources.list.d/backports.list.disabled /etc/apt/sources.list.d/backports.list
-  apt-get -o APT::Sandbox::User=root update
+  apt-get update
 }
 
 # delete anything from that now
@@ -221,6 +221,7 @@ install --verbose --mode=0755 --owner=0 --group=0 -D "${PFSRC}/postluksipc.sh" "
 systemctl enable resize-rootfs.service
 systemctl enable resolvlink.service
 systemctl enable postluksipc.service
+systemctl enable privsep-apt.service
 
 # wipe any ssh keys
 rm -rf /etc/ssh/ssh_host_*_key*
