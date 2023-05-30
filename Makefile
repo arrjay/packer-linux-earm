@@ -6,6 +6,7 @@
 TARGETS := rock64 pi sheeva
 TYPES := upstream lite netdata standard xfce ykman
 IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
+DIRECTORIES := $(addprefix images/, $(TYPES))
 COMPRESSED_IMAGES := $(addsuffix .xz, $(IMAGES))
 
 DEB_TARS := nut_debs.tar
@@ -56,7 +57,7 @@ fs-uuids.json: scripts/genuuid-json.sh
 # so that we can reference it in a packer template
 # this works around arm-image not understanding "none" as a checksum
 %.img.xz.json : %.img.xz
-	mkdir -p $(@D)	# hm, do I need this here...
+	mkdir -p $(@D)
 	md5sum $< | awk '{ printf "{ \"dynamic_checksum\": \"%s\" }",$$1 }' > $@
 
 # compress images
@@ -64,23 +65,20 @@ fs-uuids.json: scripts/genuuid-json.sh
 	-rm $@
 	xz -T0 $<
 
-images:
-	mkdir images
-
-images/upstream: images
-	mkdir images/upstream
-
 #  upstream images are the weird ones - they've all got their own recipes
-images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh images/upstream
+images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
+	mkdir -p $(@D)
 	-rm $@*
 	./scripts/sheevaplug-stage1.sh
 
-images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS) images/upstream
+images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS)
+	mkdir -p $(@D)
 	-rm $@*
 	sudo packer build -only=arm-image.rock64 -var-file=fs-uuids.json packer_templates/armbian_mod.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
-images/upstream/pi.img: images/upstream
+images/upstream/pi.img:
+	mkdir -p $(@D)
 	-rm $@*
 	echo "packer will directly handle downloading/caching the pi image, creating empty file"
 	touch $@
@@ -89,7 +87,7 @@ files/lite/cache:
 	mkdir files/lite/cache
 
 # we stuff a copy of resolv.conf in lite's cache
-files/lite/cache/resolv.conf: files/lite/cache Makefile scripts/cache-resolveconf.sh
+files/lite/cache/resolv.conf: files/lite/cache scripts/cache-resolveconf.sh
 # hack around resolvectl not telling us
 	./scripts/cache-resolveconf.sh > files/lite/cache/resolv.conf
 
@@ -98,11 +96,9 @@ images/lite/%.img.xz : images/lite/%.img
 	-rm $@
 	xz -T0 $<
 
-images/lite:
-	mkdir images/lite
-
 # create lite images
-images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS) files/lite/cache/resolv.conf images/lite
+images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS) files/lite/cache/resolv.conf
+	mkdir -p $(@D)
 	-rm images/lite/$(@F)*
 	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
@@ -146,6 +142,7 @@ images/netdata/%.img.xz : images/netdata/%.img
 	xz -T0 $<
 
 images/netdata/%.img: images/lite/%.img.xz.json packer_templates/netdata.pkr.hcl $(NETDATA_SCRIPTS)
+	mkdir -p $(@D)
 	-rm $(@D)/$(@F)*
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
