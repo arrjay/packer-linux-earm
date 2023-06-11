@@ -12,7 +12,7 @@ while [[ "${session_ct}" -ne 0 ]] ; do
   dspeed="$(xmlstarlet sel -t -v 'metadata/serial/session['"${session_ct}"']/@speed' "${IMD_PATH}")"
   ((session_ct--))
   [[ "${dname}" == '' ]] && { [[ "${dpath}" == '' ]] && continue ; }
-  tmux -L console new-window -d -n "${dname}" 'dterm '"${dpath}"' '"${dspeed}"
+  tmux -L console new-window -d -n "${dname}" 'picocom '"-b ${dspeed}"' '"/dev/${dpath}"
 done
 
 exit 0

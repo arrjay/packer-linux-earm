@@ -153,7 +153,8 @@ images/standard/%.img.xz : images/standard/%.img
 	xz -T0 $<
 
 images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) files/standard/cache/%/nut_debs.tar.xz
-	-rm -rf images/standard/$(@F)*
+	mkdir -p $(@D)
+	-rm -rf $(@D)/$(@F)*
 	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
