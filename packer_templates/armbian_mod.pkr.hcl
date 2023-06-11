@@ -6,8 +6,8 @@ variable "rk64_bootfs_uuid" {
 
 source "arm-image" "rock64" {
   image_mounts    = ["/"]
-  iso_checksum    = "sha256:f5edb2c031774e081ab408e632cece3f48c19c80b96bb619f0da0206230be609"
-  iso_url         = "https://armbian.chi.auroradev.org/dl/rock64/archive/Armbian_22.05.4_Rock64_jammy_current_5.15.48.img.xz"
+  iso_checksum    = "sha256:a4c277913dc1a160a10dc956677e6ec0faa4a3cca964b66b1dd03f829cbeac40"
+  iso_url         = "https://mirrors.aliyun.com/armbian-releases/rock64/archive/Armbian_23.5.1_Rock64_jammy_current_6.1.30_minimal.img.xz"
   output_filename = "images/upstream/rock64.img"
   qemu_binary     = "qemu-aarch64-static"
 }
