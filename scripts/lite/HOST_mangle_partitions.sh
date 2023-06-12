@@ -2,7 +2,7 @@
 
 set -ex
 
-for item in jq mlabel tune2fs kpartx ; do
+for item in jq mlabel tune2fs kpartx fatlabel e2fsck fdisk ; do
   type "${item}" 2>/dev/null 1>&2
 done
 
