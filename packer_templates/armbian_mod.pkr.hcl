@@ -9,7 +9,7 @@ source "arm-image" "rock64" {
   iso_checksum    = "sha256:a4c277913dc1a160a10dc956677e6ec0faa4a3cca964b66b1dd03f829cbeac40"
   iso_url         = "https://mirrors.aliyun.com/armbian-releases/rock64/archive/Armbian_23.5.1_Rock64_jammy_current_6.1.30_minimal.img.xz"
   output_filename = "images/upstream/rock64.img"
-  qemu_binary     = "qemu-aarch64-static"
+  image_arch      = "arm64"
 }
 
 build {
