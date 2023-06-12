@@ -20,6 +20,7 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 systemctl mask networking.service
 systemctl mask dhcpcd.service
 rm -f /etc/network/interfaces
+systemctl unmask systemd-networkd.service
 systemctl enable systemd-networkd.service
 systemctl enable systemd-resolved.service
 systemctl mask systemd-networkd-wait-online.service
