@@ -20,6 +20,11 @@ variable "dynamic_checksum" {
   sensitive = false
   default   = "none"
 }
+variable "arm_machtype" {
+  type      = string
+  sensitive = false
+  default   = "arm"
+}
 
 // the pi image has a direct upstream source, the other images are sourced
 // from Makefile targets, hence the "dynamic_checksum" use.
@@ -28,19 +33,22 @@ source "arm-image" "pi" {
   iso_checksum    = "sha256:9bf5234efbadd2d39769486e0a20923d8526a45eba57f74cda45ef78e2b628da"
   iso_url         = "https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2022-09-26/2022-09-22-raspios-bullseye-armhf-lite.img.xz"
   output_filename = "images/lite/pi.img"
+  image_arch      = "arm64"
 }
 source "arm-image" "rock64" {
   image_mounts    = ["/newboot", "/IMD", "/"]
   iso_checksum    = var.dynamic_checksum
   iso_url         = "./images/upstream/rock64.img.xz"
   output_filename = "images/lite/rock64.img"
-  qemu_binary     = "qemu-aarch64-static"
+  image_arch      = "arm64"
+  target_image_size = 2147483648
 }
 source "arm-image" "sheeva" {
   image_mounts    = ["/boot", "/boot/IMD", "/"]
   iso_checksum    = var.dynamic_checksum
   iso_url         = "./images/upstream/sheeva.img.xz"
   output_filename = "images/lite/sheeva.img"
+  image_arch      = var.arm_machtype
 }
 
 locals {

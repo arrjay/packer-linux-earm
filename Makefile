@@ -27,6 +27,15 @@ export DISPLAY
 CURRENT_USER = $(shell id -u)
 CURRENT_GROUP = $(shell id -g)
 
+# -p? -m? -i? who knows?
+HOST_MACHINE = $(shell uname -i)
+# override arm-on-arm64 builds to just use arm64 (thus chroot)
+ifeq ($(HOST_MACHINE), aarch64)
+  ARM_MACHTYPE=arm64
+else
+  ARM_MACHTYPE=arm
+endif
+
 COMMON_SCRIPTS = $(shell find scripts/common -type f)
 GLOVES_SECRETS = $(shell find secrets/gloves -type f)
 
@@ -100,7 +109,7 @@ images/lite/%.img.xz : images/lite/%.img
 images/lite/%.img: images/upstream/%.img.xz.json packer_templates/lite.pkr.hcl fs-uuids.json $(LITE_FILES) $(LITE_SCRIPTS) files/lite/cache/resolv.conf
 	mkdir -p $(@D)
 	-rm images/lite/$(@F)*
-	sudo packer build -var-file=fs-uuids.json -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
+	sudo packer build -var-file=fs-uuids.json -var-file=$< --var arm_machtype=$(ARM_MACHTYPE) -only=arm-image.$(@F:.img=) packer_templates/lite.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 files/standard/cache/%/nut_debs.tar.xz: files/standard/cache/%/nut_debs.tar
