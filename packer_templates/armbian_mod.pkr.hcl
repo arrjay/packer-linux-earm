@@ -18,7 +18,11 @@ build {
   provisioner "shell" {
     environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"]
     execute_command  = "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"
-    inline           = ["mkdir /newboot", "mkdir /IMD"]
+    inline           = [
+      "mkdir /newboot",
+      "mkdir /IMD",
+      "[ -e /etc/profile.d/armbian-check-first-login.sh ] && rm /etc/profile.d/armbian-check-first-login.sh",
+    ]
   }
 
   post-processor "manifest" {}
