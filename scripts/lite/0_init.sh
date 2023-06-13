@@ -149,6 +149,10 @@ dpkg -l rpi-eeprom        > /dev/null && apt-get reinstall rpi-eeprom
 ln -sf /usr/share/zoneinfo/UCT /etc/localtime
 
 # configure localepurge, make ssl shut _up_
+apt-get install locales
+# older locale-gen only reads locale.gen - but it also ignores all arguments.
+grep -q '^en_US.UTF-8 UTF-8$' /etc/locale.gen || printf '%s %s\n' 'en_US.UTF-8' 'UTF-8' >> /etc/locale.gen
+locale-gen en_US.UTF-8
 libssl=$(dpkg -l | grep libssl | awk '{print $2}' |grep -v dev)
 printf '%s\n' "localepurge localepurge/use-dpkg-feature boolean false" \
               "localepurge localepurge/mandelete boolean true" \

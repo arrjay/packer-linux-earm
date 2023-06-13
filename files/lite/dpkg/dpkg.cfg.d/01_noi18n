@@ -1,4 +1,8 @@
-path-exclude /usr/share/locale/*
-path-include /usr/share/locale/en*
-path-exclude /usr/share/i18n/locales/*
-path-include /usr/share/i18n/locales/en*
+path-exclude=/usr/share/locale/*
+path-include=/usr/share/locale/locale.alias
+path-include=/usr/share/locale/en*
+path-exclude=/usr/share/i18n/locales/*
+path-include=/usr/share/i18n/locales/i18n*
+path-include=/usr/share/i18n/locales/iso14651*
+path-include=/usr/share/i18n/locales/translit*
+path-include=/usr/share/i18n/locales/en*
