@@ -26,7 +26,7 @@ BUILD_PACKAGES=(
     libpowerman0-dev libptexenc1 libpthread-stubs0-dev libsensors-dev
     libsgmls-perl libsm-dev libsm6 libsnmp-base libsnmp-dev libsnmp40 libsombok3
     libsub-override-perl libsynctex2 libtasn1-6-dev libteckit0 libtexlua53
-    libtexluajit2 libthai-data libthai0 libtiff-dev libtiffxx5 libtool
+    libthai-data libthai0 libtiff-dev libtiffxx5 libtool
     libudev-dev libunbound8 libunicode-linebreak-perl libusb-0.1-4 libusb-dev
     libvpx-dev libwrap0-dev libx11-dev libxau-dev libxaw7 libxcb-render0
     libxcb-shm0 libxcb1-dev libxdmcp-dev libxi6 libxml2-dev libxml2-utils
@@ -44,7 +44,7 @@ BUILD_PACKAGES=(
 
 case "${PACKER_BUILD_NAME}" in
   pi)
-    BUILD_PACKAGES=("${BUILD_PACKAGES[@]}" libidn11 libjpeg62-turbo-dev libvpx6)
+    BUILD_PACKAGES=("${BUILD_PACKAGES[@]}" libidn11 libjpeg62-turbo-dev libvpx6 libtexluajit2)
   ;;
   rock64)
     BUILD_PACKAGES=("${BUILD_PACKAGES[@]}" libidn12 libvpx7)
@@ -52,7 +52,6 @@ case "${PACKER_BUILD_NAME}" in
 esac
 
 # build the latest nut debs on rpi for pijuice support.
-apt-get -o APT::Sandbox::User=root update
 apt-get install "${BUILD_PACKAGES[@]}"
 
 # build it out of backports...

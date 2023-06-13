@@ -123,8 +123,10 @@ files/standard/cache/%/nut_debs.tar: images/lite/%.img.xz.json packer_templates/
 	-rm -rf files/pijuice/cache
 	mkdir -p files/pijuice/cache
 	mkdir -p $(@D)
+	mkdir -p images/pijuice
 	-rm images/pijuice/$*.img
-	sudo packer build -var-file=$< -only=arm-image.$* packer_templates/pijuice.pkr.hcl
+	sudo packer build -var-file=$< --var arm_machtype=$(ARM_MACHTYPE) -only=arm-image.$* packer_templates/pijuice.pkr.hcl
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) images/pijuice/$*.img
 	-rm images/pijuice/$*.img
 	mv files/pijuice/cache/nut_debs.tar $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
