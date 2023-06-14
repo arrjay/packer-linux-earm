@@ -155,7 +155,7 @@ images/netdata/%.img.xz : images/netdata/%.img
 images/netdata/%.img: images/lite/%.img.xz.json packer_templates/netdata.pkr.hcl $(NETDATA_SCRIPTS)
 	mkdir -p $(@D)
 	-rm $(@D)/$(@F)*
-	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
+	sudo packer build -var-file=$< --var arm_machtype=$(ARM_MACHTYPE) -only=arm-image.$(@F:.img=) packer_templates/netdata.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 # standard images
@@ -166,7 +166,7 @@ images/standard/%.img.xz : images/standard/%.img
 images/standard/%.img: images/netdata/%.img.xz.json packer_templates/standard.pkr.hcl $(STANDARD_SCRIPTS) $(IMD_FILES) $(STANDARD_FILES) files/standard/cache/%/nut_debs.tar.xz
 	mkdir -p $(@D)
 	-rm -rf $(@D)/$(@F)*
-	sudo packer build -var-file=$< -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
+	sudo packer build -var-file=$< --var arm_machtype=$(ARM_MACHTYPE) -only=arm-image.$(@F:.img=) packer_templates/standard.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 # now with X!

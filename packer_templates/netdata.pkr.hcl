@@ -4,6 +4,11 @@ variable "dynamic_checksum" {
   sensitive = false
   default   = "none"
 }
+variable "arm_machtype" {
+  type      = string
+  sensitive = false
+  default   = "arm"
+}
 
 locals {
   image_size = 3221225472
@@ -15,6 +20,7 @@ source "arm-image" "pi" {
   iso_url           = "./images/lite/pi.img.xz"
   output_filename   = "images/netdata/pi.img"
   target_image_size = local.image_size
+  image_arch        = "arm64"
 }
 source "arm-image" "sheeva" {
   image_mounts      = ["/boot", "/boot/IMD", "/"]
@@ -22,6 +28,7 @@ source "arm-image" "sheeva" {
   iso_url           = "./images/lite/sheeva.img.xz"
   output_filename   = "images/netdata/sheeva.img"
   target_image_size = local.image_size
+  image_arch        = var.arm_machtype
 }
 source "arm-image" "rock64" {
   image_mounts      = ["/boot", "/boot/IMD", "/"]
@@ -29,7 +36,7 @@ source "arm-image" "rock64" {
   iso_url           = "./images/lite/rock64.img.xz"
   output_filename   = "images/netdata/rock64.img"
   target_image_size = local.image_size
-  qemu_binary       = "qemu-aarch64-static"
+  image_arch        = "arm64"
 }
 
 build {
