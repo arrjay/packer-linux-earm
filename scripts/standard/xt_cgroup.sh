@@ -38,8 +38,9 @@ dkms add -m "${MOD}" -v "${MVER}"
 
 for kv in /lib/modules/* ; do
   # HACK: do not build for 64-bit today.
+  # HACK: no, really.
   case "${kv}" in *-v8+) continue ;; esac
-  dkms install -k "${kv##*/}" -m $MOD -v "${MVER}" || {
+  setarch armv7l dkms install -k "${kv##*/}" -m $MOD -v "${MVER}" || {
     find "/var/lib/dkms/${MOD}/${MVER}" -type f ; cat "/var/lib/dkms/${MOD}/${MVER}/build/make.log" ; exit 1
   }
 done
