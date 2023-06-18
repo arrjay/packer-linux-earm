@@ -6,6 +6,18 @@ export DEBIAN_FRONTEND=noninteractive
 export LANG=C
 PFSRC=/tmp/packer-files
 
+# packages we need
+packages=(augeas-tools iptables firewalld)
+case "${PACKER_BUILD_NAME}" in
+  pi|rock64|sheeva)
+    : # these upstreams currently don't have a separate systemd-resolved package.
+  ;;
+  *)
+    packages=("${packages[@]}" systemd-resolved)
+  ;; 
+esac
+apt-get install "${packages[@]}"
+
 # load any environment things we need and export them
 . /etc/environment
 export $(awk -F= '{ print $1 }' < /etc/environment)
@@ -27,5 +39,4 @@ systemctl mask systemd-networkd-wait-online.service
 systemctl enable ssh.service
 
 # disable ipv6, install firewall bits
-apt-get install augeas-tools iptables firewalld
 augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1

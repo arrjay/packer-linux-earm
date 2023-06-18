@@ -46,7 +46,9 @@ get_driveletter () {
 
 # deps
 command -v cryptsetup >/dev/null || exit 0
-command -v cryptsetup-reencrypt >/dev/null || exit 0
+# hack in that new cryptsetup folds in cryptsetup-reencrypt
+REENCRYPT="cryptsetup reencrypt"
+command -v cryptsetup-reencrypt >/dev/null && REENCRYPT="cryptsetup-reencrypt"
 command -v blkid >/dev/null || exit 0
 command -v awk >/dev/null || exit 0
 command -v mcopy >/dev/null || exit 0
@@ -132,7 +134,8 @@ for arg in $(blkid "${srcdev}") ; do
         done < "${tune2fs_out}"
         rm "${tune2fs_out}"
         blocks="$(expr "${blkct}" \* "${blksz}")"
-        cryptsetup-reencrypt "--device-size=${blocks}" --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
+	# this may be a program, or a program + argument.
+        $REENCRYPT "--device-size=${blocks}" --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
       log_end_msg
     ;;
     'TYPE="crypto_LUKS"')

@@ -230,10 +230,10 @@ systemctl enable privsep-apt.service
 # wipe any ssh keys
 rm -rf /etc/ssh/ssh_host_*_key*
 # and disable rpi's service that makes them.
-systemctl disable regenerate_ssh_host_keys.service
+systemctl disable regenerate_ssh_host_keys.service || true
 
 # disable rpi's resize rootfs service too.
-systemctl disable resize2fs_once.service
+systemctl disable resize2fs_once.service || true
 
 # add cryptsetup stuff to initrds
 grep -q ^CRYPTSETUP=y /etc/initramfs-tools/initramfs.conf || printf '%s\n' 'CRYPTSETUP=y' >> /etc/initramfs-tools/initramfs.conf

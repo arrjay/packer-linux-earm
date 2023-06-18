@@ -22,7 +22,7 @@ copy_file config /etc/initramfs-tools/support/mtools.conf /etc
 copy_exec /sbin/cryptsetup
 copy_exec /sbin/dmsetup
 copy_exec /lib/cryptsetup/askpass
-copy_exec /usr/sbin/cryptsetup-reencrypt
+copy_exec /usr/sbin/cryptsetup-reencrypt || true
 copy_exec /bin/mktemp
 # mtools dynamically loads this one, ow.
 copy_file library /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so /usr/lib/$(dpkg-architecture -qDEB_BUILD_MULTIARCH)/gconv/IBM850.so

@@ -50,6 +50,13 @@ source "arm-image" "sheeva" {
   output_filename = "images/lite/sheeva.img"
   image_arch      = var.arm_machtype
 }
+source "arm-image" "espressobin" {
+  image_mounts    = ["/newboot", "/IMD", "/"]
+  iso_checksum    = var.dynamic_checksum
+  iso_url         = "./images/upstream/espressobin.img.xz"
+  output_filename = "images/lite/espressobin.img"
+  image_arch      = "arm64"
+}
 
 locals {
   envblock = [
@@ -70,6 +77,7 @@ build {
     "source.arm-image.pi",
     "source.arm-image.rock64",
     "source.arm-image.sheeva",
+    "source.arm-image.espressobin",
   ]
 
   // pre-prep to make provisioning work for pi, sheeva
@@ -114,9 +122,9 @@ build {
     ]
   }
 
-  // rock64 has a special step to shuffle /boot over to the new boot partition.
+  // rock64, espressobin has a special step to shuffle /boot over to the new boot partition.
   provisioner "shell" {
-    only = ["arm-image.rock64"]
+    only = ["arm-image.rock64", "arm-image.espressobin"]
     environment_vars = local.envblock
     execute_command = local.cmdexec
     inline = [

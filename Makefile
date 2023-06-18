@@ -3,7 +3,7 @@
 .ONESHELL:
 
 # used to coerce INTERMEDIATE to ignore .img files not existing, and .PRECIOUS to keep compressed versions
-TARGETS := rock64 pi sheeva
+TARGETS := rock64 pi sheeva espressobin
 TYPES := upstream lite netdata standard xfce ykman
 IMAGES := $(addprefix images/, $(foreach targ, $(TARGETS), $(addsuffix /$(targ).img, $(TYPES))))
 DIRECTORIES := $(addprefix images/, $(TYPES))
@@ -84,6 +84,12 @@ images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $
 	mkdir -p $(@D)
 	-rm $@*
 	sudo packer build -only=arm-image.rock64 -var-file=fs-uuids.json packer_templates/armbian_mod.pkr.hcl || rm $@
+	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
+
+images/upstream/espressobin.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS)
+	mkdir -p $(@D)
+	-rm $@*
+	sudo packer build -only=arm-image.espressobin -var-file=fs-uuids.json packer_templates/armbian_mod.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 images/upstream/pi.img:
