@@ -258,11 +258,19 @@ case "${PACKER_BUILD_NAME}" in
     kblob="$(mktemp)"
     cat /boot/vmlinuz-* /usr/lib/linux-image-*/kirkwood-sheevaplug.dtb > "${kblob}"
     # for the initrd, wire it to locate rootfs by LABEL (which was wired back in stage1)
+    # this does work...but it leads to side-effects from stuff that parses the command line.
     rfs="$(grep ' / ' /etc/fstab | cut -d' ' -f1)"
     for v in /lib/modules/* ; do
       k="${v##*/}"
       mkinitramfs -o "/boot/initrd.img-${k}" -r "${rfs}" "${k}"
     done
+    # copy over the dtb for use with a newer version of u-boot (which we're not yet)
+    mkdir /boot/dtb
+    cp /usr/lib/linux-image-*/kirkwood-sheevaplug.dtb /boot/dtb/kirkwood-sheevaplug.dtb
+    # but, this boot script will let us tinker with the rootfs args.
+    cp /tmp/packer-files/sheeva/boot.cmd /boot/boot.cmd
+    mkimage -A arm -T script -C none -d /boot/boot.cmd /boot/boot.scr
+    printf 'linux_rootdev=%s\n' >> /boot/sheevaEnv.txt
     mkimage -A arm -O linux -T kernel -C none -a 0x00008000 -e 0x00008000 -n kernel -d "${kblob}" /boot/uImage
     mkimage -A arm -O linux -T ramdisk -C none -a 0x0 -e 0x0 -n ramdisk -d /boot/initrd.img-* /boot/uInitrd
     rm "${kblob}"
