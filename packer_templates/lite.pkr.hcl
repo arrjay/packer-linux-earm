@@ -88,16 +88,16 @@ build {
     inline           = ["mv /etc/ld.so.preload /etc/ld.so.preload.dist"]
     skip_clean       = true
   }
+
+  // sheeva actually has a step to *install* all the cross-debootstrap packages...
   provisioner "shell" {
-    only             = ["arm-image.sheeva"]
+    only             = [ "arm-image.sheeva" ]
     environment_vars = local.envblock
     execute_command  = local.cmdexec
     inline           = [
       "chmod 0755 /",
       "chown 0:0 /",
       "/debootstrap/debootstrap --second-stage --merged-usr",
-      // set root password to nosoup4u (sheevaplug image default)
-      "usermod -p '$6$fFo1kfYxV7aTJbir$LpccRu/YSjF/7Ih2NOBhmlcZumM3lhQsbvUXIdkwyuzTVJdTgf5rlOKRRUwUwyqwFxCHQV1Tsio1El0jWNbea.' root",
     ]
     skip_clean       = true
   }
@@ -131,6 +131,20 @@ build {
       "rsync -a /boot/ /newboot/",
       "rm -rf /boot/*",
       "mkdir /newboot/IMD",
+    ]
+  }
+
+  // the root password is separate so I can tag images as a shortcut (and set their root pw)
+  provisioner "shell" {
+    only = [
+      "arm-image.sheeva",
+      "arm-image.pi"
+    ]
+    environment_vars = local.envblock
+    execute_command = local.cmdexec
+    inline = [
+      // set root password to nosoup4u (sheevaplug image default)
+      "usermod -p '$6$fFo1kfYxV7aTJbir$LpccRu/YSjF/7Ih2NOBhmlcZumM3lhQsbvUXIdkwyuzTVJdTgf5rlOKRRUwUwyqwFxCHQV1Tsio1El0jWNbea.' root",
     ]
   }
 

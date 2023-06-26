@@ -1,2 +1,6 @@
 ecb
 cbc
+xts
+aes
+algif_skcipher
+dm_crypt
