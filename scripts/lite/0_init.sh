@@ -270,7 +270,7 @@ case "${PACKER_BUILD_NAME}" in
     # but, this boot script will let us tinker with the rootfs args.
     cp /tmp/packer-files/sheeva/boot.cmd /boot/boot.cmd
     mkimage -A arm -T script -C none -d /boot/boot.cmd /boot/boot.scr
-    printf 'linux_rootdev=%s\n' >> /boot/sheevaEnv.txt
+    printf 'linux_rootdev=%s\n' "${rfs}" >> /boot/sheevaEnv.txt
     mkimage -A arm -O linux -T kernel -C none -a 0x00008000 -e 0x00008000 -n kernel -d "${kblob}" /boot/uImage
     mkimage -A arm -O linux -T ramdisk -C none -a 0x0 -e 0x0 -n ramdisk -d /boot/initrd.img-* /boot/uInitrd
     rm "${kblob}"
