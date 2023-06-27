@@ -3,6 +3,10 @@ variable "rock64_bootfs_uuid" {
   type      = string
   sensitive = false
 }
+variable "espressobin_bootfs_uuid" {
+  type      = string
+  sensitive = false
+}
 
 source "arm-image" "rock64" {
   image_mounts    = ["/"]
@@ -36,7 +40,10 @@ build {
   post-processor "manifest" {}
 
   post-processor "shell-local" {
-    environment_vars = ["RK64_BOOTFS_UUID=${var.rock64_bootfs_uuid}"]
+    environment_vars = [
+      "ROCK64_BOOTFS_UUID=${var.rock64_bootfs_uuid}",
+      "ESPRESSOBIN_BOOTFS_UUID=${var.espressobin_bootfs_uuid}",
+    ]
     scripts          = ["./scripts/armbian-mod/HOST_create_bootfs.sh"]
   }
 }

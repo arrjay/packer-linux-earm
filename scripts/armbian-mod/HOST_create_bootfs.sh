@@ -35,12 +35,17 @@ parted -s "${imagefile}" mkpart pri ext2 256M "${newpre}s"
 # now swap the partition IDs...
 sfdisk -r "${imagefile}"
 
+case "${PACKER_BUILD_NAME}" in
+  rock64) bootfs_uuid="${ROCK64_BOOTFS_UUID}" ;;
+  espressobin) bootfs_uuid="${ESPRESSOBIN_BOOTFS_UUID}" ;;
+esac
+
 # great. now let's poke at the filesystems side.
 for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
   case "${loop}" in
     *1)
       # the new /boot partition
-      mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super -U "${RK64_BOOTFS_UUID}" "/dev/mapper/${loop}"
+      [[ "${bootfs_uuid}" ]] && mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super -U "${bootfs_uuid}" "/dev/mapper/${loop}"
     ;;
     *2)
       # IMD metadata partition
