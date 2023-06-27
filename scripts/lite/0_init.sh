@@ -219,17 +219,23 @@ done
   sed -i -e 's/ = /=/' /boot/armbianEnv.txt
 }
 
+arm_luksipc () {
+  partuuid="${1}"
+  envfile="${2}"
+  printf '%s\n' \
+    'set /augeas/load/Simplevars/lens Simplevars.lns' \
+    'set /augeas/load/Simplevars/incl '"${envfile}" \
+    'load' \
+    'set /files'"${envfile}"'/extraargs luksipc=PARTUUID='"${partuuid}" \
+    'save' \
+  | augtool -A
+  sed -i -e 's/ = /=/' "${envfile}"
+}
+
 case "${PACKER_BUILD_NAME}" in
   # (rock64) arm luksipc
   rock64)
-    printf '%s\n' \
-      'set /augeas/load/Simplevars/lens Simplevars.lns' \
-      'set /augeas/load/Simplevars/incl /boot/armbianEnv.txt' \
-      'load' \
-      'set /files/boot/armbianEnv.txt/extraargs luksipc=PARTUUID='"${rock64_disk_id}"'-03' \
-      'save' \
-    | augtool -A
-    sed -i -e 's/ = /=/' /boot/armbianEnv.txt
+    arm_luksipc "${rock64_disk_id}-03" "/boot/armbianEnv.txt"
   ;;
   # (sheeva) install a kernel, flash-tools
   sheeva)
@@ -237,6 +243,7 @@ case "${PACKER_BUILD_NAME}" in
     FK_MACHINE=none apt-get install u-boot-tools flash-kernel linux-image-marvell
     # also the addswap service
     systemctl enable addswap.service
+    arm_luksipc "${sheeva_disk_id}-03" "/boot/sheevaEnv.txt"
   ;;
 esac
 

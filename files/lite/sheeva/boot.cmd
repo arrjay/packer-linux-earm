@@ -24,7 +24,7 @@ ext2load ${devtype} ${devnum} ${ramdisk_addr_r} ${prefix}uInitrd
 #fdt set /chosen linux,initrd-end ${filesize} # 6b73e3
 
 # finally, set the bootargs
-setenv bootargs console=${linux_console} cmdline.mtdparts=${mtdparts} root=${linux_rootdev}
+setenv bootargs console=${linux_console} cmdline.mtdparts=${mtdparts} root=${linux_rootdev} ${extraargs}
 #fdt set /chosen bootargs "${bootargs}"
 
 bootm ${kernel_addr_r} ${ramdisk_addr_r}

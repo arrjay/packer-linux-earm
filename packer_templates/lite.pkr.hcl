@@ -23,6 +23,10 @@ variable "rock64_imdfs_id" {
   type      = string
   sensitive = false
 }
+variable "sheeva_disk_id" {
+  type      = string
+  sensitive = false
+}
 variable "dynamic_checksum" {
   type      = string
   sensitive = false
@@ -78,6 +82,7 @@ locals {
     "rock64_bootfs_uuid=${var.rock64_bootfs_uuid}",
     "rock64_disk_id=${var.rock64_disk_id}",
     "rock64_imdfs_id=${var.rock64_imdfs_id}",
+    "sheeva_disk_id=${var.sheeva_disk_id}",
   ]
   cmdexec = "/bin/chmod +x {{ .Path }} ; {{ .Vars }} {{ .Path }}"
 }
@@ -167,6 +172,7 @@ build {
     only             = [
       "arm-image.pi",
       "arm-image.rock64",
+      "arm-image.sheeva",
     ]
     environment_vars = local.envblock
     scripts          = ["./scripts/lite/HOST_mangle_partitions.sh"]
