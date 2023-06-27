@@ -44,25 +44,31 @@ luksuuid="$(cryptsetup luksUUID "${srcdev}")"
 	exit 1
 }
 
-[[ -f /boot/luksipc.key ]] && [[ -s /boot/luksipc.key ]] && {
-  # fix crypttab
-  printf 'luks-%s UUID=%s %s\n' "${luksuuid}" "${luksuuid}" none >> /etc/crypttab.luksipc
+# the luks key could be in boot, or in /IMD? we're reconciling mounted fs paths.
+# the current logic lets /boot win...
+for kf in /boot/luksipc.key /IMD/luksipc.key ; do
+  [[ -f "${kf}" ]] && [[ -s "${kf}" ]] && luks_key="${kf}"
+done
 
+[[ "${luks_key}" ]] && {
   # regenerate initramfs
-  [[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
-    for kv in /lib/modules/* ; do
-      case "${kv}" in
-        *-v7+)   kimage=kernel7.img ;;
-        *-v7l+)  kimage=kernel7l.img ;;
-        *-v8+)   kimage=kernel8.img ;;
-        *[0-9]+) kimage=kernel.img ;;
-      esac
-      RPI_INITRD=1 /etc/kernel/postinst.d/rpi-initramfs "${kv##*/}" "/boot/${kimage}"
-    done
-  }
+  #[[ -x /etc/kernel/postinst.d/rpi-initramfs ]] && {
+  #  for kv in /lib/modules/* ; do
+  #    case "${kv}" in
+  #      *-v7+)   kimage=kernel7.img ;;
+  #      *-v7l+)  kimage=kernel7l.img ;;
+  #      *-v8+)   kimage=kernel8.img ;;
+  #      *[0-9]+) kimage=kernel.img ;;
+  #    esac
+  #    RPI_INITRD=1 /etc/kernel/postinst.d/rpi-initramfs "${kv##*/}" "/boot/${kimage}"
+  #  done
+  #}
 
   # remove commandlines
   #for file in /boot/cmdline.txt /boot/serial.txt ; do
   #  [[ -f "${file}" ]] && sed -i -e 's@luksipc=[0-9A-Za-z/_.\=-]\+@@' "${file}"
   #done
+
+  # fix crypttab
+  printf 'luks-%s UUID=%s %s\n' "${luksuuid}" "${luksuuid}" none >> /etc/crypttab.luksipc
 }

@@ -1,6 +1,7 @@
 [Unit]
 Description=post-boot luksipc handler (regenerate initramfs)
 ConditionKernelCommandLine=luksipc
+ConditionPathExists!=/etc/crypttab.luksipc
 
 [Service]
 Type=oneshot
