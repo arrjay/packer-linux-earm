@@ -92,7 +92,7 @@ sudo mkdir -p "${newsys}/IMD"
 
 printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${rfs_uuid}" | sudo tee "${newsys}/etc/fstab" > /dev/null
 printf 'UUID=%s /boot ext2 defaults,noatime 0 2\n' "${bfs_uuid}" | sudo tee -a "${newsys}/etc/fstab" > /dev/null
-printf 'UUID=%s /IMD vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "${imd_id}" | sudo tee -a "${newsys}/etc/fstab" > /dev/null
+printf 'UUID=%s /IMD vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(munge_vfat_id "${imd_id}")" | sudo tee -a "${newsys}/etc/fstab" > /dev/null
 
 sudo umount "${newsys}/boot"
 sudo umount "${newsys}"
