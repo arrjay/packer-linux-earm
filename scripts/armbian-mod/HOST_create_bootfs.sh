@@ -55,8 +55,7 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
     ;;
     *2)
       # IMD metadata partition
-      mkfs.vfat -n "IMD" "/dev/mapper/${loop}"
-      [[ "${imdfs_id}" ]] && mlabel -N "${imdfs_id}" -i "/dev/mapper/${loop}"
+      mkfs.vfat -n "IMD" -i "${imdfs_id}" "/dev/mapper/${loop}"
     ;;
     *3)
       # the new root partition
