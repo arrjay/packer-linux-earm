@@ -34,6 +34,22 @@ debootstrap () {
   return "${rc}"
 }
 
+uuidgen_trunc () {
+ out="$(uuidgen)"
+ out="${out%%-*}"
+ printf '%s\n' "${out}"
+}
+
+munge_vfat_id () {
+  id="${1}"
+  # uppercase
+  id="${id^^}"
+  # add the dash that fatfs has
+  id="${id:0:4}-${id:4:4}"
+  # return
+  printf '%s' "${id}"
+}
+
 case "${CODEREV}" in
   *-DIRTY) __warn_msg "WARNING: git tree is dirty, sleeping 5 seconds for running confirmation."
            sleep 5
@@ -44,6 +60,7 @@ echo "building ${CODEREV} at ${BUILD_TIMESTAMP}"
 
 rfs_uuid="$(uuidgen)"
 bfs_uuid="$(uuidgen)"
+imd_id="$(uuidgen_trunc)"
 
 temp_chroot="$(debootstrap bullseye)"
 
@@ -61,7 +78,7 @@ parted "${temp_image}" toggle 1 boot
 sudo kpartx -a "${temp_image}"
 lo_device=$(losetup -a | grep -F '('"${temp_image}"')' | cut -d: -f1 | cut -d/ -f3)
 sudo mkfs.ext2 -L "bfs-${BUILD_TIMESTAMP}" -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super -U "${bfs_uuid}" "/dev/mapper/${lo_device}p1"
-sudo mkfs.vfat -F16 -n IMD "/dev/mapper/${lo_device}p2"
+sudo mkfs.vfat -F16 -n IMD -i "${imd_id}" "/dev/mapper/${lo_device}p2"
 sudo mkfs.ext4 -L "rfs-${BUILD_TIMESTAMP}" -U "${rfs_uuid}" "/dev/mapper/${lo_device}p3"
 
 newsys="$(mktemp -d)"
@@ -69,12 +86,13 @@ newsys="$(mktemp -d)"
 sudo mount "/dev/mapper/${lo_device}p3" "${newsys}"
 sudo mkdir -p "${newsys}/boot"
 sudo mount "/dev/mapper/${lo_device}p1" "${newsys}/boot"
-sudo mkdir -p "${newsys}/boot/IMD"
+sudo mkdir -p "${newsys}/IMD"
 
 (cd "${temp_chroot}" && sudo tar cpf - .) | sudo tar xpf - -C "${newsys}"
 
 printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${rfs_uuid}" | sudo tee "${newsys}/etc/fstab" > /dev/null
 printf 'UUID=%s /boot ext2 defaults,noatime 0 2\n' "${bfs_uuid}" | sudo tee -a "${newsys}/etc/fstab" > /dev/null
+printf 'UUID=%s /IMD vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "${imd_id}" | sudo tee -a "${newsys}/etc/fstab" > /dev/null
 
 sudo umount "${newsys}/boot"
 sudo umount "${newsys}"
