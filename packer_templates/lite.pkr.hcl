@@ -1,17 +1,21 @@
 // external variables
-variable "rootfs_uuid" {
+variable "pi_rootfs_uuid" {
   type      = string
   sensitive = false
 }
-variable "bootfs_id" {
+variable "pi_bootfs_id" {
   type      = string
   sensitive = false
 }
-variable "partition_id" {
+variable "pi_disk_id" {
   type      = string
   sensitive = false
 }
-variable "rk64_bootfs_uuid" {
+variable "rock64_bootfs_uuid" {
+  type      = string
+  sensitive = false
+}
+variable "rock64_disk_id" {
   type      = string
   sensitive = false
 }
@@ -64,10 +68,11 @@ locals {
     "TZ=UCT",
     "DEBIAN_FRONTEND=noninteractive",
     "LANG=C",
-    "rootfs_uuid=${var.rootfs_uuid}",
-    "bootfs_id=${var.bootfs_id}",
-    "partition_id=${var.partition_id}",
-    "rk64_bootfs_uuid=${var.rk64_bootfs_uuid}",
+    "pi_rootfs_uuid=${var.pi_rootfs_uuid}",
+    "pi_bootfs_id=${var.pi_bootfs_id}",
+    "pi_disk_id=${var.pi_disk_id}",
+    "rock64_bootfs_uuid=${var.rock64_bootfs_uuid}",
+    "rock64_disk_id=${var.rock64_disk_id}",
   ]
   cmdexec = "/bin/chmod +x {{ .Path }} ; {{ .Vars }} {{ .Path }}"
 }
@@ -153,9 +158,12 @@ build {
   // call the manifest post-processor so that we can...
   post-processor "manifest" {}
 
-  // modify the pi image partitions here.
+  // modify image partitions, ids here.
   post-processor "shell-local" {
-    only             = ["arm-image.pi"]
+    only             = [
+      "arm-image.pi",
+      "arm-image.rock64",
+    ]
     environment_vars = local.envblock
     scripts          = ["./scripts/lite/HOST_mangle_partitions.sh"]
   }

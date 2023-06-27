@@ -36,12 +36,12 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
   case "${loop}" in
     *1)
       case "${PACKER_BUILD_NAME}" in
-        pi) update_fatboot_fs "/dev/mapper/${loop}" "${bootfs_id}" ;;
+        pi) update_fatboot_fs "/dev/mapper/${loop}" "${pi_bootfs_id}" ;;
       esac
     ;;
     *2)
       case "${PACKER_BUILD_NAME}" in
-        pi) update_ext2_uuid "/dev/mapper/${loop}" "${rootfs_uuid}" ;;
+        pi) update_ext2_uuid "/dev/mapper/${loop}" "${pi_rootfs_uuid}" ;;
       esac
     ;;
   esac
@@ -52,5 +52,6 @@ while : ; do
 done
 
 case "${PACKER_BUILD_NAME}" in
-  pi) update_disk_id "${imagefile}" "${partition_id}" ;;
+  pi) update_disk_id "${imagefile}" "${pi_disk_id}" ;;
+  rock64) update_disk_id "${imagefile}" "${rock64_disk_id}" ;;
 esac

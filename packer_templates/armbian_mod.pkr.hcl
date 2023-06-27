@@ -1,5 +1,5 @@
 // external variables
-variable "rk64_bootfs_uuid" {
+variable "rock64_bootfs_uuid" {
   type      = string
   sensitive = false
 }
@@ -36,7 +36,7 @@ build {
   post-processor "manifest" {}
 
   post-processor "shell-local" {
-    environment_vars = ["RK64_BOOTFS_UUID=${var.rk64_bootfs_uuid}"]
+    environment_vars = ["RK64_BOOTFS_UUID=${var.rock64_bootfs_uuid}"]
     scripts          = ["./scripts/armbian-mod/HOST_create_bootfs.sh"]
   }
 }

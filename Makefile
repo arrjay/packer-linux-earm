@@ -59,7 +59,7 @@ KEYMAT_FILES = $(shell find vendor/keymat -type f)
 
 # filesystem/disk UUIDs for when we scramble the pi/rock64 image
 fs-uuids.json: scripts/genuuid-json.sh
-	-rm pi-uuids.json
+	-rm fs-uuids.json
 	./scripts/genuuid-json.sh > fs-uuids.json
 
 # for any given compressed image, make a dynamic_checksum varfile

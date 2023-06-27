@@ -29,8 +29,8 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 # (rpi) drop dist hack for init, create serial-oriented command line
 [[ -f /boot/cmdline.txt ]] && {
   sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
-  sed -i -e 's@ root=[0-9a-zA-Z/_.\=-]\+@ root=UUID='"${rootfs_uuid}"'@' /boot/cmdline.txt
-  sed -i -e 's@ root=@ luksipc=PARTUUID='"${partition_id}"'-02 root=@' /boot/cmdline.txt
+  sed -i -e 's@ root=[0-9a-zA-Z/_.\=-]\+@ root=UUID='"${pi_rootfs_uuid}"'@' /boot/cmdline.txt
+  sed -i -e 's@ root=@ luksipc=PARTUUID='"${pi_disk_id}"'-02 root=@' /boot/cmdline.txt
   sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 }
 
@@ -47,13 +47,13 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 case "${PACKER_BUILD_NAME}" in
   pi)
     {
-      printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${rootfs_uuid}"
-      printf 'UUID=%s /boot vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(echo ${bootfs_id}| tr '[a-z]' '[A-Z]' | sed 's/./&-/4')"
+      printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${pi_rootfs_uuid}"
+      printf 'UUID=%s /boot vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(echo ${pi_bootfs_id}| tr '[a-z]' '[A-Z]' | sed 's/./&-/4')"
     } > /etc/fstab
   ;;
   rock64)
     {
-      printf 'UUID=%s /boot ext2 defaults,noatime,errors=remount-ro 0 2\n' "${rk64_bootfs_uuid}"
+      printf 'UUID=%s /boot ext2 defaults,noatime,errors=remount-ro 0 2\n' "${rock64_bootfs_uuid}"
     } >> /etc/fstab
   ;;
 esac
