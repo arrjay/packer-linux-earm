@@ -55,4 +55,5 @@ case "${PACKER_BUILD_NAME}" in
   pi) update_disk_id "${imagefile}" "${pi_disk_id}" ;;
   rock64) update_disk_id "${imagefile}" "${rock64_disk_id}" ;;
   sheeva) update_disk_id "${imagefile}" "${sheeva_disk_id}" ;;
+  espressobin) update_disk_id "${imagefile}" "${espressobin_disk_id}" ;;
 esac

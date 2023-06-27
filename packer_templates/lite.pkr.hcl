@@ -23,6 +23,18 @@ variable "rock64_imdfs_id" {
   type      = string
   sensitive = false
 }
+variable "espressobin_bootfs_uuid" {
+  type      = string
+  sensitive = false
+}
+variable "espressobin_disk_id" {
+  type      = string
+  sensitive = false
+}
+variable "espressobin_imdfs_id" {
+  type      = string
+  sensitive = false
+}
 variable "sheeva_disk_id" {
   type      = string
   sensitive = false
@@ -83,6 +95,9 @@ locals {
     "rock64_disk_id=${var.rock64_disk_id}",
     "rock64_imdfs_id=${var.rock64_imdfs_id}",
     "sheeva_disk_id=${var.sheeva_disk_id}",
+    "espressobin_bootfs_uuid=${var.espressobin_bootfs_uuid}",
+    "espressobin_imdfs_id=${var.espressobin_imdfs_id}",
+    "espressobin_disk_id=${var.espressobin_disk_id}",
   ]
   cmdexec = "/bin/chmod +x {{ .Path }} ; {{ .Vars }} {{ .Path }}"
 }
@@ -173,6 +188,7 @@ build {
       "arm-image.pi",
       "arm-image.rock64",
       "arm-image.sheeva",
+      "arm-image.espressobin",
     ]
     environment_vars = local.envblock
     scripts          = ["./scripts/lite/HOST_mangle_partitions.sh"]

@@ -70,6 +70,12 @@ case "${PACKER_BUILD_NAME}" in
       printf 'UUID=%s /IMD vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(munge_vfat_id "${rock64_imdfs_id}")"
     } >> /etc/fstab
   ;;
+  espressobin)
+    {
+      printf 'UUID=%s /boot ext2 defaults,noatime,errors=remount-ro 0 2\n' "${espressobin_bootfs_uuid}"
+      printf 'UUID=%s /IMD vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(munge_vfat_id "${espressobin_imdfs_id}")"
+    } >> /etc/fstab
+  ;;
 esac
 
 # recursion function for walking around in /tmp, installing to /etc
