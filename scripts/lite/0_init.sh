@@ -46,17 +46,28 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
   printf 'RPI_INITRD=%s\n' 'Yes' >> /etc/default/raspberrypi-kernel
 }
 
+munge_vfat_id () {
+  id="${1}"
+  # uppercase
+  id="${id^^}"
+  # add the dash that fatfs has
+  id="${id:0:4}-${id:4:4}"
+  # return
+  printf '%s' "${id}"
+}
+
 # (rpi/rock64) stomp on fstab
 case "${PACKER_BUILD_NAME}" in
   pi)
     {
       printf 'UUID=%s / ext4 defaults,noatime 0 1\n' "${pi_rootfs_uuid}"
-      printf 'UUID=%s /boot vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(echo ${pi_bootfs_id}| tr '[a-z]' '[A-Z]' | sed 's/./&-/4')"
+      printf 'UUID=%s /boot vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(munge_vfat_id "${pi_bootfs_id}")"
     } > /etc/fstab
   ;;
   rock64)
     {
       printf 'UUID=%s /boot ext2 defaults,noatime,errors=remount-ro 0 2\n' "${rock64_bootfs_uuid}"
+      printf 'UUID=%s /IMD vfat defaults,umask=0077,uid=0,gid=0 0 2\n' "$(munge_vfat_id "${rock64_imdfs_id}")"
     } >> /etc/fstab
   ;;
 esac

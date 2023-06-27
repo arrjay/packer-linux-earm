@@ -19,6 +19,10 @@ variable "rock64_disk_id" {
   type      = string
   sensitive = false
 }
+variable "rock64_imdfs_id" {
+  type      = string
+  sensitive = false
+}
 variable "dynamic_checksum" {
   type      = string
   sensitive = false
@@ -48,7 +52,7 @@ source "arm-image" "rock64" {
   target_image_size = 2147483648
 }
 source "arm-image" "sheeva" {
-  image_mounts    = ["/boot", "/boot/IMD", "/"]
+  image_mounts    = ["/boot", "/IMD", "/"]
   iso_checksum    = var.dynamic_checksum
   iso_url         = "./images/upstream/sheeva.img.xz"
   output_filename = "images/lite/sheeva.img"
@@ -73,6 +77,7 @@ locals {
     "pi_disk_id=${var.pi_disk_id}",
     "rock64_bootfs_uuid=${var.rock64_bootfs_uuid}",
     "rock64_disk_id=${var.rock64_disk_id}",
+    "rock64_imdfs_id=${var.rock64_imdfs_id}",
   ]
   cmdexec = "/bin/chmod +x {{ .Path }} ; {{ .Vars }} {{ .Path }}"
 }
@@ -135,7 +140,6 @@ build {
     inline = [
       "rsync -a /boot/ /newboot/",
       "rm -rf /boot/*",
-      "mkdir /newboot/IMD",
     ]
   }
 
