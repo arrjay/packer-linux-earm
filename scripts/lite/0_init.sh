@@ -29,8 +29,11 @@ export $(awk -F= '{ print $1 }' < /etc/environment)
 # (rpi) drop dist hack for init, create serial-oriented command line
 [[ -f /boot/cmdline.txt ]] && {
   sed -i -e 's@ init=[0-9a-zA-Z/_.\-]\+@@' /boot/cmdline.txt
+  # switch to using FS UUID for root FS discovery
   sed -i -e 's@ root=[0-9a-zA-Z/_.\=-]\+@ root=UUID='"${pi_rootfs_uuid}"'@' /boot/cmdline.txt
+  # arm luksipc
   sed -i -e 's@ root=@ luksipc=PARTUUID='"${pi_disk_id}"'-02 root=@' /boot/cmdline.txt
+  # create variant using serial for config.txt ease
   sed -e 's/console=tty1//' -e 's/quiet//' -e 's/ +//' < /boot/cmdline.txt > /boot/serial.txt
 }
 
@@ -205,8 +208,19 @@ done
   sed -i -e 's/ = /=/' /boot/armbianEnv.txt
 }
 
-# (sheeva) install a kernel, flash-tools
 case "${PACKER_BUILD_NAME}" in
+  # (rock64) arm luksipc
+  rock64)
+    printf '%s\n' \
+      'set /augeas/load/Simplevars/lens Simplevars.lns' \
+      'set /augeas/load/Simplevars/incl /boot/armbianEnv.txt' \
+      'load' \
+      'set /files/boot/armbianEnv.txt/extraargs luksipc=PARTUUID='"${rock64_disk_id}"'-03' \
+      'save' \
+    | augtool -A
+    sed -i -e 's/ = /=/' /boot/armbianEnv.txt
+  ;;
+  # (sheeva) install a kernel, flash-tools
   sheeva)
     # HACK: install the kernel and utils here
     FK_MACHINE=none apt-get install u-boot-tools flash-kernel linux-image-marvell
