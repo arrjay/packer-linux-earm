@@ -138,7 +138,9 @@ build {
   provisioner "shell" {
     only = [
       "arm-image.sheeva",
-      "arm-image.pi"
+      "arm-image.pi",
+      "arm-image.rock64",
+      "arm-image.espressobin",
     ]
     environment_vars = local.envblock
     execute_command = local.cmdexec
