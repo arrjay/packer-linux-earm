@@ -10,7 +10,7 @@ done
 update_disk_id () {
   dev="${1}"
   id="${2}"
-  printf 'x\ni\n0x%s\n\r\n\w\n' "${id}" | fdisk "${dev}"
+  printf 'x\ni\n0x%s\nr\nw\n' "${id}" | fdisk "${dev}"
 }
 
 update_fatboot_fs () {
