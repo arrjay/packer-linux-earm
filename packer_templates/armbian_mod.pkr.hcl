@@ -3,7 +3,15 @@ variable "rock64_bootfs_uuid" {
   type      = string
   sensitive = false
 }
+variable "rock64_imdfs_id" {
+  type      = string
+  sensitive = false
+}
 variable "espressobin_bootfs_uuid" {
+  type      = string
+  sensitive = false
+}
+variable "espressobin_imdfs_id" {
   type      = string
   sensitive = false
 }
@@ -42,7 +50,9 @@ build {
   post-processor "shell-local" {
     environment_vars = [
       "ROCK64_BOOTFS_UUID=${var.rock64_bootfs_uuid}",
+      "ROCK64_IMDFS_ID=${var.rock64_imdfs_id}",
       "ESPRESSOBIN_BOOTFS_UUID=${var.espressobin_bootfs_uuid}",
+      "ESPRESSOBIN_IMDFS_ID=${var.espressobin_imdfs_id}",
     ]
     scripts          = ["./scripts/armbian-mod/HOST_create_bootfs.sh"]
   }

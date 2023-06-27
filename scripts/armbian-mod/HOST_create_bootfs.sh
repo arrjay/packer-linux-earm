@@ -36,8 +36,14 @@ parted -s "${imagefile}" mkpart pri ext2 256M "${newpre}s"
 sfdisk -r "${imagefile}"
 
 case "${PACKER_BUILD_NAME}" in
-  rock64) bootfs_uuid="${ROCK64_BOOTFS_UUID}" ;;
-  espressobin) bootfs_uuid="${ESPRESSOBIN_BOOTFS_UUID}" ;;
+  rock64)
+    bootfs_uuid="${ROCK64_BOOTFS_UUID}"
+    imdfs_id="${ROCK64_IMDFS_ID}"
+  ;;
+  espressobin)
+    bootfs_uuid="${ESPRESSOBIN_BOOTFS_UUID}"
+    imdfs_id="${ESPRESSOBIN_IMDFS_ID}"
+  ;;
 esac
 
 # great. now let's poke at the filesystems side.
@@ -50,6 +56,7 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
     *2)
       # IMD metadata partition
       mkfs.vfat -n "IMD" "/dev/mapper/${loop}"
+      [[ "${imdfs_id}" ]] && mlabel -N "${imdfs_id}" -i "/dev/mapper/${loop}"
     ;;
     *3)
       # the new root partition
