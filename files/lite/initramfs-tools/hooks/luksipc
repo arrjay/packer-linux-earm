@@ -46,6 +46,9 @@ copy_exec /usr/bin/grep
 copy_exec /usr/bin/cat
 copy_exec /usr/bin/rm
 copy_exec /usr/bin/xargs
+copy_exec /usr/sbin/sfdisk
+copy_exec /usr/bin/readlink
+copy_exec /usr/bin/basename
 
 manual_add_modules aes
 manual_add_modules sha256
