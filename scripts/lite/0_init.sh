@@ -243,6 +243,11 @@ case "${PACKER_BUILD_NAME}" in
   rock64)
     arm_luksipc "${rock64_disk_id}-03" "/boot/armbianEnv.txt"
   ;;
+  espressobin)
+    arm_luksipc "${espressobin_disk_id}-03" "/boot/armbianEnv.txt"
+    # HACK: we also made the kernel stop screaming about hwmon while running initramfs.
+    sed -i -e 's/luksipc=/loglevel=2 luksipc=/' "/boot/armbianEnv.txt"
+  ;;
   # (sheeva) install a kernel, flash-tools
   sheeva)
     # HACK: install the kernel and utils here
