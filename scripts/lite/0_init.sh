@@ -199,7 +199,7 @@ apt-get install \
  rsync sudo vim curl tmux \
  augeas-tools mtools dpkg-dev \
  ca-certificates openssh-client openssh-server openssh-sftp-server \
- cryptsetup cryptsetup-initramfs zstd
+ cryptsetup cryptsetup-initramfs zstd fdisk
 
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
 for f in /etc/ssl/certs/* ; do
