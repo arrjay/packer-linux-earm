@@ -49,6 +49,8 @@ copy_exec /usr/bin/xargs
 copy_exec /usr/sbin/sfdisk
 copy_exec /usr/bin/readlink
 copy_exec /usr/bin/basename
+copy_exec /usr/bin/sed
+copy_exec /usr/bin/udevadm
 
 manual_add_modules aes
 manual_add_modules sha256

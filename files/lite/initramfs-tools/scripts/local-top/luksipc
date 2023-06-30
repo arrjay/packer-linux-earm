@@ -68,6 +68,8 @@ command -v xargs >/dev/null || exit 0
 command -v sfdisk >/dev/null || exit 0
 command -v readlink >/dev/null || exit 0
 command -v basename >/dev/null || exit 0
+command -v sed >/dev/null || exit 0
+command -v udevadm >/dev/null || exit 0
 
 for arg in $(cat /proc/cmdline) ; do
   case "${arg}" in
@@ -79,6 +81,10 @@ done
 
 [ "${srcdev}" ] || exit 0
 
+# we loop 5 times at 3 sec each for our device to show up
+deathcounter=5
+sleepcounter=3
+
 case "${srcdev}" in
   /*)
     srcdev="${ROOT}"
@@ -86,9 +92,17 @@ case "${srcdev}" in
   *=*)
     lsbk=$(echo "${srcdev}" | awk -F= '{ print $1 }')
     lsbv=$(echo "${srcdev}" | awk -F= '{ gsub(/"/, "", $2) ; print $2 }')
-    srcdev=$(blkid | awk -F: '$2 ~ "'"${lsbk}"'=\"'"${lsbv}"'\"" { print $1 }')
+    while [ "${deathcounter}" -gt 0 ] ; do
+      srcdev=$(blkid -c /dev/null | awk -F: '$2 ~ "'"${lsbk}"'=\"'"${lsbv}"'\"" { print $1 }')
+      [ "${srcdev}" ] && break
+      udevadm settle
+      deathcounter="$(expr "${deathcounter}" - 1)"
+      # do I need this?
+      sleep "${sleepcounter}"
+    done
    ;;
 esac
+
 baredev="$(basename "${srcdev}")"
 
 dataland=''
@@ -105,10 +119,17 @@ rm "${partlist}"
 [ "${dataland}" ] || exit 0
 dataland="${dataland%:*}"
 
+# update mtools.conf *here* if we're not on an mmc device...
+devparent="$(basename "$(readlink -f "/sys/class/block/${baredev}/..")")"
+case "${devparent}" in
+  mmcblk0) : ;;
+  mmcblk*) sed -e "s/mmcblk0/${devparent}/g"  < /etc/mtools.conf > "/tmp/mtools.${devparent}" ; export MTOOLSRC="/tmp/mtools.${devparent}" ;;
+  *)       sed -e "s/mmcblk0p/${devparent}/g" < /etc/mtools.conf > "/tmp/mtools.${devparent}" ; export MTOOLSRC="/tmp/mtools.${devparent}" ;;
+esac
+
 drvletter="$(get_driveletter "${dataland}")"
 [ "${drvletter}" ] || exit 0
 
-devparent="$(basename "$(readlink -f "/sys/class/block/${baredev}/..")")"
 read -r devpartno < "/sys/class/block/${baredev}/partition"
 
 mkdir /run/cryptsetup
@@ -129,7 +150,8 @@ for arg in $(blkid "${srcdev}") ; do
         fsdate="$(od -An -j 0x42c -N4 -tu4 < "${srcdev}" | xargs)"
         cdate="$(date +%s)"
         [ "${fsdate}" -gt "${cdate}" ] && date "--set=@${fsdate}"
-        e2fsck -f "${srcdev}"
+        # look, if you get a brick as the result of this...reimage.
+        e2fsck -fy "${srcdev}"
         resize2fs -M -p "${srcdev}"
         tune2fs_out="$(mktemp)"
         tune2fs -l "${srcdev}" | awk '-F: +' '$1 ~ /Block count|Block size|Filesystem UUID/ { split($1,v," ") ;print $2,v[2] }' > "${tune2fs_out}"
