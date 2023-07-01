@@ -69,7 +69,6 @@ command -v sfdisk >/dev/null || exit 0
 command -v readlink >/dev/null || exit 0
 command -v basename >/dev/null || exit 0
 command -v sed >/dev/null || exit 0
-command -v udevadm >/dev/null || exit 0
 
 for arg in $(cat /proc/cmdline) ; do
   case "${arg}" in
@@ -164,30 +163,22 @@ for arg in $(blkid "${srcdev}") ; do
         done < "${tune2fs_out}"
         rm "${tune2fs_out}"
         blocks="$(expr "${blkct}" \* "${blksz}")"
+        # personally? I *hate* the new cryptsetup checks.
+        oh=67108864	# overhead space - 64MB (in bytes)
+        # sfdisk only supports sectors, so calculate a new size with overhead, and turn it to those
+        # but first, ask sfdisk what it *thinks* a sector is
+        secsz="$(sfdisk -d "/dev/${devparent}" | awk '$1 == "sector-size:" { print $2 }')"
+        npartsec="$(expr "$(expr "${blocks}" + "${oh}")" / "${secsz}")"
+        printf ',%s\n' "${npartsec}" | sfdisk --lock -N "${devpartno}" "/dev/${devparent}" # fine! make the partition _that big_!
+        log_begin_msg "performing re-encrypt now. THIS MAKE TAKE UP TO AN HOUR. (and progress is currently broken)"
+        # NOTE: progress and batch mode appear to be...exclusive, you get fuck all status.
 	# this may be a program, or a program + argument.
-	case "${REENCRYPT}" in
-          cryptsetup-reencrypt)
-            # you can combine options with cryptsetup-reencrypt to only encrypt the fs usage, but reduce the total size by 32M...
-            $REENCRYPT "--device-size=${blocks}" --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
-          ;;
-          *)
-            # personally? I *hate* the new cryptsetup checks.
-            oh=67108864	# overhead space - 64MB (in bytes)
-            # sfdisk only supports sectors, so calculate a new size with overhead, and turn it to those
-            # but first, ask sfdisk what it *thinks* a sector is
-            secsz="$(sfdisk -d "/dev/${devparent}" | awk '$1 == "sector-size:" { print $2 }')"
-            npartsec="$(expr "$(expr "${blocks}" + "${oh}")" / "${secsz}")"
-            printf ',%s\n' "${npartsec}" | sfdisk -N "${devpartno}" "/dev/${devparent}" # fine! make the partition _that big_!
-            log_begin_msg "performing re-encrypt now. THIS MAKE TAKE UP TO AN HOUR. (and progress is currently broken)"
-            # NOTE: progress and batch mode appear to be...exclusive, you get fuck all status.
-            $REENCRYPT --batch-mode --progress-frequency 3 --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
-            log_end_msg
-            # put the partition table back to max size (...no, really!)
-            printf ',+\n' | sfdisk -N "${devpartno}" "/dev/${devparent}"
-            # tell cryptsetup/LUKS header
-            cryptsetup resize "${srcdev}" --key-file /run/luksipc.key
-          ;;
-        esac
+        $REENCRYPT --batch-mode --progress-frequency 3 --reduce-device-size=32M --new "${srcdev}" --key-file /run/luksipc.key
+        log_end_msg
+        # put the partition table back to max size (...no, really!)
+        printf ',+\n' | sfdisk --lock -N "${devpartno}" "/dev/${devparent}"
+        # tell cryptsetup/LUKS header
+        cryptsetup resize "${srcdev}" --key-file /run/luksipc.key
       log_end_msg
     ;;
     'TYPE="crypto_LUKS"')
