@@ -18,8 +18,8 @@ variable "espressobin_imdfs_id" {
 
 source "arm-image" "rock64" {
   image_mounts    = ["/"]
-  iso_checksum    = "sha256:a4c277913dc1a160a10dc956677e6ec0faa4a3cca964b66b1dd03f829cbeac40"
-  iso_url         = "https://mirrors.aliyun.com/armbian-releases/rock64/archive/Armbian_23.5.1_Rock64_jammy_current_6.1.30_minimal.img.xz"
+  iso_checksum    = "sha256:e14af9ec9243f3831fc19ca7cdb6428fd96c84b96661b951cb389c6d9316d6c4"
+  iso_url         = "https://armbian.lv.auroradev.org/dl/rock64/archive/Armbian_23.5.1_Rock64_bookworm_current_6.1.30_minimal.img.xz"
   output_filename = "images/upstream/rock64.img"
   image_arch      = "arm64"
 }
