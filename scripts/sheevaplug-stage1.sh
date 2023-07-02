@@ -25,7 +25,7 @@ debootstrap () {
    bash "${PWD}/vendor/debootstrap/sbin/debootstrap" \
     --verbose --variant=minbase --arch=armel \
     --foreign --merged-usr \
-    --keyring="${PWD}/keyrings/debian-archive-bullseye-stable.gpg" \
+    --keyring="${PWD}/keyrings/debian-archive-bookworm-stable.gpg" \
     ${release} \
     ${rootdir} \
     ${DEBIAN_URI} 1>&2
@@ -62,7 +62,7 @@ rfs_uuid="$(uuidgen)"
 bfs_uuid="$(uuidgen)"
 imd_id="$(uuidgen_trunc)"
 
-temp_chroot="$(debootstrap bullseye)"
+temp_chroot="$(debootstrap bookworm)"
 
 # create disk image, partition it
 temp_image="$(mktemp)"

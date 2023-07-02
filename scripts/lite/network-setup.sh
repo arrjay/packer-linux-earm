@@ -9,7 +9,7 @@ PFSRC=/tmp/packer-files
 # packages we need
 packages=(augeas-tools iptables firewalld)
 case "${PACKER_BUILD_NAME}" in
-  pi|rock64|sheeva)
+  pi|rock64)
     : # these upstreams currently don't have a separate systemd-resolved package.
   ;;
   *)

@@ -173,7 +173,10 @@ apt-get install locales
 # older locale-gen only reads locale.gen - but it also ignores all arguments.
 grep -q '^en_US.UTF-8 UTF-8$' /etc/locale.gen || printf '%s %s\n' 'en_US.UTF-8' 'UTF-8' >> /etc/locale.gen
 locale-gen en_US.UTF-8
-libssl=$(dpkg -l | grep libssl | awk '{print $2}' |grep -v dev)
+case "${PACKER_BUILD_NAME}" in
+  sheeva) libssl="libssl3" ;; # hack for a libssl I don't yet have?
+  *) libssl=$(dpkg -l | grep libssl | awk '{print $2}' |grep -v dev) ;;
+esac
 printf '%s\n' "localepurge localepurge/use-dpkg-feature boolean false" \
               "localepurge localepurge/mandelete boolean true" \
               "localepurge localepurge/dontbothernew boolean true" \
