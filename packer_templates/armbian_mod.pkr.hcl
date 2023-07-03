@@ -45,6 +45,22 @@ build {
     ]
   }
 
+  provisioner "shell" {
+    only             = [ "arm-image.rock64" ]
+    environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"]
+    execute_command  = "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"
+    scripts          = [
+      "./scripts/armbian-mod/grab-uboot.sh"
+    ]
+  }
+
+  provisioner "file" {
+    only        = [ "arm-image.rock64" ]
+    direction   = "download"
+    destination = "files/armbian_mod/cache/rock64_uboot.tar"
+    source      = "/tmp/uboot.tar"
+  }
+
   post-processor "manifest" {}
 
   post-processor "shell-local" {
@@ -55,5 +71,10 @@ build {
       "ESPRESSOBIN_IMDFS_ID=${var.espressobin_imdfs_id}",
     ]
     scripts          = ["./scripts/armbian-mod/HOST_create_bootfs.sh"]
+  }
+
+  post-processor "shell-local" {
+    only    = [ "arm-image.rock64" ]
+    scripts = [ "./scripts/armbian-mod/HOST_reinstall_rk64_uboot.sh" ]
   }
 }
