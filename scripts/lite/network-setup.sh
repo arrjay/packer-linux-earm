@@ -18,6 +18,10 @@ case "${PACKER_BUILD_NAME}" in
 esac
 apt-get install "${packages[@]}"
 
+# afterwords, stomp on resolv.conf *again* so it continues to work for building kthx
+rm /etc/resolv.conf
+cp "${PFSRC}/cache/resolv.conf" /etc/resolv.conf
+
 # load any environment things we need and export them
 . /etc/environment
 export $(awk -F= '{ print $1 }' < /etc/environment)
@@ -40,3 +44,6 @@ systemctl enable ssh.service
 
 # disable ipv6, install firewall bits
 augtool set /files/etc/sysctl.conf/net.ipv6.conf.default.disable_ipv6 1
+
+# clean up PFSRC here...
+rm -rf "${PFSRC}"

@@ -324,7 +324,8 @@ case "${PACKER_BUILD_NAME}" in
 esac
 
 # clean up the entire source directory
-rm -rf "${PFSRC}"
+# actually, do this after network setup. should probably move to a zz script and do proper run-parts.
+#rm -rf "${PFSRC}"
 
 # collect stats for next image...
 df -m
