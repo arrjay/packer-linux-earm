@@ -2,7 +2,7 @@
 
 set -ex
 
-for item in expr parted fdisk sfdisk truncate jq mlabel mke2fs mkfs.vfat e2fsck kpartx wipefs ; do
+for item in expr parted fdisk sfdisk truncate jq mlabel mke2fs mkfs.ext4 mkfs.vfat e2fsck kpartx wipefs ; do
   type "${item}" 2>/dev/null 1>&2
 done
 
@@ -51,7 +51,14 @@ for loop in $(kpartx -a -v "${imagefile}" | awk '{ print $3 }') ; do
   case "${loop}" in
     *1)
       # the new /boot partition
-      [[ "${bootfs_uuid}" ]] && mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super -U "${bootfs_uuid}" "/dev/mapper/${loop}"
+      case "${PACKER_BUILD_NAME}" in
+        rock64)
+          [[ "${bootfs_uuid}" ]] && mkfs.ext4 -U "${bootfs_uuid}" "/dev/mapper/${loop}"
+        ;;
+        *)
+          [[ "${bootfs_uuid}" ]] && mke2fs -O none,ext_attr,resize_inode,dir_index,filetype,sparse_super -U "${bootfs_uuid}" "/dev/mapper/${loop}"
+        ;;
+      esac
     ;;
     *2)
       # IMD metadata partition
