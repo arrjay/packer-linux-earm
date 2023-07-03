@@ -190,10 +190,4 @@ build {
     environment_vars = local.envblock
     scripts          = ["./scripts/lite/HOST_mangle_partitions.sh"]
   }
-
-  // re-install rock64's bootloader...
-  post-processor "shell-local" {
-    only    = ["arm-image.rock64"]
-    scripts = ["./scripts/armbian-mod/HOST_reinstall_rk64_uboot.sh"]
-  }
 }

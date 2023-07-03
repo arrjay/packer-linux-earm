@@ -80,10 +80,7 @@ images/upstream/sheeva.img: scripts/sheevaplug-stage1.sh
 	-rm $@*
 	./scripts/sheevaplug-stage1.sh
 
-files/armbian_mod/cache:
-	mkdir -p files/armbian_mod/cache
-
-images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS) files/armbian_mod/cache
+images/upstream/rock64.img: packer_templates/armbian_mod.pkr.hcl fs-uuids.json $(ARMBIAN_MOD_SCRIPTS)
 	mkdir -p $(@D)
 	-rm $@*
 	sudo packer build -only=arm-image.rock64 -var-file=fs-uuids.json packer_templates/armbian_mod.pkr.hcl || rm $@
