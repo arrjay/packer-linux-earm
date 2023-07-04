@@ -23,7 +23,7 @@ source "arm-image" "pi" {
   image_arch        = "arm64"
 }
 source "arm-image" "sheeva" {
-  image_mounts      = ["/boot", "/boot/IMD", "/"]
+  image_mounts      = ["/boot", "/IMD", "/"]
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/lite/sheeva.img.xz"
   output_filename   = "images/netdata/sheeva.img"
@@ -31,16 +31,24 @@ source "arm-image" "sheeva" {
   image_arch        = var.arm_machtype
 }
 source "arm-image" "rock64" {
-  image_mounts      = ["/boot", "/boot/IMD", "/"]
+  image_mounts      = ["/boot", "/IMD", "/"]
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/lite/rock64.img.xz"
   output_filename   = "images/netdata/rock64.img"
   target_image_size = local.image_size
   image_arch        = "arm64"
 }
+source "arm-image" "espressobin" {
+  image_mounts      = ["/boot", "/IMD", "/"]
+  iso_checksum      = var.dynamic_checksum
+  iso_url           = "./images/lite/espressobin.img.xz"
+  output_filename   = "images/netdata/espressobin.img"
+  target_image_size = local.image_size
+  image_arch        = "arm64"
+}
 
 build {
-  sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64"]
+  sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64", "source.arm-image.espressobin"]
 
   provisioner "shell" {
     environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT"]
