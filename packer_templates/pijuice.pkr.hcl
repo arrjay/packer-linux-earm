@@ -54,6 +54,11 @@ source "arm-image" "espressobin" {
 build {
   sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64", "source.arm-image.espressobin"]
 
+  provisioner "file" {
+    destination = "/tmp/rules.patch"
+    source      = "files/pijuice/rules.patch"
+  }
+
   provisioner "shell" {
     environment_vars = ["PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "TZ=UCT"]
     execute_command  = "/bin/chmod +x {{ .Path }}; {{ .Vars }} {{ .Path }}"

@@ -15,7 +15,7 @@ BUILD_PACKAGES=(
     libdatrie1 libdebhelper-perl libdeflate-dev libexpat1-dev
     libfile-stripnondeterminism-perl libfontbox-java libfontconfig-dev
     libfontenc1 libfreeipmi-dev libfreeipmi17 libgd-dev libgmp-dev libgmpxx4ldbl
-    libgnutls-dane0 libgnutls-openssl27 libgnutls28-dev libgnutlsxx28
+    libgnutls-dane0 libgnutls-openssl27 libgnutls28-dev
     libgraphite2-3 libgssrpc4 libharfbuzz0b libice-dev libice6 libicu-dev
     libidn2-dev libipmimonitoring-dev libipmimonitoring6 libjbig-dev
     libjpeg-dev libjs-jquery libkadm5clnt-mit12
@@ -26,7 +26,7 @@ BUILD_PACKAGES=(
     libpowerman0-dev libptexenc1 libpthread-stubs0-dev libsensors-dev
     libsgmls-perl libsm-dev libsm6 libsnmp-base libsnmp-dev libsnmp40 libsombok3
     libsub-override-perl libsynctex2 libtasn1-6-dev libteckit0 libtexlua53
-    libthai-data libthai0 libtiff-dev libtiffxx5 libtool
+    libthai-data libthai0 libtiff-dev libtool
     libudev-dev libunbound8 libunicode-linebreak-perl libusb-0.1-4 libusb-dev
     libvpx-dev libwrap0-dev libx11-dev libxau-dev libxaw7 libxcb-render0
     libxcb-shm0 libxcb1-dev libxdmcp-dev libxi6 libxml2-dev libxml2-utils
@@ -51,8 +51,18 @@ case "${PACKER_BUILD_NAME}" in
   ;;
 esac
 
+cat /etc/resolv.conf
+
 # build the latest nut debs on rpi for pijuice support.
 apt-get install "${BUILD_PACKAGES[@]}"
+
+# do something _really annoying_ (upstream freeipmi packaging failure)
+ipmi_ver="$(dpkg -s libfreeipmi-dev|grep '^Version:')"
+case "${ipmi_ver}" in
+  *1.6.9-2ubuntu0*)
+    sed -i -e 's@#include <freeipmi/record-format/oem/ipmi-fru-xilinx-oem-record-format.h>@@' /usr/include/freeipmi/freeipmi.h
+  ;;
+esac
 
 # build it out of backports...
 curl -L -o /tmp/nut.tgz http://deb.debian.org/debian/pool/main/n/nut/nut_2.8.0.orig.tar.gz
@@ -63,6 +73,8 @@ cd /usr/src
 tar xf /tmp/nut.tgz
 cd nut-*
 tar xf /tmp/nut_debian.txz
+patch -p1 < /tmp/rules.patch
+rm /tmp/rules.patch
 debuild -b -uc -us
 cd ..
 
