@@ -1,0 +1,11 @@
+diff -uNr nut_deb.o/debian/rules nut_deb/debian/rules
+--- nut_deb.o/debian/rules	2023-01-25 04:27:30.000000000 -0500
++++ nut_deb/debian/rules	2023-07-03 21:17:17.510385433 -0400
+@@ -8,6 +8,7 @@
+ include /usr/share/dpkg/pkg-info.mk
+ 
+ DEB_CONFIGURE_EXTRA_FLAGS := --prefix= \
++	                     --with-all \
+ 	                     --sysconfdir=/etc/nut \
+ 	                     --includedir=/usr/include \
+ 			     --mandir=/usr/share/man \
