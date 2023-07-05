@@ -181,8 +181,9 @@ images/xfce/%.img.xz : images/xfce/%.img
 	xz -T0 $<
 
 images/xfce/%.img: images/standard/%.img.xz.json packer_templates/xfce.pkr.hcl $(XFCE_SCRIPTS) $(XFCE_FILES)
+	mkdir -p $(@D)
 	-rm -rf images/xfce/$(@F)*
-	sudo packer build -var-file $< -only=arm-image.$(@F:.img=) packer_templates/xfce.pkr.hcl || rm $@
+	sudo packer build -var-file $< --var arm_machtype=$(ARM_MACHTYPE) -only=arm-image.$(@F:.img=) packer_templates/xfce.pkr.hcl || rm $@
 	sudo chown $(CURRENT_USER):$(CURRENT_GROUP) $@
 
 # set up for yubikey/gpg mangling

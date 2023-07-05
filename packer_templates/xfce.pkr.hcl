@@ -4,6 +4,11 @@ variable "dynamic_checksum" {
   sensitive = false
   default   = "none"
 }
+variable "arm_machtype" {
+  type      = string
+  sensitive = false
+  default   = "arm"
+}
 
 source "arm-image" "pi" {
   image_type        = "raspberrypi"
@@ -11,15 +16,16 @@ source "arm-image" "pi" {
   iso_url           = "./images/standard/pi.img.xz"
   output_filename   = "./images/xfce/pi.img"
   target_image_size = 6442450944
+  image_arch        = var.arm_machtype
 }
 
 source "arm-image" "rock64" {
-  image_mounts    = ["/boot", "/boot/IMD", "/"]
-  iso_checksum    = var.dynamic_checksum
-  iso_url         = "./images/standard/rock64.img.xz"
-  output_filename = "images/xfce/rock64.img"
-  qemu_binary     = "qemu-aarch64-static"
+  image_mounts      = ["/boot", "/IMD", "/"]
+  iso_checksum      = var.dynamic_checksum
+  iso_url           = "./images/standard/rock64.img.xz"
+  output_filename   = "images/xfce/rock64.img"
   target_image_size = 6442450944
+  image_arch        = "arm64"
 }
 
 build {
