@@ -20,7 +20,7 @@ source "arm-image" "pi" {
 }
 
 source "arm-image" "rock64" {
-  image_mounts      = ["/boot", "/boot/IMD", "/"]
+  image_mounts      = ["/boot", "/IMD", "/"]
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/netdata/rock64.img.xz"
   output_filename   = "images/standard/rock64.img"
@@ -29,12 +29,21 @@ source "arm-image" "rock64" {
 }
 
 source "arm-image" "sheeva" {
-  image_mounts      = ["/boot", "/boot/IMD", "/"]
+  image_mounts      = ["/boot", "/IMD", "/"]
   iso_checksum      = var.dynamic_checksum
   iso_url           = "./images/netdata/sheeva.img.xz"
   output_filename   = "images/standard/sheeva.img"
   target_image_size = 3221225472
   image_arch        = var.arm_machtype
+}
+
+source "arm-image" "espressobin" {
+  image_mounts      = ["/boot", "/IMD", "/"]
+  iso_checksum      = var.dynamic_checksum
+  iso_url           = "./images/netdata/espressobin.img.xz"
+  output_filename   = "images/standard/espressobin.img"
+  target_image_size = 4831838208
+  image_arch        = "arm64"
 }
 
 locals {
@@ -50,7 +59,7 @@ locals {
 }
 
 build {
-  sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64"]
+  sources = ["source.arm-image.pi", "source.arm-image.sheeva", "source.arm-image.rock64", "source.arm-image.espressobin"]
 
   provisioner "shell-local" {
     inline          = [

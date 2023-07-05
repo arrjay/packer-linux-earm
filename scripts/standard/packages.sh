@@ -26,7 +26,7 @@ systemctl disable ntp
 systemctl disable isc-dhcp-server
 systemctl disable hostapd
 systemctl disable tftpd-hpa
-systemctl disable pijuice
+systemctl disable pijuice || true
 
 # allow dhcp, dns through the trusted zone in firewalld
 firewall-offline-cmd --zone=trusted --add-service=dhcp
