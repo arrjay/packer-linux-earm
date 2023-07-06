@@ -1,0 +1,4 @@
+SUBSYSTEM=="bcm2835-gpiomem", KERNEL=="gpiomem", GROUP="dialout", MODE="0660"
+# https://github.com/raspberrypi/linux/issues/3779
+SUBSYSTEM=="gpio", KERNEL=="gpiochip*", ACTION=="add", PROGRAM="/usr/bin/chown root:dialout /sys/class/gpio/export /sys/class/gpio/unexport", PROGRAM="/usr/bin/chmod 220 /sys/class/gpio/export /sys/class/gpio/unexport"
+SUBSYSTEM=="gpio", KERNEL=="gpio*", ACTION=="add", PROGRAM="/usr/bin/chown root:dialout /sys/%p/active_low", PROGRAM="/usr/bin/chown root:dialout /sys/%p/direction", PROGRAM="/usr/bin/chown root:dialout /sys/%p/edge", PROGRAM="/usr/bin/chown root:dialout /sys/%p/value", PROGRAM="/usr/bin/chmod 660 /sys/%p/active_low", "PROGRAM="/usr/bin/chmod 660 /sys/%p/direction", PROGRAM="/usr/bin/chmod 660 /sys/%p/edge", PROGRAM="/usr/bin/chmod 660 /sys/%p/value"

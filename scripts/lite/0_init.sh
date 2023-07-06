@@ -204,6 +204,20 @@ apt-get install \
  ca-certificates openssh-client openssh-server openssh-sftp-server \
  cryptsetup cryptsetup-initramfs zstd fdisk
 
+# pi's udev rules are *broken* for gpio. or maybe systemd is broken. I don't care, just fix it.
+case "${PACKER_BUILD_NAME}" in
+  pi)
+    rpi_gpio_sum="$(md5sum /usr/lib/udev/rules.d/60-rpi.gpio-common.rules)"
+    rpi_gpio_sum="${rpi_gpio_sum% *}"
+    case "${rpi_gpio_sum}" in
+      f9bbb85798060dfe95239e7f4674c12d)
+        rm /usr/lib/udev/rules.d/60-rpi.gpio-common.rules
+        cp "${PFSRC}/pi/60-rpi.gpio-common.rules" /etc/udev/rules.d
+      ;;
+    esac
+  ;;
+esac
+
 # do exceedingly wacky thing in case c_rehash just...didn't do anything
 for f in /etc/ssl/certs/* ; do
   case "${f}" in
