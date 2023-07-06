@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# this should run *after* the nutcfg script in standard, so we'll reference the copied file
+nutxml='/run/untrustedhost/nut/conf.xml'
+[[ -f "${nutxml}" ]] || exit 0
+
+# is there a pijuice defined here? if so, go start the service.
+pijuice_sel="$(xmlstarlet sel -t -v '/nut/ups[@vendor="pijuice"]/@vendor' < "${nutxml}")"
+
+# if we got anything back, then go start the attaching service.
+[[ "${pijuice_sel}" ]] && {
+  systemctl start attach-pijuice-ups
+}
+
+exit 0
