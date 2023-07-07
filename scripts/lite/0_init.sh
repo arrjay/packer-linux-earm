@@ -207,10 +207,12 @@ apt-get install \
 # pi's udev rules are *broken* for gpio. or maybe systemd is broken. I don't care, just fix it.
 case "${PACKER_BUILD_NAME}" in
   pi)
+    # honestly? we should be good to just install this.
+    apt-get install rpi.gpio-common
     rpi_gpio_sum="$(md5sum /usr/lib/udev/rules.d/60-rpi.gpio-common.rules)"
     rpi_gpio_sum="${rpi_gpio_sum% *}"
     case "${rpi_gpio_sum}" in
-      f9bbb85798060dfe95239e7f4674c12d)
+      f9bbb85798060dfe95239e7f4674c12d*)
         rm /usr/lib/udev/rules.d/60-rpi.gpio-common.rules
         cp "${PFSRC}/pi/60-rpi.gpio-common.rules" /etc/udev/rules.d
       ;;
