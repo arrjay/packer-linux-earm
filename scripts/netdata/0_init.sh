@@ -23,7 +23,7 @@ apt-get install autoconf autoconf-archive autogen automake curl cmake gcc git gz
 cd /usr/src
 git clone https://github.com/netdata/netdata.git
 cd netdata
-git checkout v1.40.1
+git checkout v1.41.0
 git submodule update --init --recursive
 ./netdata-installer.sh --dont-start-it --dont-wait --disable-telemetry
 
