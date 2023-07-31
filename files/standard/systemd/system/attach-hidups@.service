@@ -1,7 +1,7 @@
 [Unit]
 Description=attach-hidups for %I
-Wants=write-upsd-config.service
-Before=write-upsd-config.service
+Wants=untrustedhost-upsd-config.service
+Before=untrustedhost-upsd-config.service
 
 [Service]
 Type=oneshot
